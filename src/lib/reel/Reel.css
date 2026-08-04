@@ -1,0 +1,145 @@
+.reel {
+    position: relative;
+    width: 100%;
+    --reel-accent: #8ab4ff;
+}
+
+.reel-viewport {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    touch-action: pan-y;
+    cursor: grab;
+    outline: none;
+}
+
+.reel-viewport:active {
+    cursor: grabbing;
+}
+
+.reel-viewport:focus-visible {
+    outline: 2px solid var(--reel-accent);
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
+.reel-item {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+    user-select: none;
+}
+
+.reel-item-inner {
+    width: 100%;
+    height: 100%;
+    transition:
+        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.32s ease,
+        filter 0.32s ease;
+}
+
+.reel-item[data-active="false"] .reel-item-inner {
+    filter: saturate(0.75);
+}
+
+.reel-item-clickable[data-active="false"] .reel-item-inner {
+    cursor: pointer;
+}
+
+.reel-item-clickable[data-active="false"] .reel-item-inner:hover {
+    filter: saturate(1);
+    transform: scale(1.04);
+}
+
+.reel-item[data-active="true"] .reel-item-inner:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow:
+        0 30px 60px -20px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(255, 255, 255, 0.14),
+        0 0 44px -12px var(--reel-accent);
+}
+
+.reel-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 1200;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-top: -21px;
+    padding: 0 0 3px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 50%;
+    background: rgba(12, 12, 18, 0.72);
+    backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        opacity 0.18s ease;
+}
+
+.reel-arrow:hover:not(:disabled) {
+    background: rgba(30, 30, 44, 0.9);
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+.reel-arrow:disabled {
+    opacity: 0.28;
+    cursor: default;
+}
+
+.reel-arrow-prev {
+    left: 16px;
+}
+
+.reel-arrow-next {
+    right: 16px;
+}
+
+.reel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+.reel-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.24);
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.reel-dot:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.reel-dot-active {
+    background: var(--reel-accent);
+    transform: scale(1.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reel-item-inner {
+        transition: none;
+    }
+
+    .reel-item[data-active="true"] .reel-item-inner:hover {
+        transform: none;
+    }
+}

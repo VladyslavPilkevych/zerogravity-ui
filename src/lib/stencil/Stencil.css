@@ -1,0 +1,95 @@
+.stencil {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    line-height: 0.92;
+    user-select: none;
+    --stencil-strength: 1;
+    --stencil-wave: 0;
+    --stencil-offset: 0;
+    --stencil-tile: 64;
+    --stencil-duration: 0s;
+    --stencil-outline: 0px;
+    --stencil-outline-color: #ffffff;
+}
+
+.stencil-letter {
+    display: inline-block;
+    background-repeat: repeat;
+    background-position: calc(var(--stencil-offset) * 1px) 0;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    transform-origin: 50% 80%;
+    will-change: transform;
+    transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.28s ease,
+        background-position 0.4s ease;
+}
+
+.stencil-space {
+    display: inline-block;
+}
+
+.stencil-outlined .stencil-letter {
+    -webkit-text-stroke: var(--stencil-outline) var(--stencil-outline-color);
+    paint-order: stroke fill;
+}
+
+@keyframes stencil-pan {
+    from {
+        background-position: calc(var(--stencil-offset) * 1px) 0;
+    }
+    to {
+        background-position: calc(var(--stencil-offset) * 1px + var(--stencil-tile) * 1px) 0;
+    }
+}
+
+.stencil-animated .stencil-letter {
+    animation: stencil-pan var(--stencil-duration) linear infinite;
+}
+
+.stencil-hover-lift .stencil-letter:hover {
+    transform: translateY(calc(var(--stencil-strength) * -0.1em));
+}
+
+.stencil-hover-pop .stencil-letter:hover {
+    transform: scale(calc(1 + var(--stencil-strength) * 0.16));
+}
+
+.stencil-hover-tilt .stencil-letter:hover {
+    transform: rotate(calc(var(--stencil-strength) * -7deg)) skewX(calc(var(--stencil-strength) * -8deg))
+        translateY(calc(var(--stencil-strength) * -0.05em));
+}
+
+.stencil-hover-glow .stencil-letter:hover {
+    filter: drop-shadow(0 0 calc(var(--stencil-strength) * 22px) rgba(255, 255, 255, 0.65))
+        brightness(calc(1 + var(--stencil-strength) * 0.18));
+}
+
+.stencil-hover-shift .stencil-letter:hover {
+    background-position: calc(var(--stencil-offset) * 1px + var(--stencil-tile) * 0.5px)
+        calc(var(--stencil-tile) * 0.35px);
+}
+
+.stencil-hover-wave .stencil-letter {
+    transform: translateY(calc(var(--stencil-wave) * var(--stencil-strength) * -0.22em))
+        scale(calc(1 + var(--stencil-wave) * var(--stencil-strength) * 0.12));
+    transition: transform 0.18s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stencil-letter {
+        transition: none;
+    }
+
+    .stencil-animated .stencil-letter {
+        animation: none;
+    }
+
+    .stencil-hover-wave .stencil-letter {
+        transform: none;
+    }
+}
