@@ -1,0 +1,78 @@
+.trailing-cursor {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.trailing-cursor[data-visible="true"] {
+    opacity: 1;
+}
+
+.trailing-cursor[data-hidden="true"] {
+    opacity: 0;
+}
+
+.trailing-cursor-dot,
+.trailing-cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.trailing-cursor-dot {
+    width: var(--tc-dot-size, 6px);
+    height: var(--tc-dot-size, 6px);
+    margin: calc(var(--tc-dot-size, 6px) / -2) 0 0 calc(var(--tc-dot-size, 6px) / -2);
+    border-radius: 50%;
+    background: var(--tc-dot);
+}
+
+.trailing-cursor-ring-shape {
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--tc-border);
+    border-radius: 50%;
+    background: var(--tc-ring);
+    transform: translate(-50%, -50%);
+    transition:
+        width 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.22s ease,
+        border-color 0.22s ease;
+}
+
+.trailing-cursor-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    color: var(--tc-border);
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.trailing-cursor[data-labelled="true"] .trailing-cursor-label {
+    opacity: 1;
+}
+
+.trailing-cursor[data-variant="ring-only"] .trailing-cursor-dot,
+.trailing-cursor[data-variant="dot-only"] .trailing-cursor-ring {
+    display: none;
+}
+
+body.trailing-cursor-none,
+body.trailing-cursor-none * {
+    cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trailing-cursor-ring-shape,
+    .trailing-cursor-label,
+    .trailing-cursor {
+        transition: none;
+    }
+}

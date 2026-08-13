@@ -15,10 +15,12 @@ not have it, `corepack enable` will fetch the exact version from `package.json`.
 
 | Component | |
 | --- | --- |
-| [Antigravity](src/lib/antigravity/README.md) | Canvas particle cloud that follows the cursor — or stays put and scatters away from it. Fifteen formations including a real 3-D planet, a torus and a black hole accretion disc; particle shapes, a pulse with a configurable waveform, palette shimmer, shockwaves |
+| [Antigravity](src/lib/antigravity/README.md) | Canvas particle cloud that follows the cursor — or stays put and scatters away from it. Eighteen formations including a real 3-D planet, a DNA helix, an atom, a tree and a black hole accretion disc; particle shapes, a pulse with a configurable waveform, palette shimmer, shockwaves |
 | [ScrollStack](src/lib/scroll-stack/README.md) | Sections that slide over each other on scroll and unstack on the way back. Full-screen or mixed heights |
 | [Reel](src/lib/reel/README.md) | Roulette-style carousel with drag, flick, wheel, keyboard and a highlighted centre slide |
 | [Stencil](src/lib/stencil/README.md) | Display type with a pattern showing through the letters — zebra, leopard, a photo — and per-letter hover effects |
+| [GridTrail](src/lib/grid-trail/README.md) | Squares of an invisible grid light up under the pointer and fade out. Viewport-wide or scoped to a container |
+| [TrailingCursor](src/lib/trailing-cursor/README.md) | Dot pinned to the pointer plus a ring that lags, with per-element `data-cursor-*` overrides |
 
 Each component has its own README with the full prop table and its performance
 notes.
@@ -39,14 +41,19 @@ src/
 │   │   └── presets.ts            twelve ready-made looks
 │   ├── scroll-stack/
 │   ├── reel/
-│   └── stencil/
+│   ├── stencil/
+│   ├── grid-trail/               canvas engine + React wrapper
+│   ├── trailing-cursor/
+│   └── pointer-fx/               resolveColor, usePointerFxEnabled, preset palette
 │
 ├── playground/               the demo, not part of the library
 │   ├── panel/                    generic control panel driven by a schema
 │   ├── antigravity/              demo + control schema
 │   ├── scroll-stack/
 │   ├── reel/
-│   └── stencil/
+│   ├── stencil/
+│   ├── grid-trail/
+│   └── trailing-cursor/
 │
 └── app/                      Next App Router, hosts the playground
 ```
@@ -56,7 +63,8 @@ can be lifted into a standalone package as-is.
 
 ## Playground
 
-- One route per component: `/`, `/scroll-stack`, `/reel`, `/stencil`.
+- One route per component: `/`, `/scroll-stack`, `/reel`, `/stencil`,
+  `/grid-trail`, `/trailing-cursor`.
 - The panel on the right is generated from a schema, and every row is labelled
   with the **real prop path** (`pulse.waveform`, `formation.radius`).
 - At the bottom of the panel is ready-to-paste JSX containing only the props
@@ -88,6 +96,12 @@ Reset to hand those fields back to the presets.
 - **Documentation lives in READMEs, not in comments.** The source stays free of
   comments; every "why" belongs in the component's README.
 - **Reduced motion is handled by every component**, not bolted on afterwards.
+- **Pointer effects share one gate.** `src/lib/pointer-fx` owns `resolveColor`,
+  the `usePointerFxEnabled` hook (reduced motion, pointer type, `disabled`) and
+  the preset palette, so GridTrail and TrailingCursor cannot drift apart.
+- **Colours are never parsed by hand.** Canvas takes the raw string and
+  transparency comes from `globalAlpha`, which buys `oklch()` and everything else
+  for free. Only `var(--token)` is resolved, through `getComputedStyle`.
 
 ## Adding the next component
 
@@ -106,6 +120,8 @@ Reset to hand those fields back to the presets.
 | `pnpm dev` | Dev server |
 | `pnpm build` | Production build |
 | `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm test` | Vitest, jsdom |
+| `pnpm test:watch` | Vitest in watch mode |
 
 Do not run `pnpm build` while `pnpm dev` is running — both write to `.next` and
 the dev server starts returning 500s afterwards.

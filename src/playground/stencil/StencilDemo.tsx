@@ -9,6 +9,7 @@ import { countOverrides, mergeDeep } from "../panel/overrides"
 import { setPath } from "../panel/path"
 import type { ChangeHandler } from "../panel/types"
 import {
+    REVEAL_MEDIA,
     STENCIL_CONTROLS,
     STENCIL_DEFAULTS,
     STENCIL_PRESETS,
@@ -44,6 +45,7 @@ export function StencilDemo() {
 
                 <Stencil
                     text={config.text}
+                    media={config.hover === "reveal" ? REVEAL_MEDIA : undefined}
                     fill={config.fill}
                     colors={config.colors}
                     image={config.image || undefined}

@@ -49,7 +49,7 @@ export const ANTIGRAVITY_PRESETS: AntigravityPreset[] = [
         options: {
             count: 1200,
             formation: { shape: "heart", radius: 420, innerRatio: 0.55, jitter: 0.05 },
-            deform: { amount: 6, frequency: 5, layers: 2, speed: 0.5 },
+            deform: { amount: 0 },
             particle: { shape: "dot", size: 2.4, depthScale: 0.5 },
             color: {
                 palette: ["#ff4d6d", "#ff8fa3", "#ffd6e0", "#c9184a"],

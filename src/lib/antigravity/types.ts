@@ -14,6 +14,9 @@ export type FormationShape =
     | "sunflower"
     | "arms"
     | "rays"
+    | "dna"
+    | "atom"
+    | "tree"
 
 export type ParticleShape =
     | "dot"

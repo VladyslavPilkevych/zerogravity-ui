@@ -16,6 +16,9 @@ const FORMATION_SHAPES = [
     "sunflower",
     "arms",
     "rays",
+    "dna",
+    "atom",
+    "tree",
 ] as const
 
 const PARTICLE_SHAPES = [

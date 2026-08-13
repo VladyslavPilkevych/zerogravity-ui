@@ -50,7 +50,7 @@ const FILLS = [
     "image",
 ] as const
 
-const HOVERS = ["none", "lift", "pop", "wave", "tilt", "shift", "glow"] as const
+const HOVERS = ["none", "lift", "pop", "wave", "tilt", "shift", "glow", "expand", "reveal"] as const
 
 export const STENCIL_CONTROLS: ControlGroup[] = [
     {
@@ -99,6 +99,8 @@ export const STENCIL_PRESETS: PanelPreset[] = [
     { id: "rainbow", label: "Rainbow", hint: "Full spectrum, waving on hover" },
     { id: "photo", label: "Photo", hint: "Any image through the glyphs" },
     { id: "wire", label: "Wire", hint: "Grid fill with an outline" },
+    { id: "reveal", label: "Reveal", hint: "A different picture inside every letter" },
+    { id: "dock", label: "Dock", hint: "The letter under the cursor widens" },
 ]
 
 const PHOTO =
@@ -106,6 +108,25 @@ const PHOTO =
     encodeURIComponent(
         `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><defs><linearGradient id="s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%23ff9a3c"/><stop offset="0.5" stop-color="%23ff3c8f"/><stop offset="1" stop-color="%236a3cff"/></linearGradient></defs><rect width="600" height="400" fill="url(%23s)"/><circle cx="140" cy="120" r="90" fill="%23ffe9a8" opacity="0.85"/><path d="M0 320 L160 200 L300 300 L430 190 L600 310 L600 400 L0 400 Z" fill="%23120a2a" opacity="0.7"/></svg>`,
     )
+
+
+function tile(a: string, b: string): string {
+    return (
+        "data:image/svg+xml;utf8," +
+        encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="240" height="240" fill="url(#g)"/><circle cx="70" cy="70" r="46" fill="#ffffff" opacity="0.35"/><path d="M0 190 L70 130 L130 175 L190 120 L240 165 L240 240 L0 240 Z" fill="#000000" opacity="0.35"/></svg>`,
+        )
+    )
+}
+
+export const REVEAL_MEDIA = [
+    tile("%23ff9a3c", "%23ff3c8f"),
+    tile("%2322d3ee", "%230f766e"),
+    tile("%23a78bfa", "%234338ca"),
+    tile("%2334d399", "%23065f46"),
+    tile("%23fb7185", "%23881337"),
+    tile("%23fde68a", "%23b45309"),
+]
 
 export const STENCIL_PRESET_VALUES: Record<string, Partial<StencilDemoConfig>> = {
     zebra: {},
@@ -144,6 +165,25 @@ export const STENCIL_PRESET_VALUES: Record<string, Partial<StencilDemoConfig>> =
         hover: "glow",
         size: 170,
         tracking: -0.04,
+    },
+    reveal: {
+        text: "GALLERY",
+        fill: "gradient",
+        colors: ["#23232c", "#15151c", "#23232c"],
+        hover: "reveal",
+        size: 150,
+        tracking: 0.01,
+        outline: 1,
+        outlineColor: "#5b5b6b",
+    },
+    dock: {
+        text: "DOCK",
+        fill: "stripes",
+        colors: ["#8ab4ff", "#0b1020"],
+        scale: 40,
+        hover: "expand",
+        strength: 1.4,
+        size: 170,
     },
     wire: {
         text: "WIRE",

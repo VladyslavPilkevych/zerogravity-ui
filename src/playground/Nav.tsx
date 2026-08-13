@@ -10,6 +10,10 @@ const LINKS = [
     { href: "/scroll-stack", label: "ScrollStack" },
     { href: "/reel", label: "Reel" },
     { href: "/stencil", label: "Stencil" },
+    { href: "/grid-trail", label: "GridTrail" },
+    { href: "/trailing-cursor", label: "TrailingCursor" },
+    { href: "/split-flap", label: "SplitFlap" },
+    { href: "/aperture", label: "Aperture" },
 ]
 
 export function Nav() {

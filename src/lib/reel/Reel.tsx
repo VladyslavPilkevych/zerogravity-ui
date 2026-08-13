@@ -53,6 +53,7 @@ const DRAG_THRESHOLD = 4
 const WHEEL_STEP = 60
 const WHEEL_COOLDOWN = 220
 const MAX_FLICK = 3
+const HEADROOM = 56
 
 function wrap(value: number, length: number): number {
     return ((value % length) + length) % length
@@ -414,7 +415,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
             <div
                 ref={viewportRef}
                 className="reel-viewport"
-                style={{ height: itemHeight, perspective: `${perspective}px` }}
+                style={{ height: itemHeight + HEADROOM, perspective: `${perspective}px` }}
                 tabIndex={0}
                 onKeyDown={onKeyDown}
                 onPointerDown={onPointerDown}

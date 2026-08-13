@@ -24,10 +24,11 @@ export const SALT = {
 } as const
 
 const HEART_SCALE = 1 / 17
+const HEART_OFFSET = 2.7
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 
 export function isVolumetric(shape: FormationShape): boolean {
-    return shape === "planet" || shape === "torus"
+    return shape === "planet" || shape === "torus" || shape === "dna" || shape === "atom"
 }
 
 export function formationPoint(
@@ -85,7 +86,7 @@ export function formationPoint(
             const hy = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
             const fill = lerp(inner, 1, Math.sqrt(u)) * radius * HEART_SCALE
             x = hx * fill
-            y = -hy * fill
+            y = -(hy + HEART_OFFSET) * fill
             break
         }
 
@@ -186,6 +187,79 @@ export function formationPoint(
             x = Math.cos(around) * sweep
             y = tube * Math.sin(through) * fill
             z = Math.sin(around) * sweep
+            break
+        }
+
+        case "dna": {
+            const turns = Math.max(0.5, cfg.turns)
+            const helix = radius * clamp(inner, 0.08, 1)
+            const step = count > 1 ? (index + 0.5) / count : 0.5
+            const phase = step * turns * TAU
+            const slot = index % 5
+
+            y = (step - 0.5) * 2 * radius
+
+            if (slot === 4) {
+                const across = hash01(seed, index, SALT.tube)
+                x = Math.cos(phase) * helix * (1 - 2 * across)
+                z = Math.sin(phase) * helix * (1 - 2 * across)
+            } else {
+                const strand = slot < 2 ? 0 : Math.PI
+                x = Math.cos(phase + strand) * helix
+                z = Math.sin(phase + strand) * helix
+            }
+            break
+        }
+
+        case "atom": {
+            const slot = index % 4
+
+            if (slot === 0) {
+                const t = count > 1 ? (index + 0.5) / count : 0.5
+                const py = 1 - 2 * t
+                const ring = Math.sqrt(Math.max(0, 1 - py * py))
+                const phi = index * GOLDEN_ANGLE
+                const core = radius * clamp(inner, 0.05, 0.6) * Math.cbrt(v)
+                x = Math.cos(phi) * ring * core
+                y = py * core
+                z = Math.sin(phi) * ring * core
+                break
+            }
+
+            const orbit = slot - 1
+            const around = v * TAU
+            const band = radius * (1 + (u - 0.5) * 0.04)
+            const lean = orbit * (Math.PI / 3)
+            const ox = Math.cos(around) * band
+            z = Math.sin(around) * band
+            x = ox * Math.cos(lean)
+            y = ox * Math.sin(lean)
+            break
+        }
+
+        case "tree": {
+            const levels = 7
+            const spread = 0.34 + clamp(cfg.depth, 0, 1) * 0.46
+            const shrink = 0.62 + clamp(inner, 0, 0.98) * 0.22
+            const depth = Math.min(levels - 1, Math.floor(u * levels))
+
+            let bx = 0
+            let by = radius
+            let angle = -Math.PI / 2
+            let len = radius * 0.5
+
+            for (let d = 0; d <= depth; d += 1) {
+                const advance = d === depth ? v : 1
+                bx += Math.cos(angle) * len * advance
+                by += Math.sin(angle) * len * advance
+                if (d === depth) break
+                const side = hash01(seed, index, 20 + d) < 0.5 ? -1 : 1
+                angle += side * spread * (0.7 + hash01(seed, index, 30 + d) * 0.6)
+                len *= shrink
+            }
+
+            x = bx
+            y = by - radius * 0.28
             break
         }
 

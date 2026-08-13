@@ -12,10 +12,20 @@ import {
 import { buildPattern, type StencilFill } from "./patterns"
 import "./Stencil.css"
 
-export type StencilHover = "none" | "lift" | "pop" | "wave" | "tilt" | "shift" | "glow"
+export type StencilHover =
+    | "none"
+    | "lift"
+    | "pop"
+    | "wave"
+    | "tilt"
+    | "shift"
+    | "glow"
+    | "expand"
+    | "reveal"
 
 export interface StencilProps {
     text: string
+    media?: (string | undefined)[]
     fill?: StencilFill
     colors?: string[]
     image?: string
@@ -37,9 +47,11 @@ export interface StencilProps {
 }
 
 const WAVE_REACH = 2.2
+const VIDEO_PATTERN = /\.(mp4|webm|ogv|mov)(\?|#|$)/i
 
 export function Stencil({
     text,
+    media,
     fill = "zebra",
     colors,
     image,
@@ -61,6 +73,8 @@ export function Stencil({
 }: StencilProps) {
     const rootRef = useRef<HTMLDivElement>(null)
     const lettersRef = useRef<(HTMLSpanElement | null)[]>([])
+    const masksRef = useRef<(HTMLSpanElement | null)[]>([])
+    const measureRef = useRef<CanvasRenderingContext2D | null>(null)
     const frameRef = useRef(0)
     const pointerRef = useRef(-1)
 
@@ -85,13 +99,48 @@ export function Stencil({
 
         const rootBox = root.getBoundingClientRect()
 
-        lettersRef.current.forEach((letter) => {
+        lettersRef.current.forEach((letter, index) => {
             if (!letter) return
-            const offset = letter.getBoundingClientRect().left - rootBox.left
+            const box = letter.getBoundingClientRect()
+            const offset = box.left - rootBox.left
             letter.style.setProperty("--stencil-offset", continuous ? `${-offset}` : "0")
             if (fill === "image") {
                 letter.style.backgroundSize = `${rootBox.width}px ${rootBox.height}px`
             }
+
+            const mask = masksRef.current[index]
+            if (!mask || box.width === 0) return
+
+            const computed = window.getComputedStyle(letter)
+            const glyph = letter.dataset.glyph ?? ""
+            const family = computed.fontFamily.replace(/"/g, "'")
+
+            if (!measureRef.current) {
+                measureRef.current = document.createElement("canvas").getContext("2d")
+            }
+
+            const size = parseFloat(computed.fontSize) || 16
+            let ascent = size * 0.8
+            let descent = size * 0.2
+
+            const gauge = measureRef.current
+            if (gauge) {
+                gauge.font = `${computed.fontStyle} ${computed.fontWeight} ${computed.fontSize} ${family}`
+                const metrics = gauge.measureText(glyph)
+                if (metrics.fontBoundingBoxAscent) ascent = metrics.fontBoundingBoxAscent
+                if (metrics.fontBoundingBoxDescent) descent = metrics.fontBoundingBoxDescent
+            }
+
+            const baseline = (box.height - (ascent + descent)) / 2 + ascent
+            const svg =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${box.width}" height="${box.height}">` +
+                `<text x="0" y="${baseline}" text-anchor="start" ` +
+                `font-family="${family}" ` +
+                `font-size="${computed.fontSize}" font-weight="${computed.fontWeight}" ` +
+                `fill="#000">${glyph.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text></svg>`
+            const url = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`
+            mask.style.maskImage = url
+            mask.style.webkitMaskImage = url
         })
     }, [continuous, fill])
 
@@ -127,7 +176,7 @@ export function Stencil({
     )
 
     useEffect(() => {
-        if (hover !== "wave") return
+        if (hover !== "wave" && hover !== "expand") return
         const root = rootRef.current
         if (!root) return
 
@@ -137,6 +186,7 @@ export function Stencil({
             frameRef.current = requestAnimationFrame(() => {
                 frameRef.current = 0
                 applyWave(pointerRef.current)
+                if (hover === "expand") layout()
             })
         }
 
@@ -167,7 +217,7 @@ export function Stencil({
             frameRef.current = 0
             applyWave(-1)
         }
-    }, [hover, applyWave, characters])
+    }, [hover, applyWave, layout, characters])
 
     const rootStyle: CSSProperties = {
         ...style,
@@ -206,10 +256,25 @@ export function Stencil({
                             lettersRef.current[index] = node
                         }}
                         className="stencil-letter"
-                        style={letterStyle}
+                        style={
+                            hover === "reveal" && media?.[index] && !VIDEO_PATTERN.test(media[index] as string)
+                                ? { ...letterStyle, ["--stencil-media" as string]: `url("${media[index]}")` }
+                                : letterStyle
+                        }
+                        data-glyph={character}
                         aria-hidden="true"
                     >
                         {character}
+                        {hover === "reveal" && media?.[index] && VIDEO_PATTERN.test(media[index] as string) ? (
+                            <span
+                                className="stencil-media"
+                                ref={(node) => {
+                                    masksRef.current[index] = node
+                                }}
+                            >
+                                <video src={media[index]} muted loop playsInline autoPlay preload="metadata" />
+                            </span>
+                        ) : null}
                     </span>
                 ),
             )}

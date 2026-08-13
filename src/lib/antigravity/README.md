@@ -1,8 +1,8 @@
 # Antigravity
 
 A canvas particle cloud that trails the cursor: it pulses, breathes, shimmers
-through a palette and occasionally fires shockwaves. Fifteen formations, from a
-plain ring to a real 3-D planet and a black hole accretion disc.
+through a palette and occasionally fires shockwaves. Eighteen formations, from a
+plain ring to a real 3-D planet, a DNA helix and a black hole accretion disc.
 
 Everything is a prop. The only dependency is React.
 
@@ -67,12 +67,12 @@ level deep, so `pulse={{ size: 0.6 }}` does not reset the rest of `pulse`.
 | `innerRatio` | `0.31` | Hole in the middle, 0..0.98 |
 | `sides` | `5` | Polygon sides / star spikes / galaxy arms / spokes / wave lobes |
 | `depth` | `0.5` | Star spike depth |
-| `turns` | `3` | Spiral and galaxy-arm turns |
+| `turns` | `3` | Spiral, galaxy-arm and DNA turns |
 | `jitter` | `0` | Random scatter |
 | `angle` | `0` | Static rotation, ° |
 | `aspect` | `1` | Horizontal stretch — this is what flattens a disc into an ellipse |
-| `spin` | `0` | Continuous rotation, °/s. On `planet` and `torus` this spins the actual 3-D body |
-| `tilt` | `18` | `planet` and `torus` only: tilt of the axis, ° |
+| `spin` | `0` | Continuous rotation, °/s. On the 3-D shapes this spins the actual body |
+| `tilt` | `18` | 3-D shapes only: tilt of the axis, ° |
 
 | `shape` | |
 | --- | --- |
@@ -91,10 +91,13 @@ level deep, so `pulse={{ size: 0.6 }}` does not reset the rest of `pulse`.
 | `sunflower` | Phyllotaxis spiral, one dot per seed |
 | `arms` | Multi-arm galaxy, `sides` arms |
 | `rays` | Radial spokes |
+| `dna` | **3-D**: double helix with rungs, runs top to bottom, `turns` sets the twist |
+| `atom` | **3-D**: nucleus plus three splayed electron orbits |
+| `tree` | Trunk that branches recursively; `depth` widens the fork angle, `innerRatio` how fast branches shorten |
 
-### The two 3-D shapes
+### The four 3-D shapes
 
-`planet` and `torus` are not projections faked in 2-D: every particle keeps real
+`planet`, `torus`, `dna` and `atom` are not projections faked in 2-D: every particle keeps real
 `x, y, z`, gets rotated around the Y axis by `spin` each frame, tilted by
 `tilt`, and its depth drives size and opacity through `particle.depthScale` and
 `color.opacityDepth`. Dots on the far side are smaller and dimmer, which is what
