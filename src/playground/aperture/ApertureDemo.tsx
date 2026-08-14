@@ -22,7 +22,11 @@ export function ApertureDemo() {
     const [progress, setProgress] = useState(0)
 
     const config = useMemo(
-        () => mergeDeep(mergeDeep(APERTURE_DEFAULTS, APERTURE_PRESET_VALUES[presetId] ?? {}), overrides),
+        () =>
+            mergeDeep(
+                mergeDeep(APERTURE_DEFAULTS, APERTURE_PRESET_VALUES[presetId] ?? {}),
+                overrides,
+            ),
         [presetId, overrides],
     )
 
@@ -41,7 +45,10 @@ export function ApertureDemo() {
         <div className="pg-scroll-root">
             <section className="pg-intro">
                 <h1>Aperture</h1>
-                <p>A full-bleed panel that closes into a framed card as you scroll — or the other way round.</p>
+                <p>
+                    A full-bleed panel that closes into a framed card as you scroll — or the other
+                    way round.
+                </p>
                 <span className="pg-scroll-hint">scroll ↓</span>
             </section>
 

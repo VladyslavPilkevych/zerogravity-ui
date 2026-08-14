@@ -61,7 +61,10 @@ export function TrailingCursorDemo() {
             <div className="pg-cursor-stage">
                 <header className="pg-cursor-head">
                     <h1>TrailingCursor</h1>
-                    <p>The ring lags behind the dot, grows over anything interactive and shrinks while pressed.</p>
+                    <p>
+                        The ring lags behind the dot, grows over anything interactive and shrinks
+                        while pressed.
+                    </p>
                 </header>
 
                 <div className="pg-cursor-grid">

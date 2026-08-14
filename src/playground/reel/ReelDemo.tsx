@@ -75,7 +75,9 @@ export function ReelDemo() {
                         <article
                             key={product.name}
                             className="pg-product"
-                            style={{ background: `linear-gradient(160deg, ${product.from}, ${product.to})` }}
+                            style={{
+                                background: `linear-gradient(160deg, ${product.from}, ${product.to})`,
+                            }}
                         >
                             <span className="pg-product-tag">{product.tag}</span>
                             <div className="pg-product-body">

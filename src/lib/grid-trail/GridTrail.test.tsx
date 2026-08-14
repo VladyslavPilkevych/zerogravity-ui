@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { act, render } from "@testing-library/react"
 
 import { installCanvasHarness, installFrameHarness, type FrameHarness } from "../../test/frames"
-import { mediaState } from "../../../vitest.setup"
+import { mediaState } from "../../test/environment"
 import { GridTrail } from "./GridTrail"
 
 function movePointer(x: number, y: number) {
@@ -101,6 +101,8 @@ describe("GridTrail", () => {
 
         unmount()
 
-        expect(remove.mock.calls.filter(([type]) => type === "pointermove").length).toBeGreaterThan(0)
+        expect(remove.mock.calls.filter(([type]) => type === "pointermove").length).toBeGreaterThan(
+            0,
+        )
     })
 })

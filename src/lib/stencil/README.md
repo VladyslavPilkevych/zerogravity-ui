@@ -14,41 +14,41 @@ export function Title() {
 
 ## Props
 
-| Prop | Type | Default | |
-| --- | --- | --- | --- |
-| `text` | string | | The word. Spaces are preserved |
-| `fill` | StencilFill | `"zebra"` | Pattern, see below |
-| `colors` | string[] | per pattern | Pattern colours, meaning depends on the fill |
-| `image` | string | | URL or data URI for `fill="image"` |
-| `background` | string | | Raw CSS `background-image` for `fill="custom"` |
-| `scale` | number | `64` | Pattern tile size, px |
-| `angle` | number | `68` | Pattern angle, ° |
-| `size` | number | `140` | Font size, px |
-| `weight` | number | `800` | Font weight |
-| `tracking` | number | `-0.02` | Letter spacing, em |
-| `font` | string | | Font family; inherits when omitted |
-| `hover` | StencilHover | `"lift"` | Effect under the cursor |
-| `strength` | number | `1` | Multiplier for the hover effect |
-| `animate` | number | `0` | Seconds per pattern loop, `0` = static |
-| `continuous` | boolean | `true` | Pattern flows across the whole word |
-| `outline` | number | `0` | Stroke width, px |
-| `outlineColor` | string | `"#ffffff"` | Stroke colour |
-| `className`, `style` | | | Applied to the root |
+| Prop                 | Type         | Default     |                                                |
+| -------------------- | ------------ | ----------- | ---------------------------------------------- |
+| `text`               | string       |             | The word. Spaces are preserved                 |
+| `fill`               | StencilFill  | `"zebra"`   | Pattern, see below                             |
+| `colors`             | string[]     | per pattern | Pattern colours, meaning depends on the fill   |
+| `image`              | string       |             | URL or data URI for `fill="image"`             |
+| `background`         | string       |             | Raw CSS `background-image` for `fill="custom"` |
+| `scale`              | number       | `64`        | Pattern tile size, px                          |
+| `angle`              | number       | `68`        | Pattern angle, °                               |
+| `size`               | number       | `140`       | Font size, px                                  |
+| `weight`             | number       | `800`       | Font weight                                    |
+| `tracking`           | number       | `-0.02`     | Letter spacing, em                             |
+| `font`               | string       |             | Font family; inherits when omitted             |
+| `hover`              | StencilHover | `"lift"`    | Effect under the cursor                        |
+| `strength`           | number       | `1`         | Multiplier for the hover effect                |
+| `animate`            | number       | `0`         | Seconds per pattern loop, `0` = static         |
+| `continuous`         | boolean      | `true`      | Pattern flows across the whole word            |
+| `outline`            | number       | `0`         | Stroke width, px                               |
+| `outlineColor`       | string       | `"#ffffff"` | Stroke colour                                  |
+| `className`, `style` |              |             | Applied to the root                            |
 
 ### Fills
 
-| `fill` | `colors` | |
-| --- | --- | --- |
-| `zebra` | `[light, dark]` | Irregular bands at unequal widths |
-| `leopard` | `[coat, ring, core]` | Rosettes: a dark ring around a lighter core |
-| `stripes` | `[a, b]` | Even diagonal stripes |
-| `checker` | `[a, b]` | Checkerboard |
-| `dots` | `[a, b]` | Polka dots |
-| `grid` | `[background, line]` | Thin grid lines |
-| `gradient` | `[a, b, c]` | Three-stop linear gradient |
-| `rainbow` | — | Full spectrum |
-| `image` | — | `image` prop, any URL or data URI |
-| `custom` | — | `background` prop, verbatim CSS |
+| `fill`     | `colors`             |                                             |
+| ---------- | -------------------- | ------------------------------------------- |
+| `zebra`    | `[light, dark]`      | Irregular bands at unequal widths           |
+| `leopard`  | `[coat, ring, core]` | Rosettes: a dark ring around a lighter core |
+| `stripes`  | `[a, b]`             | Even diagonal stripes                       |
+| `checker`  | `[a, b]`             | Checkerboard                                |
+| `dots`     | `[a, b]`             | Polka dots                                  |
+| `grid`     | `[background, line]` | Thin grid lines                             |
+| `gradient` | `[a, b, c]`          | Three-stop linear gradient                  |
+| `rainbow`  | —                    | Full spectrum                               |
+| `image`    | —                    | `image` prop, any URL or data URI           |
+| `custom`   | —                    | `background` prop, verbatim CSS             |
 
 `FILL_DEFAULT_COLORS` exports a sensible palette for each fill.
 

@@ -23,24 +23,24 @@ lift, blur — of the card being covered.
 
 ## Props
 
-| Prop | Type | Default | |
-| --- | --- | --- | --- |
-| `children` | ReactNode | | One card per child |
-| `height` | string | `"100vh"` | Default height of every section |
-| `heights` | (string \| undefined)[] | | Per-section overrides; `undefined` falls back to `height` |
-| `top` | number | `0` | Where a card sticks, px from the top |
-| `peek` | number | `0` | Extra sticky offset per card, so previous edges stay visible |
-| `scaleTo` | number | `0.92` | Scale a fully covered card shrinks to |
-| `dim` | number | `0.5` | Opacity of the dark veil over a covered card |
-| `dimColor` | string | `"#05050a"` | Colour of that veil |
-| `opacityTo` | number | `1` | Real element opacity of a covered card |
-| `liftTo` | number | `0` | Upward travel of a covered card, px |
-| `blurTo` | number | `0` | Blur of a covered card, px |
-| `rounded` | number | `0` | Corner radius, px (also clips the content) |
-| `easing` | `"smooth" \| "linear"` | `"smooth"` | Curve applied to the cover progress |
-| `disabled` | boolean | `false` | Plain sticky stacking with no motion |
-| `className`, `cardClassName`, `style` | | | Escape hatches for styling |
-| `onActiveChange` | `(index: number) => void` | | Fires when the top card changes |
+| Prop                                  | Type                      | Default     |                                                              |
+| ------------------------------------- | ------------------------- | ----------- | ------------------------------------------------------------ |
+| `children`                            | ReactNode                 |             | One card per child                                           |
+| `height`                              | string                    | `"100vh"`   | Default height of every section                              |
+| `heights`                             | (string \| undefined)[]   |             | Per-section overrides; `undefined` falls back to `height`    |
+| `top`                                 | number                    | `0`         | Where a card sticks, px from the top                         |
+| `peek`                                | number                    | `0`         | Extra sticky offset per card, so previous edges stay visible |
+| `scaleTo`                             | number                    | `0.92`      | Scale a fully covered card shrinks to                        |
+| `dim`                                 | number                    | `0.5`       | Opacity of the dark veil over a covered card                 |
+| `dimColor`                            | string                    | `"#05050a"` | Colour of that veil                                          |
+| `opacityTo`                           | number                    | `1`         | Real element opacity of a covered card                       |
+| `liftTo`                              | number                    | `0`         | Upward travel of a covered card, px                          |
+| `blurTo`                              | number                    | `0`         | Blur of a covered card, px                                   |
+| `rounded`                             | number                    | `0`         | Corner radius, px (also clips the content)                   |
+| `easing`                              | `"smooth" \| "linear"`    | `"smooth"`  | Curve applied to the cover progress                          |
+| `disabled`                            | boolean                   | `false`     | Plain sticky stacking with no motion                         |
+| `className`, `cardClassName`, `style` |                           |             | Escape hatches for styling                                   |
+| `onActiveChange`                      | `(index: number) => void` |             | Fires when the top card changes                              |
 
 ### `dim` versus `opacityTo`
 

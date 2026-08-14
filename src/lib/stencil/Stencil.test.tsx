@@ -1,0 +1,59 @@
+import { render } from "@testing-library/react"
+import { describe, expect, it } from "vitest"
+
+import { Stencil } from "./Stencil"
+
+describe("Stencil", () => {
+    it("reads as one word rather than one letter at a time", () => {
+        const { container } = render(<Stencil text="ZEBRA" />)
+        const root = container.querySelector(".stencil")
+
+        expect(root?.getAttribute("role")).toBe("img")
+        expect(root?.getAttribute("aria-label")).toBe("ZEBRA")
+        expect(
+            Array.from(container.querySelectorAll(".stencil-letter")).every(
+                (letter) => letter.getAttribute("aria-hidden") === "true",
+            ),
+        ).toBe(true)
+    })
+
+    it("renders one element per character and preserves spaces", () => {
+        const { container } = render(<Stencil text="A B" />)
+
+        expect(container.querySelectorAll(".stencil-letter")).toHaveLength(2)
+        expect(container.querySelectorAll(".stencil-space")).toHaveLength(1)
+    })
+
+    it("exposes the hover mode as a class hook", () => {
+        const { container } = render(<Stencil text="AB" hover="wave" />)
+
+        expect(container.querySelector(".stencil")?.className).toContain("stencil-hover-wave")
+    })
+
+    it("marks animated and outlined variants only when enabled", () => {
+        const { container, rerender } = render(<Stencil text="AB" />)
+        expect(container.querySelector(".stencil")?.className).not.toContain("stencil-animated")
+
+        rerender(<Stencil text="AB" animate={4} outline={2} />)
+        const className = container.querySelector(".stencil")?.className ?? ""
+        expect(className).toContain("stencil-animated")
+        expect(className).toContain("stencil-outlined")
+    })
+
+    it("escapes a media url so it cannot inject extra css declarations", () => {
+        const { container } = render(
+            <Stencil text="A" hover="reveal" media={['a.png"); background: url("evil.png']} />,
+        )
+        const letter = container.querySelector<HTMLElement>(".stencil-letter")
+        const media = letter?.style.getPropertyValue("--stencil-media") ?? ""
+
+        expect(media).toContain("url(")
+        expect(media).not.toContain("); background")
+    })
+
+    it("keeps the consumer className alongside its own", () => {
+        const { container } = render(<Stencil text="A" className="headline" />)
+
+        expect(container.querySelector(".stencil")?.className).toContain("headline")
+    })
+})

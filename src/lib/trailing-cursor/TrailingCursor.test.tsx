@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { act, render } from "@testing-library/react"
 
 import { installFrameHarness, type FrameHarness } from "../../test/frames"
-import { mediaState } from "../../../vitest.setup"
+import { mediaState } from "../../test/environment"
 import { TrailingCursor } from "./TrailingCursor"
 
 function movePointer(x: number, y: number) {

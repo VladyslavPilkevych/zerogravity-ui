@@ -1,3 +1,5 @@
+import { cssUrl } from "../internal"
+
 export type StencilFill =
     | "zebra"
     | "leopard"
@@ -99,7 +101,7 @@ export function buildPattern(input: PatternInput): PatternOutput {
 
         case "image":
             return {
-                backgroundImage: `url("${input.image ?? ""}")`,
+                backgroundImage: cssUrl(input.image ?? ""),
                 backgroundSize: "cover",
                 tile,
             }

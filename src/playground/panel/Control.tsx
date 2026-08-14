@@ -49,7 +49,9 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
                             max={def.max}
                             step={def.step}
                             value={current}
-                            onChange={(event) => onChange(def.path, event.currentTarget.valueAsNumber)}
+                            onChange={(event) =>
+                                onChange(def.path, event.currentTarget.valueAsNumber)
+                            }
                         />
                         <input
                             type="number"
@@ -82,7 +84,10 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
                             step={def.step}
                             value={current}
                             onChange={(event) =>
-                                onChange(def.path, `${event.currentTarget.valueAsNumber}${def.unit}`)
+                                onChange(
+                                    def.path,
+                                    `${event.currentTarget.valueAsNumber}${def.unit}`,
+                                )
                             }
                         />
                         <input

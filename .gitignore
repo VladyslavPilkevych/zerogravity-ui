@@ -1,10 +1,32 @@
+# dependencies
 node_modules/
+
+# builds
 .next/
 out/
 build/
 dist/
+
+# typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test output
+coverage/
+
+# editors
+.idea/
+.vscode/
+*.swp
+
+# os
 .DS_Store
+Thumbs.db
+
+# env
+.env
 .env*.local
+
+# logs
+*.log
 npm-debug.log*

@@ -1,27 +1,13 @@
 "use client"
 
-import {
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useMemo,
-    useRef,
-    type CSSProperties,
-} from "react"
+import { useCallback, useEffect, useMemo, useRef, type CSSProperties } from "react"
 
+import { cssUrl, cx, useIsomorphicLayoutEffect } from "../internal"
 import { buildPattern, type StencilFill } from "./patterns"
 import "./Stencil.css"
 
 export type StencilHover =
-    | "none"
-    | "lift"
-    | "pop"
-    | "wave"
-    | "tilt"
-    | "shift"
-    | "glow"
-    | "expand"
-    | "reveal"
+    "none" | "lift" | "pop" | "wave" | "tilt" | "shift" | "glow" | "expand" | "reveal"
 
 export interface StencilProps {
     text: string
@@ -144,7 +130,7 @@ export function Stencil({
         })
     }, [continuous, fill])
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         lettersRef.current.length = characters.length
         layout()
     }, [characters, layout, size, tracking, weight, pattern])
@@ -163,17 +149,14 @@ export function Stencil({
         }
     }, [layout])
 
-    const applyWave = useCallback(
-        (index: number) => {
-            lettersRef.current.forEach((letter, i) => {
-                if (!letter) return
-                const distance = index < 0 ? WAVE_REACH : Math.abs(i - index)
-                const value = distance >= WAVE_REACH ? 0 : 1 - distance / WAVE_REACH
-                letter.style.setProperty("--stencil-wave", value.toFixed(3))
-            })
-        },
-        [],
-    )
+    const applyWave = useCallback((index: number) => {
+        lettersRef.current.forEach((letter, i) => {
+            if (!letter) return
+            const distance = index < 0 ? WAVE_REACH : Math.abs(i - index)
+            const value = distance >= WAVE_REACH ? 0 : 1 - distance / WAVE_REACH
+            letter.style.setProperty("--stencil-wave", value.toFixed(3))
+        })
+    }, [])
 
     useEffect(() => {
         if (hover !== "wave" && hover !== "expand") return
@@ -237,13 +220,20 @@ export function Stencil({
         backgroundSize: pattern.backgroundSize,
     }
 
-    const classes = ["stencil", `stencil-hover-${hover}`]
-    if (animate > 0) classes.push("stencil-animated")
-    if (outline > 0) classes.push("stencil-outlined")
-    if (className) classes.push(className)
-
     return (
-        <div ref={rootRef} className={classes.join(" ")} style={rootStyle} aria-label={text} role="img">
+        <div
+            ref={rootRef}
+            className={cx(
+                "stencil",
+                `stencil-hover-${hover}`,
+                animate > 0 && "stencil-animated",
+                outline > 0 && "stencil-outlined",
+                className,
+            )}
+            style={rootStyle}
+            aria-label={text}
+            role="img"
+        >
             {characters.map((character, index) =>
                 character === " " ? (
                     <span key={index} className="stencil-space" aria-hidden="true">
@@ -257,22 +247,36 @@ export function Stencil({
                         }}
                         className="stencil-letter"
                         style={
-                            hover === "reveal" && media?.[index] && !VIDEO_PATTERN.test(media[index] as string)
-                                ? { ...letterStyle, ["--stencil-media" as string]: `url("${media[index]}")` }
+                            hover === "reveal" &&
+                            media?.[index] &&
+                            !VIDEO_PATTERN.test(media[index] as string)
+                                ? {
+                                      ...letterStyle,
+                                      ["--stencil-media" as string]: cssUrl(media[index] as string),
+                                  }
                                 : letterStyle
                         }
                         data-glyph={character}
                         aria-hidden="true"
                     >
                         {character}
-                        {hover === "reveal" && media?.[index] && VIDEO_PATTERN.test(media[index] as string) ? (
+                        {hover === "reveal" &&
+                        media?.[index] &&
+                        VIDEO_PATTERN.test(media[index] as string) ? (
                             <span
                                 className="stencil-media"
                                 ref={(node) => {
                                     masksRef.current[index] = node
                                 }}
                             >
-                                <video src={media[index]} muted loop playsInline autoPlay preload="metadata" />
+                                <video
+                                    src={media[index]}
+                                    muted
+                                    loop
+                                    playsInline
+                                    autoPlay
+                                    preload="metadata"
+                                />
                             </span>
                         ) : null}
                     </span>

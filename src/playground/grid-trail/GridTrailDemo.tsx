@@ -67,8 +67,8 @@ export function GridTrailDemo() {
                 <header className="pg-trail-head">
                     <h1>GridTrail</h1>
                     <p>
-                        Move the pointer. Cells light up and fade, and the animation frame loop stops
-                        completely once the last one is gone.
+                        Move the pointer. Cells light up and fade, and the animation frame loop
+                        stops completely once the last one is gone.
                     </p>
                 </header>
 

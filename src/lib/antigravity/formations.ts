@@ -43,8 +43,8 @@ export function formationPoint(
     const radius = cfg.radius
     const inner = clamp(cfg.innerRatio, 0, 0.98)
 
-    let x = 0
-    let y = 0
+    let x: number
+    let y: number
     let z = 0
 
     switch (cfg.shape) {
@@ -72,7 +72,7 @@ export function formationPoint(
             const theta = v * TAU
             const segment = TAU / sides
             const half = segment * 0.5
-            const outer = (radius * Math.cos(half)) / Math.cos(((theta % segment) - half) || 0)
+            const outer = (radius * Math.cos(half)) / Math.cos((theta % segment) - half || 0)
             const r = lerp(outer * inner, outer, Math.sqrt(u))
             x = Math.cos(theta) * r
             y = Math.sin(theta) * r
@@ -83,7 +83,8 @@ export function formationPoint(
             const t = v * TAU
             const sin = Math.sin(t)
             const hx = 16 * sin * sin * sin
-            const hy = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
+            const hy =
+                13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)
             const fill = lerp(inner, 1, Math.sqrt(u)) * radius * HEART_SCALE
             x = hx * fill
             y = -(hy + HEART_OFFSET) * fill

@@ -60,6 +60,10 @@ export function installCanvasHarness(): CanvasHarness {
         roundRect: () => {},
         fill: () => {},
         stroke: () => {},
+        drawImage: () => {},
+        createRadialGradient: () => ({ addColorStop: () => {} }),
+        createLinearGradient: () => ({ addColorStop: () => {} }),
+        measureText: () => ({ width: 0 }),
     }
 
     const spy = vi

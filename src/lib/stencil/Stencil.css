@@ -60,7 +60,8 @@
 }
 
 .stencil-hover-tilt .stencil-letter:hover {
-    transform: rotate(calc(var(--stencil-strength) * -7deg)) skewX(calc(var(--stencil-strength) * -8deg))
+    transform: rotate(calc(var(--stencil-strength) * -7deg))
+        skewX(calc(var(--stencil-strength) * -8deg))
         translateY(calc(var(--stencil-strength) * -0.05em));
 }
 

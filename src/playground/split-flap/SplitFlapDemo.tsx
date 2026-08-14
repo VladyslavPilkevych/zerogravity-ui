@@ -24,12 +24,16 @@ export function SplitFlapDemo() {
     const [wordIndex, setWordIndex] = useState(0)
 
     const config = useMemo(
-        () => mergeDeep(mergeDeep(SPLIT_FLAP_DEFAULTS, SPLIT_FLAP_PRESET_VALUES[presetId] ?? {}), overrides),
+        () =>
+            mergeDeep(
+                mergeDeep(SPLIT_FLAP_DEFAULTS, SPLIT_FLAP_PRESET_VALUES[presetId] ?? {}),
+                overrides,
+            ),
         [presetId, overrides],
     )
 
     const editCount = useMemo(() => countOverrides(overrides), [overrides])
-    const deadline = useMemo(() => Date.now() + 1000 * 60 * 12, [])
+    const [deadline] = useState(() => Date.now() + 1000 * 60 * 12)
 
     const update = useCallback<ChangeHandler>((path, value) => {
         setOverrides((prev) => setPath(prev, path, value))
@@ -48,7 +52,10 @@ export function SplitFlapDemo() {
             <div className="pg-flap-stage">
                 <header className="pg-flap-head">
                     <h1>SplitFlap</h1>
-                    <p>Airport board halves that flip a character at a time. Time, a countdown, or any word.</p>
+                    <p>
+                        Airport board halves that flip a character at a time. Time, a countdown, or
+                        any word.
+                    </p>
                 </header>
 
                 <SplitFlap
@@ -68,7 +75,11 @@ export function SplitFlapDemo() {
                 />
 
                 {config.mode === "text" ? (
-                    <button type="button" className="pg-flap-next" onClick={() => setWordIndex((i) => i + 1)}>
+                    <button
+                        type="button"
+                        className="pg-flap-next"
+                        onClick={() => setWordIndex((i) => i + 1)}
+                    >
                         Flip to the next word
                     </button>
                 ) : null}

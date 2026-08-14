@@ -9,7 +9,8 @@ export function mergeDeep<T extends object>(base: T, patch: object): T {
 
     for (const [key, value] of Object.entries(patch as Dict)) {
         const current = out[key]
-        out[key] = isPlainObject(value) && isPlainObject(current) ? mergeDeep(current, value) : value
+        out[key] =
+            isPlainObject(value) && isPlainObject(current) ? mergeDeep(current, value) : value
     }
 
     return out as T

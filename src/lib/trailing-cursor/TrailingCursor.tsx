@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, type CSSProperties } from "react"
 
-import { pointerFxTokens, resolveColor, usePointerFxEnabled, type PointerFxPreset } from "../pointer-fx"
+import { cx, useLatestRef } from "../internal"
+import { resolveColor, usePointerFxEnabled, type PointerFxPreset } from "../pointer-fx"
+import { pointerFxTokens } from "../pointer-fx/presets"
 import "./TrailingCursor.css"
 
 export type TrailingCursorVariant = "dot-ring" | "ring-only" | "dot-only"
@@ -62,7 +64,7 @@ export function TrailingCursor({
     const enabled = usePointerFxEnabled({ disabled, enableOnTouch, respectReducedMotion })
 
     const tokens = pointerFxTokens(preset)
-    const settings = useRef({
+    const settings = useLatestRef({
         ease,
         ringSize,
         ringHoverSize,
@@ -72,16 +74,6 @@ export function TrailingCursor({
         ring: ringColor ?? tokens.ring,
         border: ringBorderColor ?? tokens.ringBorder,
     })
-    settings.current = {
-        ease,
-        ringSize,
-        ringHoverSize,
-        ringPressSize,
-        interactiveSelector,
-        dot: dotColor ?? tokens.dot,
-        ring: ringColor ?? tokens.ring,
-        border: ringBorderColor ?? tokens.ringBorder,
-    }
 
     useEffect(() => {
         if (!enabled) return
@@ -145,7 +137,9 @@ export function TrailingCursor({
             const target = event.target
             if (!(target instanceof Element)) return
 
-            const scoped = target.closest("[data-cursor], [data-cursor-scale], [data-cursor-color], [data-cursor-label]")
+            const scoped = target.closest(
+                "[data-cursor], [data-cursor-scale], [data-cursor-color], [data-cursor-label]",
+            )
             const mode = scoped?.getAttribute("data-cursor") ?? ""
             root.dataset.hidden = mode === "hidden" ? "true" : "false"
 
@@ -211,7 +205,7 @@ export function TrailingCursor({
             document.removeEventListener("visibilitychange", onVisibility)
             if (frame !== null) cancelAnimationFrame(frame)
         }
-    }, [enabled, hideNativeCursor, enableOnTouch])
+    }, [enabled, hideNativeCursor, enableOnTouch, settings])
 
     useEffect(() => {
         resizeRef.current?.()
@@ -232,7 +226,7 @@ export function TrailingCursor({
         <div
             ref={rootRef}
             aria-hidden="true"
-            className={className ? `trailing-cursor ${className}` : "trailing-cursor"}
+            className={cx("trailing-cursor", className)}
             data-variant={variant}
             data-visible="false"
             data-hidden="false"

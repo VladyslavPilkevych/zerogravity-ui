@@ -14,28 +14,28 @@ export function Background() {
 
 ## Props
 
-| Prop | Type | Default | |
-| --- | --- | --- | --- |
-| `preset` | `amber \| cyan \| violet \| emerald \| rose \| mono` | `amber` | Fills `color` and `gridColor` from the shared palette |
-| `color` | string | from preset | Any CSS colour, including `oklch()` and `var(--token)` |
-| `cellSize` | number | `56` | Grid pitch in px |
-| `gap` | number | `2` | Inset between the square and its cell |
-| `cornerRadius` | number | `0` | Uses `roundRect` when above 0 |
-| `shape` | `square \| circle` | `square` | |
-| `peakOpacity` | number | `0.5` | Alpha of a freshly lit cell |
-| `fadeDuration` | number | `450` | ms from full to zero |
-| `maxCells` | number | `90` | Oldest cells are evicted past this |
-| `neighborFalloff` | number | `0` | `0.3` lights the eight neighbours at 30% |
-| `showGrid` | boolean | `false` | Static grid lines on the same canvas |
-| `gridColor` | string | from preset | |
-| `gridOpacity` | number | `0.06` | |
-| `blendMode` | GlobalCompositeOperation | `source-over` | `lighter` glows on dark backgrounds |
-| `container` | `RefObject<HTMLElement>` | | Scope to an element instead of the viewport |
-| `zIndex` | number | `-10` | |
-| `className` | string | | |
-| `disabled` | boolean | `false` | |
-| `enableOnTouch` | boolean | `false` | |
-| `respectReducedMotion` | boolean | `true` | |
+| Prop                   | Type                                                 | Default       |                                                        |
+| ---------------------- | ---------------------------------------------------- | ------------- | ------------------------------------------------------ |
+| `preset`               | `amber \| cyan \| violet \| emerald \| rose \| mono` | `amber`       | Fills `color` and `gridColor` from the shared palette  |
+| `color`                | string                                               | from preset   | Any CSS colour, including `oklch()` and `var(--token)` |
+| `cellSize`             | number                                               | `56`          | Grid pitch in px                                       |
+| `gap`                  | number                                               | `2`           | Inset between the square and its cell                  |
+| `cornerRadius`         | number                                               | `0`           | Uses `roundRect` when above 0                          |
+| `shape`                | `square \| circle`                                   | `square`      |                                                        |
+| `peakOpacity`          | number                                               | `0.5`         | Alpha of a freshly lit cell                            |
+| `fadeDuration`         | number                                               | `450`         | ms from full to zero                                   |
+| `maxCells`             | number                                               | `90`          | Oldest cells are evicted past this                     |
+| `neighborFalloff`      | number                                               | `0`           | `0.3` lights the eight neighbours at 30%               |
+| `showGrid`             | boolean                                              | `false`       | Static grid lines on the same canvas                   |
+| `gridColor`            | string                                               | from preset   |                                                        |
+| `gridOpacity`          | number                                               | `0.06`        |                                                        |
+| `blendMode`            | GlobalCompositeOperation                             | `source-over` | `lighter` glows on dark backgrounds                    |
+| `container`            | `RefObject<HTMLElement>`                             |               | Scope to an element instead of the viewport            |
+| `zIndex`               | number                                               | `-10`         |                                                        |
+| `className`            | string                                               |               |                                                        |
+| `disabled`             | boolean                                              | `false`       |                                                        |
+| `enableOnTouch`        | boolean                                              | `false`       |                                                        |
+| `respectReducedMotion` | boolean                                              | `true`        |                                                        |
 
 Explicit `color` and `gridColor` always beat the preset.
 
@@ -91,7 +91,7 @@ runtime, re-render the component so the new value is picked up.
 - The loop is cancelled on `visibilitychange` when the tab goes hidden and
   resumes if cells are still alive.
 - Changing props never restarts anything: the React layer pushes config into a
-  plain `GridTrailEngine`, which diffs it. Only a `cellSize` change clears the
+  plain internal engine, which diffs it. Only a `cellSize` change clears the
   cell map, because the old coordinates no longer line up.
 
 ## Accessibility

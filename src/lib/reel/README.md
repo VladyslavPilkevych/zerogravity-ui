@@ -25,30 +25,30 @@ Leave `index` out to let the component own the selection.
 
 ## Props
 
-| Prop | Type | Default | |
-| --- | --- | --- | --- |
-| `children` | ReactNode | | One slide per child |
-| `index` | number | | Controlled index; omit for uncontrolled |
-| `defaultIndex` | number | `0` | Starting index when uncontrolled |
-| `onIndexChange` | `(index: number) => void` | | Fires on every selection change |
-| `loop` | boolean | `false` | Infinite wrap-around |
-| `itemWidth` | number | `300` | Slide width, px |
-| `itemHeight` | number | `400` | Slide height, px |
-| `spacing` | number | `340` | Distance between slide centres, px |
-| `visible` | number | `3` | Neighbours kept on screen each side |
-| `scale` | number | `0.8` | Scale of a neighbour |
-| `opacity` | number | `0.35` | Opacity of a neighbour |
-| `rotate` | number | `0` | Y rotation of a neighbour, ° — the coverflow look |
-| `depth` | number | `0` | How far back a neighbour is pushed, px |
-| `perspective` | number | `1400` | 3D perspective on the viewport, px |
-| `stiffness` | number | `9` | Spring speed; higher snaps harder |
-| `drag` | boolean | `true` | Pointer dragging with flick-to-advance |
-| `wheel` | boolean | `true` | Horizontal wheel and shift+wheel |
-| `arrows` | boolean | `true` | Previous / next buttons |
-| `dots` | boolean | `true` | Dots, rendered for up to 12 items |
-| `clickToSelect` | boolean | `true` | Clicking a neighbour glides it to the centre |
-| `className`, `style` | | | Applied to the root |
-| `label` | string | `"Carousel"` | `aria-label` for the carousel group |
+| Prop                 | Type                      | Default      |                                                   |
+| -------------------- | ------------------------- | ------------ | ------------------------------------------------- |
+| `children`           | ReactNode                 |              | One slide per child                               |
+| `index`              | number                    |              | Controlled index; omit for uncontrolled           |
+| `defaultIndex`       | number                    | `0`          | Starting index when uncontrolled                  |
+| `onIndexChange`      | `(index: number) => void` |              | Fires on every selection change                   |
+| `loop`               | boolean                   | `false`      | Infinite wrap-around                              |
+| `itemWidth`          | number                    | `300`        | Slide width, px                                   |
+| `itemHeight`         | number                    | `400`        | Slide height, px                                  |
+| `spacing`            | number                    | `340`        | Distance between slide centres, px                |
+| `visible`            | number                    | `3`          | Neighbours kept on screen each side               |
+| `scale`              | number                    | `0.8`        | Scale of a neighbour                              |
+| `opacity`            | number                    | `0.35`       | Opacity of a neighbour                            |
+| `rotate`             | number                    | `0`          | Y rotation of a neighbour, ° — the coverflow look |
+| `depth`              | number                    | `0`          | How far back a neighbour is pushed, px            |
+| `perspective`        | number                    | `1400`       | 3D perspective on the viewport, px                |
+| `stiffness`          | number                    | `9`          | Spring speed; higher snaps harder                 |
+| `drag`               | boolean                   | `true`       | Pointer dragging with flick-to-advance            |
+| `wheel`              | boolean                   | `true`       | Horizontal wheel and shift+wheel                  |
+| `arrows`             | boolean                   | `true`       | Previous / next buttons                           |
+| `dots`               | boolean                   | `true`       | Dots, rendered for up to 12 items                 |
+| `clickToSelect`      | boolean                   | `true`       | Clicking a neighbour glides it to the centre      |
+| `className`, `style` |                           |              | Applied to the root                               |
+| `label`              | string                    | `"Carousel"` | `aria-label` for the carousel group               |
 
 ## Imperative API
 

@@ -15,8 +15,7 @@
     isolation: isolate;
     background:
         radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.13), transparent 34%),
-        radial-gradient(circle at 80% 70%, rgba(120, 120, 255, 0.12), transparent 28%),
-        #050505;
+        radial-gradient(circle at 80% 70%, rgba(120, 120, 255, 0.12), transparent 28%), #050505;
 }
 
 .antigravity-stage::after {

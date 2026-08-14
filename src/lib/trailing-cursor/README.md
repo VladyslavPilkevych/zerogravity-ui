@@ -17,26 +17,26 @@ Mount it once, near the root of the app.
 
 ## Props
 
-| Prop | Type | Default | |
-| --- | --- | --- | --- |
-| `preset` | `amber \| cyan \| violet \| emerald \| rose \| mono` | `amber` | Fills the three colours from the shared palette |
-| `variant` | `dot-ring \| ring-only \| dot-only` | `dot-ring` | |
-| `dotColor` | string | from preset | Any CSS colour, `var(--token)` included |
-| `ringColor` | string | from preset | Ring fill |
-| `ringBorderColor` | string | from preset | Ring border and label colour |
-| `dotSize` | number | `6` | px |
-| `ringSize` | number | `34` | px at rest |
-| `ringHoverSize` | number | `52` | px over an interactive element |
-| `ringPressSize` | number | `26` | px while the pointer is down |
-| `ease` | number | `0.16` | Lerp factor, 0..1. Higher snaps harder |
-| `hideNativeCursor` | boolean | `true` | |
-| `interactiveSelector` | string | see below | What counts as interactive |
-| `mixBlendMode` | CSS value | | `difference` inverts against any background |
-| `zIndex` | number | `2147483000` | |
-| `className` | string | | |
-| `disabled` | boolean | `false` | |
-| `enableOnTouch` | boolean | `false` | |
-| `respectReducedMotion` | boolean | `true` | |
+| Prop                   | Type                                                 | Default      |                                                 |
+| ---------------------- | ---------------------------------------------------- | ------------ | ----------------------------------------------- |
+| `preset`               | `amber \| cyan \| violet \| emerald \| rose \| mono` | `amber`      | Fills the three colours from the shared palette |
+| `variant`              | `dot-ring \| ring-only \| dot-only`                  | `dot-ring`   |                                                 |
+| `dotColor`             | string                                               | from preset  | Any CSS colour, `var(--token)` included         |
+| `ringColor`            | string                                               | from preset  | Ring fill                                       |
+| `ringBorderColor`      | string                                               | from preset  | Ring border and label colour                    |
+| `dotSize`              | number                                               | `6`          | px                                              |
+| `ringSize`             | number                                               | `34`         | px at rest                                      |
+| `ringHoverSize`        | number                                               | `52`         | px over an interactive element                  |
+| `ringPressSize`        | number                                               | `26`         | px while the pointer is down                    |
+| `ease`                 | number                                               | `0.16`       | Lerp factor, 0..1. Higher snaps harder          |
+| `hideNativeCursor`     | boolean                                              | `true`       |                                                 |
+| `interactiveSelector`  | string                                               | see below    | What counts as interactive                      |
+| `mixBlendMode`         | CSS value                                            |              | `difference` inverts against any background     |
+| `zIndex`               | number                                               | `2147483000` |                                                 |
+| `className`            | string                                               |              |                                                 |
+| `disabled`             | boolean                                              | `false`      |                                                 |
+| `enableOnTouch`        | boolean                                              | `false`      |                                                 |
+| `respectReducedMotion` | boolean                                              | `true`       |                                                 |
 
 The default `interactiveSelector` is
 `a, button, input, select, textarea, [role='button'], [data-cursor]`.
@@ -45,12 +45,12 @@ The default `interactiveSelector` is
 
 Resolved on `pointerover` against the closest ancestor carrying any of them:
 
-| Attribute | Effect |
-| --- | --- |
-| `data-cursor="hidden"` | Both layers fade out over that element |
-| `data-cursor-scale="2"` | Multiplies the current ring size |
+| Attribute                     | Effect                                               |
+| ----------------------------- | ---------------------------------------------------- |
+| `data-cursor="hidden"`        | Both layers fade out over that element               |
+| `data-cursor-scale="2"`       | Multiplies the current ring size                     |
 | `data-cursor-color="#22d3ee"` | Recolours the dot and the ring border while hovering |
-| `data-cursor-label="Open"` | Renders short text inside the ring |
+| `data-cursor-label="Open"`    | Renders short text inside the ring                   |
 
 ```tsx
 <article data-cursor-label="Read" data-cursor-scale="1.8">…</article>

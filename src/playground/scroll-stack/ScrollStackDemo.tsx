@@ -18,10 +18,30 @@ import {
 } from "./schema"
 
 const SECTIONS = [
-    { title: "Sticky, not scripted", note: "Layout is pure CSS position: sticky", from: "#14243f", to: "#080c16" },
-    { title: "Scale and fade", note: "Only transform and opacity are written", from: "#2b1a3d", to: "#0d0812" },
-    { title: "Reads scrollY only", note: "Zero layout reads while scrolling", from: "#123330", to: "#07120f" },
-    { title: "Reverses for free", note: "Progress comes from position, not direction", from: "#3a2416", to: "#140b06" },
+    {
+        title: "Sticky, not scripted",
+        note: "Layout is pure CSS position: sticky",
+        from: "#14243f",
+        to: "#080c16",
+    },
+    {
+        title: "Scale and fade",
+        note: "Only transform and opacity are written",
+        from: "#2b1a3d",
+        to: "#0d0812",
+    },
+    {
+        title: "Reads scrollY only",
+        note: "Zero layout reads while scrolling",
+        from: "#123330",
+        to: "#07120f",
+    },
+    {
+        title: "Reverses for free",
+        note: "Progress comes from position, not direction",
+        from: "#3a2416",
+        to: "#140b06",
+    },
     { title: "Any content", note: "Cards are your own markup", from: "#1b2140", to: "#080a14" },
     { title: "Six", note: "Add or remove sections live", from: "#3d1a2a", to: "#12060c" },
     { title: "Seven", note: "The stack grows with your children", from: "#16303d", to: "#060f14" },
@@ -58,13 +78,16 @@ export function ScrollStackDemo() {
     const heights = useMemo(() => {
         const mix = SIZE_MIXES[config.sizeMix] ?? SIZE_MIXES.uniform
         return sections.map((_, index) => mix(index, sections.length))
-    }, [config.sizeMix, sections.length])
+    }, [config.sizeMix, sections])
 
     return (
         <div className="pg-scroll-root">
             <section className="pg-intro">
                 <h1>ScrollStack</h1>
-                <p>Full-height sections that slide over each other as you scroll, and unstack on the way back.</p>
+                <p>
+                    Full-height sections that slide over each other as you scroll, and unstack on
+                    the way back.
+                </p>
                 <span className="pg-scroll-hint">scroll ↓</span>
             </section>
 
@@ -88,10 +111,13 @@ export function ScrollStackDemo() {
                     <article
                         key={section.title}
                         className="pg-card"
-                        style={{ background: `linear-gradient(155deg, ${section.from}, ${section.to})` }}
+                        style={{
+                            background: `linear-gradient(155deg, ${section.from}, ${section.to})`,
+                        }}
                     >
                         <span className="pg-card-index">
-                            {String(index + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}
+                            {String(index + 1).padStart(2, "0")} /{" "}
+                            {String(sections.length).padStart(2, "0")}
                         </span>
                         <h2>{section.title}</h2>
                         <p>{section.note}</p>

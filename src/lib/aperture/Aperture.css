@@ -17,7 +17,7 @@
     --aperture-radius: 0px;
     clip-path: inset(
         var(--aperture-inset) var(--aperture-inset) var(--aperture-inset) var(--aperture-inset)
-        round var(--aperture-radius)
+            round var(--aperture-radius)
     );
     will-change: clip-path;
 }

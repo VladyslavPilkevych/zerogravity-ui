@@ -1,15 +1,8 @@
 "use client"
 
-import {
-    Children,
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useRef,
-    type CSSProperties,
-    type ReactNode,
-} from "react"
+import { Children, useCallback, useEffect, useRef, type CSSProperties, type ReactNode } from "react"
 
+import { cx, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
 import "./Aperture.css"
 
 export type ApertureDirection = "close" | "open" | "both"
@@ -57,13 +50,10 @@ export function Aperture({
     const veilRef = useRef<HTMLDivElement>(null)
     const rafRef = useRef(0)
     const lastRef = useRef(-1)
-    const metricsRef = useRef<{ top: number; span: number; viewport: number } | null>(null)
+    const metricsRef = useRef<{ top: number; span: number } | null>(null)
 
-    const settings = useRef({ inset, radius, direction, scale, dim, easing, disabled })
-    settings.current = { inset, radius, direction, scale, dim, easing, disabled }
-
-    const progressRef = useRef(onProgress)
-    progressRef.current = onProgress
+    const settings = useLatestRef({ inset, radius, direction, scale, dim, easing, disabled })
+    const progressRef = useLatestRef(onProgress)
 
     const measure = useCallback(() => {
         const track = trackRef.current
@@ -75,7 +65,6 @@ export function Aperture({
         metricsRef.current = {
             top: box.top + window.scrollY,
             span: Math.max(1, box.height - window.innerHeight),
-            viewport: window.innerHeight,
         }
     }, [])
 
@@ -110,7 +99,7 @@ export function Aperture({
         if (veil) veil.style.opacity = (config.dim * progress).toFixed(3)
 
         progressRef.current?.(progress)
-    }, [])
+    }, [settings, progressRef])
 
     const schedule = useCallback(() => {
         if (rafRef.current !== 0) return
@@ -120,7 +109,7 @@ export function Aperture({
         })
     }, [paint])
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         measure()
         lastRef.current = -1
         paint()
@@ -156,17 +145,18 @@ export function Aperture({
     }, [measure, schedule])
 
     return (
-        <div
-            ref={trackRef}
-            className={className ? `aperture ${className}` : "aperture"}
-            style={{ ...style, height }}
-        >
+        <div ref={trackRef} className={cx("aperture", className)} style={{ ...style, height }}>
             <div className="aperture-sticky">
                 <div ref={frameRef} className="aperture-frame">
                     <div ref={innerRef} className="aperture-inner">
                         {children}
                     </div>
-                    <div ref={veilRef} className="aperture-veil" style={{ background: dimColor }} />
+                    <div
+                        ref={veilRef}
+                        className="aperture-veil"
+                        style={{ background: dimColor }}
+                        aria-hidden="true"
+                    />
                 </div>
             </div>
         </div>

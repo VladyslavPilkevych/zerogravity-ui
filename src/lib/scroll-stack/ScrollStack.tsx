@@ -1,15 +1,8 @@
 "use client"
 
-import {
-    Children,
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useRef,
-    type CSSProperties,
-    type ReactNode,
-} from "react"
+import { Children, useCallback, useEffect, useRef, type CSSProperties, type ReactNode } from "react"
 
+import { cx, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
 import "./ScrollStack.css"
 
 export type StackEasing = "linear" | "smooth"
@@ -77,11 +70,18 @@ export function ScrollStack({
     const items = Children.toArray(children)
     const count = items.length
 
-    const settingsRef = useRef({ top, peek, scaleTo, dim, opacityTo, liftTo, blurTo, easing, disabled })
-    settingsRef.current = { top, peek, scaleTo, dim, opacityTo, liftTo, blurTo, easing, disabled }
-
-    const activeHandlerRef = useRef(onActiveChange)
-    activeHandlerRef.current = onActiveChange
+    const settingsRef = useLatestRef({
+        top,
+        peek,
+        scaleTo,
+        dim,
+        opacityTo,
+        liftTo,
+        blurTo,
+        easing,
+        disabled,
+    })
+    const activeHandlerRef = useLatestRef(onActiveChange)
 
     const measure = useCallback(() => {
         const container = containerRef.current
@@ -133,7 +133,8 @@ export function ScrollStack({
                 const nextTop = nextStatic < nextSticky ? nextSticky : nextStatic
                 const travel = viewport - nextSticky
                 progress = travel > 0 ? clamp01((viewport - nextTop) / travel) : 0
-                if (settings.easing === "smooth") progress = progress * progress * (3 - 2 * progress)
+                if (settings.easing === "smooth")
+                    progress = progress * progress * (3 - 2 * progress)
             }
 
             if (Math.abs(progress - (progressRef.current[i] ?? -1)) < EPSILON) continue
@@ -143,12 +144,15 @@ export function ScrollStack({
             const lift = -settings.liftTo * progress
 
             card.style.transform =
-                progress === 0 ? "" : `translate3d(0, ${lift.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`
+                progress === 0
+                    ? ""
+                    : `translate3d(0, ${lift.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`
             card.style.opacity =
                 settings.opacityTo === 1 ? "" : String(1 - (1 - settings.opacityTo) * progress)
 
             if (settings.blurTo > 0) {
-                card.style.filter = progress === 0 ? "" : `blur(${(settings.blurTo * progress).toFixed(2)}px)`
+                card.style.filter =
+                    progress === 0 ? "" : `blur(${(settings.blurTo * progress).toFixed(2)}px)`
             }
 
             const veil = veilsRef.current[i]
@@ -159,7 +163,7 @@ export function ScrollStack({
             activeRef.current = active
             activeHandlerRef.current?.(active)
         }
-    }, [])
+    }, [settingsRef, activeHandlerRef])
 
     const schedule = useCallback(() => {
         if (frameRef.current !== 0) return
@@ -169,7 +173,7 @@ export function ScrollStack({
         })
     }, [paint])
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         cardsRef.current.length = count
         veilsRef.current.length = count
         progressRef.current = new Array(count).fill(-1)
@@ -208,18 +212,16 @@ export function ScrollStack({
     }, [measure, schedule])
 
     return (
-        <div
-            ref={containerRef}
-            className={className ? `scroll-stack ${className}` : "scroll-stack"}
-            style={style}
-        >
+        <div ref={containerRef} className={cx("scroll-stack", className)} style={style}>
             {items.map((item, index) => (
                 <div
                     key={index}
                     ref={(node) => {
                         cardsRef.current[index] = node
                     }}
-                    className={cardClassName ? `scroll-stack-card ${cardClassName}` : "scroll-stack-card"}
+                    className={
+                        cardClassName ? `scroll-stack-card ${cardClassName}` : "scroll-stack-card"
+                    }
                     style={{
                         height: heights?.[index] ?? height,
                         top: top + index * peek,

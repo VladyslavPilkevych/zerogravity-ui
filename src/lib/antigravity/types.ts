@@ -19,23 +19,10 @@ export type FormationShape =
     | "tree"
 
 export type ParticleShape =
-    | "dot"
-    | "square"
-    | "diamond"
-    | "bar"
-    | "triangle"
-    | "ring"
-    | "cross"
-    | "star"
+    "dot" | "square" | "diamond" | "bar" | "triangle" | "ring" | "cross" | "star"
 
 export type Waveform =
-    | "sine"
-    | "triangle"
-    | "sawtooth"
-    | "square"
-    | "heartbeat"
-    | "decay"
-    | "organic"
+    "sine" | "triangle" | "sawtooth" | "square" | "heartbeat" | "decay" | "organic"
 
 export type PulseMode = "sync" | "scatter" | "radial" | "angular"
 
@@ -201,8 +188,8 @@ export type DeepPartial<T> = {
         ? T[K]
         : T[K] extends object | null
           ? T[K] extends null
-            ? T[K]
-            : DeepPartial<NonNullable<T[K]>> | null
+              ? T[K]
+              : DeepPartial<NonNullable<T[K]>> | null
           : T[K]
 }
 

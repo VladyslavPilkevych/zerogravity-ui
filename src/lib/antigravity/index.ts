@@ -1,19 +1,19 @@
 export { Antigravity } from "./Antigravity"
 export type { AntigravityProps, AntigravityHandle } from "./Antigravity"
 
-export { AntigravityEngine } from "./engine"
 export { ANTIGRAVITY_DEFAULTS, resolveAntigravityConfig } from "./types"
 export { ANTIGRAVITY_PRESETS, getAntigravityPreset } from "./presets"
-export { parseColor, hslToRgb } from "./color"
 export type { AntigravityPreset } from "./presets"
 
 export type {
+    AntigravityConfig,
+    AntigravityOptions,
+    AntigravityStats,
     BlendMode,
+    BurstConfig,
     ColorConfig,
     ColorMode,
     ColorWaveConfig,
-    BurstConfig,
-    DeepPartial,
     DeformConfig,
     DriftConfig,
     FollowConfig,
@@ -21,9 +21,6 @@ export type {
     FormationShape,
     GlowConfig,
     ParticleConfig,
-    AntigravityConfig,
-    AntigravityOptions,
-    AntigravityStats,
     ParticleShape,
     PointerSource,
     PulseConfig,

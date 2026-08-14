@@ -6,7 +6,6 @@ import {
     useCallback,
     useEffect,
     useImperativeHandle,
-    useLayoutEffect,
     useRef,
     useState,
     type CSSProperties,
@@ -14,6 +13,7 @@ import {
     type ReactNode,
 } from "react"
 
+import { cx, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
 import "./Reel.css"
 
 export interface ReelHandle {
@@ -125,11 +125,18 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
     const [internal, setInternal] = useState(() => clamp(defaultIndex, 0, Math.max(0, count - 1)))
     const current = controlled ? clamp(index, 0, Math.max(0, count - 1)) : internal
 
-    const settings = useRef({ loop, spacing, visible, scale, opacity, rotate, depth, stiffness, count })
-    settings.current = { loop, spacing, visible, scale, opacity, rotate, depth, stiffness, count }
-
-    const changeRef = useRef(onIndexChange)
-    changeRef.current = onIndexChange
+    const settings = useLatestRef({
+        loop,
+        spacing,
+        visible,
+        scale,
+        opacity,
+        rotate,
+        depth,
+        stiffness,
+        count,
+    })
+    const changeRef = useLatestRef(onIndexChange)
 
     const paint = useCallback(() => {
         const config = settings.current
@@ -165,7 +172,9 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
             const spin = -config.rotate * clamp(offset, -1, 1)
             const push = -config.depth * ramp
 
-            node.style.transform = `translate(-50%, -50%) translate3d(${(offset * config.spacing).toFixed(
+            node.style.transform = `translate(-50%, -50%) translate3d(${(
+                offset * config.spacing
+            ).toFixed(
                 2,
             )}px, 0, ${push.toFixed(2)}px) rotateY(${spin.toFixed(2)}deg) scale(${itemScale.toFixed(4)})`
             node.style.opacity = itemOpacity.toFixed(3)
@@ -179,11 +188,16 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
                 if (node) node.dataset.active = i === active ? "true" : "false"
             }
         }
-    }, [])
+    }, [settings])
+
+    const tickRef = useRef<(now: number) => void>(() => {})
 
     const tick = useCallback(
         (now: number) => {
-            const dt = lastTimeRef.current === 0 ? 1 / 60 : Math.min((now - lastTimeRef.current) / 1000, 1 / 15)
+            const dt =
+                lastTimeRef.current === 0
+                    ? 1 / 60
+                    : Math.min((now - lastTimeRef.current) / 1000, 1 / 15)
             lastTimeRef.current = now
 
             if (!dragStateRef.current.active) {
@@ -199,14 +213,18 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
             paint()
 
             if (runningRef.current || dragStateRef.current.active) {
-                frameRef.current = requestAnimationFrame(tick)
+                frameRef.current = requestAnimationFrame((next) => tickRef.current(next))
             } else {
                 frameRef.current = 0
                 lastTimeRef.current = 0
             }
         },
-        [paint],
+        [paint, settings],
     )
+
+    useIsomorphicLayoutEffect(() => {
+        tickRef.current = tick
+    }, [tick])
 
     const start = useCallback(() => {
         if (frameRef.current !== 0) return
@@ -223,7 +241,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
             if (!controlled) setInternal(normalized)
             changeRef.current?.(normalized)
         },
-        [controlled],
+        [controlled, settings, changeRef],
     )
 
     const step = useCallback(
@@ -232,7 +250,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
             if (total === 0) return
             commit(Math.round(targetRef.current) + direction)
         },
-        [commit],
+        [commit, settings],
     )
 
     useImperativeHandle(
@@ -245,7 +263,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         [step, commit],
     )
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         itemRefs.current.length = count
         activePaintedRef.current = -1
         paint()
@@ -378,7 +396,8 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         if (tapped) {
             commit(pressed)
         } else {
-            const projected = positionRef.current + clamp(state.velocity * 0.2, -MAX_FLICK, MAX_FLICK)
+            const projected =
+                positionRef.current + clamp(state.velocity * 0.2, -MAX_FLICK, MAX_FLICK)
             commit(Math.round(projected))
         }
 
@@ -406,7 +425,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
 
     return (
         <div
-            className={className ? `reel ${className}` : "reel"}
+            className={cx("reel", className)}
             style={style}
             role="group"
             aria-roledescription="carousel"

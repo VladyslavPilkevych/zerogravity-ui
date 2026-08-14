@@ -22,7 +22,11 @@ export function StencilDemo() {
     const [overrides, setOverrides] = useState<Partial<StencilDemoConfig>>({})
 
     const config = useMemo(
-        () => mergeDeep(mergeDeep(STENCIL_DEFAULTS, STENCIL_PRESET_VALUES[presetId] ?? {}), overrides),
+        () =>
+            mergeDeep(
+                mergeDeep(STENCIL_DEFAULTS, STENCIL_PRESET_VALUES[presetId] ?? {}),
+                overrides,
+            ),
         [presetId, overrides],
     )
 

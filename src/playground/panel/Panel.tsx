@@ -106,7 +106,9 @@ export function Panel({
                                 type="button"
                                 key={preset.id}
                                 title={preset.hint}
-                                className={preset.id === presetId ? "pg-chip pg-chip-active" : "pg-chip"}
+                                className={
+                                    preset.id === presetId ? "pg-chip pg-chip-active" : "pg-chip"
+                                }
                                 onClick={() => onPreset?.(preset.id)}
                             >
                                 {preset.label}
@@ -117,7 +119,8 @@ export function Panel({
 
                 {editCount > 0 ? (
                     <p className="pg-sticky-note">
-                        <b>{editCount}</b> manual {editCount === 1 ? "edit" : "edits"} kept across presets
+                        <b>{editCount}</b> manual {editCount === 1 ? "edit" : "edits"} kept across
+                        presets
                     </p>
                 ) : null}
 

@@ -6,7 +6,6 @@ import {
     ANTIGRAVITY_DEFAULTS,
     ANTIGRAVITY_PRESETS,
     Antigravity,
-    hslToRgb,
     resolveAntigravityConfig,
     type AntigravityOptions,
     type AntigravityHandle,
@@ -27,9 +26,8 @@ function between(min: number, max: number): number {
     return min + Math.random() * (max - min)
 }
 
-function hex(h: number, s: number, l: number): string {
-    const [r, g, b] = hslToRgb(((h % 360) + 360) % 360, s, l)
-    return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`
+function hex(hue: number, saturation: number, lightness: number): string {
+    return `hsl(${((hue % 360) + 360) % 360} ${saturation}% ${lightness}%)`
 }
 
 function randomOptions(): AntigravityOptions {
@@ -79,7 +77,16 @@ function randomOptions(): AntigravityOptions {
             speed: between(0.1, 0.9),
         },
         particle: {
-            shape: pick(["dot", "square", "diamond", "bar", "triangle", "ring", "cross", "star"] as const),
+            shape: pick([
+                "dot",
+                "square",
+                "diamond",
+                "bar",
+                "triangle",
+                "ring",
+                "cross",
+                "star",
+            ] as const),
             size: between(1.4, 4.5),
             sizeVariance: between(0, 0.8),
             length: between(2, 8),
@@ -96,7 +103,15 @@ function randomOptions(): AntigravityOptions {
         },
         pulse: {
             enabled: true,
-            waveform: pick(["sine", "triangle", "sawtooth", "square", "heartbeat", "decay", "organic"] as const),
+            waveform: pick([
+                "sine",
+                "triangle",
+                "sawtooth",
+                "square",
+                "heartbeat",
+                "decay",
+                "organic",
+            ] as const),
             mode: pick(["sync", "scatter", "radial", "angular"] as const),
             speed: between(0.1, 1.2),
             size: between(0.1, 0.8),
@@ -127,7 +142,11 @@ function randomOptions(): AntigravityOptions {
             falloff: pick(["linear", "smooth", "sharp"] as const),
             ease: between(0.06, 0.3),
         },
-        glow: { color: hex(hue + 30, 70, 70), intensity: between(0.04, 0.16), radius: between(280, 560) },
+        glow: {
+            color: hex(hue + 30, 70, 70),
+            intensity: between(0.04, 0.16),
+            radius: between(280, 560),
+        },
         render: {
             blend: Math.random() < 0.4 ? "lighter" : "normal",
             trail: Math.random() < 0.35 ? between(0.1, 0.6) : 0,

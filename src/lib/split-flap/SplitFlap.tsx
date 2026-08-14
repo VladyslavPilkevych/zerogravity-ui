@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 
+import { cx, usePrefersReducedMotion } from "../internal"
 import "./SplitFlap.css"
 
 export type SplitFlapMode = "text" | "clock" | "countdown"
@@ -63,13 +64,7 @@ function Flap({ target, alphabet, stepDuration, delay, reduced }: FlapProps) {
     const timerRef = useRef<number | null>(null)
 
     useEffect(() => {
-        if (shownRef.current === target) return
-
-        if (reduced) {
-            shownRef.current = target
-            setShown(target)
-            return
-        }
+        if (reduced || shownRef.current === target) return
 
         const from = alphabet.indexOf(shownRef.current)
         const to = alphabet.indexOf(target)
@@ -103,15 +98,17 @@ function Flap({ target, alphabet, stepDuration, delay, reduced }: FlapProps) {
         }
     }, [target, alphabet, stepDuration, delay, reduced])
 
+    const visible = reduced ? target : shown
+
     return (
-        <span className="split-flap-cell" data-flipping={shown === target ? "false" : "true"}>
+        <span className="split-flap-cell" data-flipping={visible === target ? "false" : "true"}>
             <span className="split-flap-half split-flap-top">
-                <span className="split-flap-face">{shown}</span>
+                <span className="split-flap-face">{visible}</span>
             </span>
             <span className="split-flap-half split-flap-bottom">
-                <span className="split-flap-face">{shown}</span>
+                <span className="split-flap-face">{visible}</span>
             </span>
-            <span className="split-flap-leaf" key={shown}>
+            <span className="split-flap-leaf" key={visible}>
                 <span className="split-flap-face">{previous}</span>
             </span>
             <span className="split-flap-seam" />
@@ -140,16 +137,7 @@ export function SplitFlap({
     onSettled,
 }: SplitFlapProps) {
     const [tick, setTick] = useState(() => (mode === "text" ? value : ""))
-    const [reduced, setReduced] = useState(false)
-
-    useEffect(() => {
-        if (typeof window.matchMedia !== "function") return
-        const query = window.matchMedia("(prefers-reduced-motion: reduce)")
-        const update = () => setReduced(query.matches)
-        update()
-        query.addEventListener("change", update)
-        return () => query.removeEventListener("change", update)
-    }, [])
+    const reduced = usePrefersReducedMotion()
 
     useEffect(() => {
         if (mode === "text") {
@@ -157,7 +145,8 @@ export function SplitFlap({
             return
         }
 
-        const read = () => setTick(mode === "clock" ? clockText() : countdownText(target ?? Date.now()))
+        const read = () =>
+            setTick(mode === "clock" ? clockText() : countdownText(target ?? Date.now()))
         read()
         const id = window.setInterval(read, 1000)
         return () => window.clearInterval(id)
@@ -195,7 +184,7 @@ export function SplitFlap({
 
     return (
         <div
-            className={className ? `split-flap ${className}` : "split-flap"}
+            className={cx("split-flap", className)}
             style={rootStyle}
             role="img"
             aria-label={cells.join("").trim()}

@@ -319,7 +319,7 @@ export class AntigravityEngine {
         for (let i = 0; i < count; i += 1) {
             formationPoint(i, count, seed, cfg.formation, point)
 
-            let ox = point.x
+            const ox = point.x
             let oy = point.y
             let depthSource = hash01(seed, i, SALT.depth) * 2 - 1
 
@@ -686,7 +686,8 @@ export class AntigravityEngine {
             if (this.burstTimer <= 0) {
                 this.spawnRipple()
                 this.burstTimer =
-                    burst.minInterval + Math.random() * Math.max(0, burst.maxInterval - burst.minInterval)
+                    burst.minInterval +
+                    Math.random() * Math.max(0, burst.maxInterval - burst.minInterval)
             }
         }
 
@@ -757,7 +758,8 @@ export class AntigravityEngine {
         const pulseAngularK = pulse.spread / TAU
 
         const wave = cfg.wave
-        const waveOn = wave.enabled && (wave.displace !== 0 || wave.opacity !== 0 || wave.size !== 0)
+        const waveOn =
+            wave.enabled && (wave.displace !== 0 || wave.opacity !== 0 || wave.size !== 0)
         const waveWave = waveFn(wave.waveform)
         const waveTime = this.waveTime
         const waveK = wave.wavelength > 0 ? 1 / wave.wavelength : 0
@@ -774,7 +776,9 @@ export class AntigravityEngine {
 
         const emit = SHAPE_EMITTERS[cfg.particle.shape] ?? SHAPE_EMITTERS.dot
         const [pa, pb] = shapeParams(cfg.particle, this.scratchParams)
-        const rotationMode = isRotationInvariant(cfg.particle.shape) ? "none" : cfg.particle.rotation
+        const rotationMode = isRotationInvariant(cfg.particle.shape)
+            ? "none"
+            : cfg.particle.rotation
         const baseAngle = cfg.particle.angle * DEG
         const fixedCos = Math.cos(baseAngle)
         const fixedSin = Math.sin(baseAngle)
@@ -906,7 +910,11 @@ export class AntigravityEngine {
                 if (distance < repelRadius) {
                     const near = 1 - distance * repelInv
                     const influence =
-                        repelCurve === 0 ? near : repelCurve === 2 ? near * near : near * near * (3 - 2 * near)
+                        repelCurve === 0
+                            ? near
+                            : repelCurve === 2
+                              ? near * near
+                              : near * near * (3 - 2 * near)
                     const inv = distance > 0.001 ? 1 / distance : 0
                     const push = repelStrength * influence
                     targetPX += rdx * inv * push
@@ -1026,7 +1034,16 @@ export class AntigravityEngine {
 
             ctx.beginPath()
             for (let i = bucketHead[key]; i !== -1; i = bucketNext[i]) {
-                emit(ctx, this.drawX[i], this.drawY[i], this.drawSize[i], this.drawCos[i], this.drawSin[i], pa, pb)
+                emit(
+                    ctx,
+                    this.drawX[i],
+                    this.drawY[i],
+                    this.drawSize[i],
+                    this.drawCos[i],
+                    this.drawSin[i],
+                    pa,
+                    pb,
+                )
             }
             ctx.fill()
             bucketHead[key] = -1

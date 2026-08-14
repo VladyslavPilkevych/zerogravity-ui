@@ -61,10 +61,34 @@ export const STENCIL_CONTROLS: ControlGroup[] = [
         controls: [
             { kind: "select", path: "fill", label: "Pattern", options: FILLS },
             { kind: "palette", path: "colors", label: "Pattern colours" },
-            { kind: "number", path: "scale", label: "Pattern scale", min: 8, max: 300, step: 2, unit: "px" },
-            { kind: "number", path: "angle", label: "Pattern angle", min: 0, max: 180, step: 1, unit: "°" },
+            {
+                kind: "number",
+                path: "scale",
+                label: "Pattern scale",
+                min: 8,
+                max: 300,
+                step: 2,
+                unit: "px",
+            },
+            {
+                kind: "number",
+                path: "angle",
+                label: "Pattern angle",
+                min: 0,
+                max: 180,
+                step: 1,
+                unit: "°",
+            },
             { kind: "boolean", path: "continuous", label: "Pattern flows across the word" },
-            { kind: "number", path: "animate", label: "Pattern loop time", min: 0, max: 20, step: 0.5, unit: "s" },
+            {
+                kind: "number",
+                path: "animate",
+                label: "Pattern loop time",
+                min: 0,
+                max: 20,
+                step: 0.5,
+                unit: "s",
+            },
         ],
     },
     {
@@ -73,10 +97,34 @@ export const STENCIL_CONTROLS: ControlGroup[] = [
         hint: "size and weight of the letters",
         open: true,
         controls: [
-            { kind: "number", path: "size", label: "Font size", min: 40, max: 340, step: 4, unit: "px" },
+            {
+                kind: "number",
+                path: "size",
+                label: "Font size",
+                min: 40,
+                max: 340,
+                step: 4,
+                unit: "px",
+            },
             { kind: "number", path: "weight", label: "Weight", min: 100, max: 900, step: 100 },
-            { kind: "number", path: "tracking", label: "Tracking", min: -0.12, max: 0.3, step: 0.005, unit: "em" },
-            { kind: "number", path: "outline", label: "Outline", min: 0, max: 6, step: 0.5, unit: "px" },
+            {
+                kind: "number",
+                path: "tracking",
+                label: "Tracking",
+                min: -0.12,
+                max: 0.3,
+                step: 0.005,
+                unit: "em",
+            },
+            {
+                kind: "number",
+                path: "outline",
+                label: "Outline",
+                min: 0,
+                max: 6,
+                step: 0.5,
+                unit: "px",
+            },
             { kind: "color", path: "outlineColor", label: "Outline colour" },
         ],
     },
@@ -108,7 +156,6 @@ const PHOTO =
     encodeURIComponent(
         `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><defs><linearGradient id="s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%23ff9a3c"/><stop offset="0.5" stop-color="%23ff3c8f"/><stop offset="1" stop-color="%236a3cff"/></linearGradient></defs><rect width="600" height="400" fill="url(%23s)"/><circle cx="140" cy="120" r="90" fill="%23ffe9a8" opacity="0.85"/><path d="M0 320 L160 200 L300 300 L430 190 L600 310 L600 400 L0 400 Z" fill="%23120a2a" opacity="0.7"/></svg>`,
     )
-
 
 function tile(a: string, b: string): string {
     return (
