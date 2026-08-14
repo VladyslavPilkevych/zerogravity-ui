@@ -132,13 +132,13 @@ export function Aperture({
 
         window.addEventListener("scroll", schedule, { passive: true })
         window.addEventListener("resize", onResize)
-        const observer = new ResizeObserver(onResize)
-        observer.observe(track)
+        const observer = typeof ResizeObserver === "function" ? new ResizeObserver(onResize) : null
+        observer?.observe(track)
 
         return () => {
             window.removeEventListener("scroll", schedule)
             window.removeEventListener("resize", onResize)
-            observer.disconnect()
+            observer?.disconnect()
             if (rafRef.current !== 0) cancelAnimationFrame(rafRef.current)
             rafRef.current = 0
         }

@@ -34,6 +34,7 @@ Leave `index` out to let the component own the selection.
 | `loop`               | boolean                   | `false`      | Infinite wrap-around                              |
 | `itemWidth`          | number                    | `300`        | Slide width, px                                   |
 | `itemHeight`         | number                    | `400`        | Slide height, px                                  |
+| `radius`             | number                    | `0`          | Corner radius of a slide, px                      |
 | `spacing`            | number                    | `340`        | Distance between slide centres, px                |
 | `visible`            | number                    | `3`          | Neighbours kept on screen each side               |
 | `scale`              | number                    | `0.8`        | Scale of a neighbour                              |
@@ -77,6 +78,18 @@ hooks are available:
     --reel-accent: #ff5d8f;
 }
 ```
+
+### Rounded slides
+
+If your slides have rounded corners, set `radius` to the same value rather than
+only rounding your own markup. The hover state on the active slide is drawn with
+`box-shadow`, and a shadow follows the radius of the element it is drawn on — not
+that of a rounded child. Without `radius` the hairline ring renders as a
+rectangle around a rounded card.
+
+`radius` is published as `--reel-radius` on the root and inherited by
+`.reel-item-inner`, so a single value keeps the geometry, the shadow and the glow
+in agreement.
 
 ## Input details
 

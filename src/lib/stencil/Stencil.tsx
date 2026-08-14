@@ -105,9 +105,10 @@ export function Stencil({
                 measureRef.current = document.createElement("canvas").getContext("2d")
             }
 
-            const size = parseFloat(computed.fontSize) || 16
-            let ascent = size * 0.8
-            let descent = size * 0.2
+            const fontSize = parseFloat(computed.fontSize) || 16
+            let ascent = fontSize * 0.8
+            let descent = fontSize * 0.2
+            let advance = box.width
 
             const gauge = measureRef.current
             if (gauge) {
@@ -115,16 +116,35 @@ export function Stencil({
                 const metrics = gauge.measureText(glyph)
                 if (metrics.fontBoundingBoxAscent) ascent = metrics.fontBoundingBoxAscent
                 if (metrics.fontBoundingBoxDescent) descent = metrics.fontBoundingBoxDescent
+                if (metrics.width) advance = metrics.width
             }
 
+            const maskWidth = Math.max(box.width, advance)
             const baseline = (box.height - (ascent + descent)) / 2 + ascent
+            const attributes = [
+                `x="0"`,
+                `y="${baseline}"`,
+                `text-anchor="start"`,
+                `font-family="${family}"`,
+                `font-size="${computed.fontSize}"`,
+                `font-weight="${computed.fontWeight}"`,
+                `font-style="${computed.fontStyle}"`,
+                `font-stretch="${computed.fontStretch}"`,
+                `letter-spacing="${computed.letterSpacing === "normal" ? "0" : computed.letterSpacing}"`,
+                computed.fontVariationSettings !== "normal"
+                    ? `font-variation-settings="${computed.fontVariationSettings}"`
+                    : "",
+                `fill="#000"`,
+            ]
+                .filter(Boolean)
+                .join(" ")
+
             const svg =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${box.width}" height="${box.height}">` +
-                `<text x="0" y="${baseline}" text-anchor="start" ` +
-                `font-family="${family}" ` +
-                `font-size="${computed.fontSize}" font-weight="${computed.fontWeight}" ` +
-                `fill="#000">${glyph.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text></svg>`
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${maskWidth}" height="${box.height}">` +
+                `<text ${attributes}>${glyph.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text></svg>`
             const url = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`
+
+            mask.style.width = `${maskWidth}px`
             mask.style.maskImage = url
             mask.style.webkitMaskImage = url
         })
@@ -139,13 +159,32 @@ export function Stencil({
         const root = rootRef.current
         if (!root) return
 
-        const observer = new ResizeObserver(() => layout())
-        observer.observe(root)
+        const observer =
+            typeof ResizeObserver === "function" ? new ResizeObserver(() => layout()) : null
+        observer?.observe(root)
         window.addEventListener("resize", layout)
 
         return () => {
-            observer.disconnect()
+            observer?.disconnect()
             window.removeEventListener("resize", layout)
+        }
+    }, [layout])
+
+    useEffect(() => {
+        const fonts = document.fonts
+        if (!fonts) return
+
+        let cancelled = false
+        const remeasure = () => {
+            if (!cancelled) layout()
+        }
+
+        fonts.ready.then(remeasure)
+        fonts.addEventListener("loadingdone", remeasure)
+
+        return () => {
+            cancelled = true
+            fonts.removeEventListener("loadingdone", remeasure)
         }
     }, [layout])
 
@@ -276,6 +315,8 @@ export function Stencil({
                                     playsInline
                                     autoPlay
                                     preload="metadata"
+                                    tabIndex={-1}
+                                    aria-hidden="true"
                                 />
                             </span>
                         ) : null}

@@ -3,6 +3,7 @@ import type { ControlGroup, PanelPreset } from "../panel/types"
 export interface ReelDemoConfig {
     itemWidth: number
     itemHeight: number
+    radius: number
     spacing: number
     visible: number
     scale: number
@@ -23,6 +24,7 @@ export interface ReelDemoConfig {
 export const REEL_DEFAULTS: ReelDemoConfig = {
     itemWidth: 300,
     itemHeight: 400,
+    radius: 20,
     spacing: 340,
     visible: 3,
     scale: 0.8,

@@ -23,9 +23,27 @@
         "url": "https://github.com/VladyslavPilkevych/zerogravity-ui/issues"
     },
     "homepage": "https://github.com/VladyslavPilkevych/zerogravity-ui#readme",
+    "type": "module",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ],
     "sideEffects": [
         "**/*.css"
     ],
+    "publishConfig": {
+        "access": "public"
+    },
     "packageManager": "pnpm@10.16.1",
     "engines": {
         "node": ">=20",
@@ -34,6 +52,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "build:lib": "tsup",
         "start": "next start",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
@@ -42,7 +61,9 @@
         "typecheck": "tsc --noEmit",
         "test": "vitest run",
         "test:watch": "vitest",
-        "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+        "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+        "release:check": "pnpm check && pnpm build:lib",
+        "prepack": "pnpm build:lib"
     },
     "peerDependencies": {
         "react": "^18.2.0 || ^19.0.0",
@@ -65,6 +86,7 @@
         "prettier": "^3.9.6",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
+        "tsup": "^8.5.1",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.67.0",
         "vitest": "^3.2.7"
@@ -76,7 +98,8 @@
         "overrides": {
             "postcss@<8.5.23": ">=8.5.23",
             "nanoid@<3.3.18": ">=3.3.18",
-            "sharp@<0.35.0": ">=0.35.0"
+            "sharp@<0.35.0": ">=0.35.0",
+            "esbuild@<0.28.1": ">=0.28.1"
         }
     }
 }

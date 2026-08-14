@@ -72,7 +72,33 @@ tile restarting inside each glyph. Set `continuous={false}` to restart the
 pattern per letter.
 
 Measurement happens in a layout effect and again on resize through a
-`ResizeObserver` — never while scrolling or hovering.
+`ResizeObserver` — never while scrolling or hovering. `ResizeObserver` is
+feature-detected, so a missing implementation costs the resize update rather
+than throwing.
+
+## Images and video
+
+Images go through the letter background and are clipped with
+`background-clip: text`, which is exact: the glyph outline is the clip path.
+
+Video cannot be used as a background, so it renders in a separate layer clipped
+by an SVG `mask-image` containing the same character. The component copies
+`font-family`, `font-size`, `font-weight`, `font-style`, `font-stretch`,
+`letter-spacing` and `font-variation-settings` from the computed style onto the
+SVG text, measures the glyph with a canvas to place the baseline, and sizes the
+mask to the glyph advance rather than the span width — negative `letter-spacing`
+can make the advance wider than the box, which previously clipped the mask.
+
+This alignment is very close but not guaranteed to be pixel-exact. The SVG text
+is rendered by the browser's SVG text engine while the visible letter is laid out
+by the CSS text engine, and the two can disagree on subpixel positioning,
+hinting, and the resolution of a `font-family` list. If a video mask looks
+slightly off, name a single concrete family in `font` instead of relying on an
+inherited stack.
+
+Masks are recomputed once `document.fonts` reports loading is done, so a web font
+that arrives after first paint does not leave the mask measured against the
+fallback.
 
 ## Animation
 
@@ -87,6 +113,10 @@ The root carries `role="img"` and `aria-label={text}`, and every letter span is
 `aria-hidden`, so assistive tech reads the word once rather than spelling it
 out. Under `prefers-reduced-motion: reduce` the pattern animation, the hover
 transitions and the wave effect are all disabled.
+
+Video mask layers are decorative: they are `aria-hidden`, carry `tabIndex={-1}`
+so they never take focus, and render without controls. The word stays readable to
+assistive tech whether the fill is a colour, an image or a video.
 
 ## Notes
 

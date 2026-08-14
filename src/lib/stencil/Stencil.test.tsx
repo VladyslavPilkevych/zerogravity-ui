@@ -51,6 +51,31 @@ describe("Stencil", () => {
         expect(media).not.toContain("); background")
     })
 
+    it("keeps a video mask layer out of the accessibility tree", () => {
+        const { container } = render(<Stencil text="A" hover="reveal" media={["/clip.mp4"]} />)
+        const letter = container.querySelector(".stencil-letter")
+        const video = container.querySelector("video")
+
+        expect(letter?.getAttribute("aria-hidden")).toBe("true")
+        expect(video).not.toBeNull()
+        expect(video?.getAttribute("tabindex")).toBe("-1")
+        expect(video?.hasAttribute("controls")).toBe(false)
+    })
+
+    it("routes images through the letter background and video through a mask layer", () => {
+        const images = render(<Stencil text="A" hover="reveal" media={["/photo.png"]} />)
+        expect(images.container.querySelector(".stencil-media")).toBeNull()
+        expect(
+            images.container
+                .querySelector<HTMLElement>(".stencil-letter")
+                ?.style.getPropertyValue("--stencil-media"),
+        ).toContain("/photo.png")
+        images.unmount()
+
+        const videos = render(<Stencil text="A" hover="reveal" media={["/clip.webm"]} />)
+        expect(videos.container.querySelector(".stencil-media")).not.toBeNull()
+    })
+
     it("keeps the consumer className alongside its own", () => {
         const { container } = render(<Stencil text="A" className="headline" />)
 

@@ -30,6 +30,7 @@ export interface ReelProps {
     loop?: boolean
     itemWidth?: number
     itemHeight?: number
+    radius?: number
     spacing?: number
     visible?: number
     scale?: number
@@ -76,6 +77,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         loop = false,
         itemWidth = 300,
         itemHeight = 400,
+        radius = 0,
         spacing = 340,
         visible = 3,
         scale = 0.8,
@@ -426,7 +428,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
     return (
         <div
             className={cx("reel", className)}
-            style={style}
+            style={{ ...style, ["--reel-radius" as string]: `${radius}px` }}
             role="group"
             aria-roledescription="carousel"
             aria-label={label}

@@ -32,7 +32,7 @@ export const Antigravity = forwardRef<AntigravityHandle, AntigravityProps>(funct
     useEffect(() => {
         const canvas = canvasRef.current
         const host = canvas?.parentElement
-        if (!canvas || !host) return
+        if (!canvas || !host || !canvas.getContext("2d", { alpha: true })) return
 
         const engine = new AntigravityEngine(canvas, host, configRef.current)
         engine.setStatsHandler((stats) => statsRef.current?.(stats))

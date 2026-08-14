@@ -55,6 +55,7 @@ export function ReelDemo() {
                     onIndexChange={setIndex}
                     itemWidth={config.itemWidth}
                     itemHeight={config.itemHeight}
+                    radius={config.radius}
                     spacing={config.spacing}
                     visible={config.visible}
                     scale={config.scale}

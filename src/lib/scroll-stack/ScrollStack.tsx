@@ -199,13 +199,13 @@ export function ScrollStack({
         window.addEventListener("scroll", schedule, { passive: true })
         window.addEventListener("resize", onResize)
 
-        const observer = new ResizeObserver(onResize)
-        observer.observe(container)
+        const observer = typeof ResizeObserver === "function" ? new ResizeObserver(onResize) : null
+        observer?.observe(container)
 
         return () => {
             window.removeEventListener("scroll", schedule)
             window.removeEventListener("resize", onResize)
-            observer.disconnect()
+            observer?.disconnect()
             if (frameRef.current !== 0) cancelAnimationFrame(frameRef.current)
             frameRef.current = 0
         }

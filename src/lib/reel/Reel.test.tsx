@@ -110,6 +110,16 @@ describe("Reel", () => {
         expect(onIndexChange).not.toHaveBeenCalled()
     })
 
+    it("publishes the radius so hover decoration follows the card geometry", () => {
+        const { container, rerender } = render(<Reel radius={20}>{slides()}</Reel>)
+        const root = container.querySelector(".reel") as HTMLElement
+
+        expect(root.style.getPropertyValue("--reel-radius")).toBe("20px")
+
+        rerender(<Reel>{slides()}</Reel>)
+        expect(root.style.getPropertyValue("--reel-radius")).toBe("0px")
+    })
+
     it("settles its animation loop and cancels frames on unmount", () => {
         const { container, unmount } = render(<Reel stiffness={20}>{slides()}</Reel>)
 

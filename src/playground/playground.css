@@ -259,7 +259,7 @@ kbd {
     height: 100%;
     padding: 18px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    border-radius: inherit;
     box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.8);
     overflow: hidden;
 }

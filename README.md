@@ -1,15 +1,85 @@
 # zerogravity-ui
 
 Motion-first React components — particle fields, scroll framing, carousels and
-display type — plus a playground where every prop is wired to a live control.
+display type. Every component ships its own styles, stops animating when idle,
+and honours `prefers-reduced-motion`.
+
+> **Not published yet.** The package name and the licence are still unresolved —
+> see [Release blockers](#release-blockers). Everything below describes the
+> package as it is built and verified today.
+
+## Installation
 
 ```bash
-pnpm install
-pnpm dev        # http://localhost:3000
+pnpm add zerogravity-ui
 ```
 
-The project uses **pnpm** and pins the version in `packageManager`. If you do not
-have it, `corepack enable` picks up the exact version from `package.json`.
+React and React DOM are peer dependencies:
+
+```json
+"react": "^18.2.0 || ^19.0.0",
+"react-dom": "^18.2.0 || ^19.0.0"
+```
+
+The package is **ESM only**. It needs a bundler that understands CSS imports —
+Vite, Next.js, Rspack, webpack 5 and Parcel all qualify. Importing it from plain
+Node without a bundler will fail on the CSS imports.
+
+## Usage
+
+```tsx
+import { Reel, SplitFlap } from "zerogravity-ui"
+
+export function Showcase() {
+    return (
+        <>
+            <SplitFlap value="ARRIVALS" />
+            <Reel radius={20}>
+                <article>One</article>
+                <article>Two</article>
+                <article>Three</article>
+            </Reel>
+        </>
+    )
+}
+```
+
+### Styles
+
+There is nothing to import. Each component imports its own stylesheet, and
+`sideEffects` in `package.json` marks those CSS files so bundlers keep them while
+still tree-shaking unused components — import two components and only their two
+stylesheets end up in your bundle.
+
+Colours that are meant to be themed are exposed as CSS custom properties on the
+component root, so you override them with ordinary CSS:
+
+```css
+.my-carousel {
+    --reel-accent: oklch(0.8 0.15 200);
+}
+```
+
+### Next.js App Router
+
+Interactive components are compiled with their `"use client"` directive intact,
+so you can import and render them directly from a Server Component without
+marking your own page as a client component:
+
+```tsx
+import { Reel } from "zerogravity-ui"
+
+export default function Page() {
+    return (
+        <Reel radius={20}>
+            <article>One</article>
+        </Reel>
+    )
+}
+```
+
+This is verified against a real Next.js 15 App Router production build, including
+static prerendering.
 
 ## Components
 
@@ -28,11 +98,62 @@ have it, `corepack enable` picks up the exact version from `package.json`.
 Every component README carries the full prop table, accessibility notes and
 performance characteristics.
 
-## Layout
+### Environment requirements
+
+Components degrade instead of throwing when a browser API is missing:
+`ResizeObserver` and `IntersectionObserver` are feature-detected, and Antigravity
+skips its engine when a 2D canvas context is unavailable. Server rendering and
+jsdom-based test suites therefore need no polyfills.
+
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/), with the
+pre-1.0 caveat that the public API is still settling:
+
+- **Patch** — bug fixes, internal changes, documentation.
+- **Minor** — new components, new props, new presets. Anything additive.
+- **Major** — removing or renaming a prop or export, changing a default that
+  alters rendered output, dropping a React version, changing the CSS strategy.
+
+While the version is `0.x`, breaking changes ship in **minor** releases and are
+listed under a `Changed` or `Removed` heading in [CHANGELOG.md](CHANGELOG.md).
+
+The public API is exactly what `src/lib/index.ts` exports. The `exports` map
+blocks deep imports, so engines, geometry, math helpers and `src/lib/internal`
+are not reachable from the package and can change in a patch release.
+
+## Development
+
+```bash
+corepack enable
+pnpm install
+pnpm dev        # playground at http://localhost:3000
+```
+
+The project uses **pnpm** and pins the version in `packageManager`.
+
+### Playground
+
+- One route per component: `/`, `/aperture`, `/grid-trail`, `/reel`,
+  `/scroll-stack`, `/split-flap`, `/stencil`, `/trailing-cursor`.
+- The panel is generated from a schema, and every row is labelled with the real
+  prop path (`pulse.waveform`, `formation.radius`).
+- At the bottom of the panel is ready-to-paste JSX containing only the props that
+  differ from the defaults, with a copy button.
+- `H` hides the panel.
+
+Anything changed by hand becomes a sticky override. Switching presets applies the
+preset underneath those edits, so tweaks survive until **Reset**:
+
+```
+config = defaults → preset → your edits (win)
+```
+
+### Layout
 
 ```
 src/
-├── lib/                    the library — this is what would be published
+├── lib/                    the published library
 │   ├── internal/               shared helpers, never exported publicly
 │   ├── pointer-fx/             colour resolution + the pointer/motion gate
 │   ├── antigravity/
@@ -54,91 +175,66 @@ src/
 ```
 
 Each component owns its folder: the component, its types, its CSS, a `README.md`
-and an `index.ts` that defines its public surface. Files beyond that exist only
-where the implementation needs them — Antigravity has an engine, geometry and
-math modules; SplitFlap is a single file.
-
-### Boundaries
+and an `index.ts` that defines its public surface.
 
 - `src/playground` may import from `src/lib`. The reverse never happens.
 - `src/lib` imports React and browser APIs, never Next.js. An ESLint rule fails
   the build if either boundary is crossed.
-- `src/lib/internal` is shared by several components but is not exported from
-  `src/lib/index.ts`. Engines, geometry and math helpers stay internal too.
 - Cross-component imports inside the library go to the specific module, not to
   another component's barrel, so barrels stay a description of the public API.
 
-## Playground
-
-- One route per component: `/`, `/aperture`, `/grid-trail`, `/reel`,
-  `/scroll-stack`, `/split-flap`, `/stencil`, `/trailing-cursor`.
-- The panel is generated from a schema, and every row is labelled with the real
-  prop path (`pulse.waveform`, `formation.radius`).
-- At the bottom of the panel is ready-to-paste JSX containing only the props that
-  differ from the defaults, with a copy button.
-- `H` hides the panel.
-
-### Presets keep your edits
-
-Anything changed by hand becomes a sticky override. Switching presets applies the
-preset underneath those edits, so tweaks survive until **Reset** — the panel
-shows how many are being kept.
-
-```
-config = defaults → preset → your edits (win)
-```
-
-## Conventions
+### Conventions
 
 - **Engine separate from the React wrapper** for canvas components. The component
   mounts a canvas and pushes config objects into a plain class, so changing a
   prop never restarts the animation.
-- **Props only.** No global theme, no context, no CSS framework. Colours that
-  need theming are exposed as CSS custom properties on the component root.
+- **Props only.** No global theme, no context, no CSS framework.
 - **Colours are never parsed by hand.** Canvas takes the raw string and
   transparency comes from `globalAlpha`, which supports `oklch()` and everything
   else for free. Only `var(--token)` is resolved, via `getComputedStyle`.
 - **Every animation loop stops when idle** and restarts on demand.
-- **Reduced motion and coarse pointers are handled by every component**, not
-  bolted on afterwards.
-- **Documentation lives in READMEs.** Source stays comment-free; the "why" goes
-  in the component's README.
+- **Documentation lives in READMEs.** Source stays comment-free.
 
-## Scripts
+### Scripts
 
 |                                     |                                             |
 | ----------------------------------- | ------------------------------------------- |
 | `pnpm dev`                          | Playground dev server                       |
-| `pnpm build`                        | Production build                            |
+| `pnpm build`                        | Playground production build                 |
+| `pnpm build:lib`                    | Library build into `dist/` via tsup         |
 | `pnpm lint`                         | ESLint, including the library-boundary rule |
 | `pnpm format` / `pnpm format:check` | Prettier                                    |
 | `pnpm typecheck`                    | `tsc --noEmit`                              |
 | `pnpm test`                         | Vitest, jsdom                               |
 | `pnpm check`                        | Everything CI runs                          |
+| `pnpm release:check`                | `pnpm check` plus the library build         |
 
 Do not run `pnpm build` while `pnpm dev` is running — both write to `.next`.
 
-## Publishing
+### Library build
 
-The package is currently `private: true`. React and React DOM are already
-declared as `peerDependencies`, the public entry point is explicit, and
-`sideEffects` marks the CSS files so bundlers keep them.
+`pnpm build:lib` runs [tsup](https://tsup.egoist.dev/) in preserved-module mode:
+every source file becomes one ESM file in `dist/`, with declarations and source
+maps. Nothing is bundled, which is what keeps `"use client"` attached to the
+individual client modules instead of collapsing the whole library into one client
+boundary. CSS files are copied next to the modules that import them.
 
-Two things are deliberately missing, because they cannot be inferred from the
-repository:
+The release process is documented in [CONTRIBUTING.md](CONTRIBUTING.md#releasing).
 
-1. **A licence.** `license` is `UNLICENSED`, which grants nobody any rights.
-   Choose a real one and add a `LICENSE` file before making the repository public.
-2. **A free package name.** `zerogravity-ui` matches the repository but is
-   already taken on npm; `zerogravity` was free at the time of writing.
+## Release blockers
 
-Publishing also needs a library build step, which this repository does not have:
-components import `.css` files directly, so consumers currently need a bundler
-that understands CSS imports. The recommended next step is a small `tsup` (or
-`rollup`) config emitting ESM plus type declarations and a single stylesheet,
-wired to `exports`, `files` and `publishConfig`. That was left out on purpose —
-adding a build pipeline before the licence and name are settled would be
-premature.
+Two things cannot be inferred from the repository and must be decided by the
+project owner before a first publish:
+
+1. **A licence.** `license` is `UNLICENSED` and there is no `LICENSE` file, which
+   grants nobody any rights. Choose a licence and add the file with the real
+   copyright holder.
+2. **A package name.** `zerogravity-ui` matches the repository but was already
+   taken on npm at the time of writing. Confirm an available name and update
+   `name` in `package.json` plus the install instructions above.
+
+`private: true` is still set in `package.json` and must be removed once both are
+resolved.
 
 ## Adding a component
 

@@ -156,10 +156,12 @@ export class AntigravityEngine {
         this.burstTimer = config.burst.minInterval
         this.cwTimer = config.colorWave.minInterval
 
-        this.resizeObserver = new ResizeObserver(this.handleResize)
-        this.resizeObserver.observe(container)
+        if (typeof ResizeObserver === "function") {
+            this.resizeObserver = new ResizeObserver(this.handleResize)
+            this.resizeObserver.observe(container)
+        }
 
-        if (!this.staticMode) {
+        if (!this.staticMode && typeof IntersectionObserver === "function") {
             this.observer = new IntersectionObserver(this.handleIntersect, { threshold: 0 })
             this.observer.observe(container)
         }
