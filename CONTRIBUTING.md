@@ -89,9 +89,8 @@ maintenance.
 
 `prepack` runs `pnpm build:lib`, so the build cannot be skipped by accident.
 
-1. Confirm the [release blockers](README.md#release-blockers) are resolved: a
-   real licence and `LICENSE` file, an available package name, and `private`
-   removed from `package.json`.
+1. Confirm the [release blockers](README.md#release-blockers) are resolved: an
+   available package name, and `private` removed from `package.json`.
 2. `pnpm release:check` — lint, format, typecheck, tests, then the library build.
 3. `pnpm audit` — no known vulnerabilities.
 4. Move the `## [Unreleased]` entries in `CHANGELOG.md` under a new version

@@ -16,6 +16,7 @@ README before tagging.
 
 ### Added
 
+- MIT licence and a root `LICENSE` file, shipped with the package.
 - Nine components: `Antigravity`, `Aperture`, `GridTrail`, `Reel`,
   `ScrollStack`, `SplitFlap`, `Stencil`, `TrailingCursor`, and the shared
   `pointer-fx` utilities.

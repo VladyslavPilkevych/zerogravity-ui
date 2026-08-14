@@ -4,9 +4,9 @@ Motion-first React components — particle fields, scroll framing, carousels and
 display type. Every component ships its own styles, stops animating when idle,
 and honours `prefers-reduced-motion`.
 
-> **Not published yet.** The package name and the licence are still unresolved —
-> see [Release blockers](#release-blockers). Everything below describes the
-> package as it is built and verified today.
+> **Not published yet.** The package name is still unresolved — see
+> [Release blockers](#release-blockers). Everything below describes the package
+> as it is built and verified today.
 
 ## Installation
 
@@ -223,17 +223,14 @@ The release process is documented in [CONTRIBUTING.md](CONTRIBUTING.md#releasing
 
 ## Release blockers
 
-Two things cannot be inferred from the repository and must be decided by the
+One thing cannot be inferred from the repository and must be decided by the
 project owner before a first publish:
 
-1. **A licence.** `license` is `UNLICENSED` and there is no `LICENSE` file, which
-   grants nobody any rights. Choose a licence and add the file with the real
-   copyright holder.
-2. **A package name.** `zerogravity-ui` matches the repository but was already
+1. **A package name.** `zerogravity-ui` matches the repository but was already
    taken on npm at the time of writing. Confirm an available name and update
    `name` in `package.json` plus the install instructions above.
 
-`private: true` is still set in `package.json` and must be removed once both are
+`private: true` is still set in `package.json` and must be removed once that is
 resolved.
 
 ## Adding a component
@@ -245,3 +242,7 @@ resolved.
 4. A route in `src/app/<component>/page.tsx` and a link in `src/playground/Nav.tsx`.
 5. A test next to the component covering rendering, keyboard or pointer
    behaviour, cleanup, and reduced-motion.
+
+## License
+
+[MIT](LICENSE) © Vladyslav Pilkevych

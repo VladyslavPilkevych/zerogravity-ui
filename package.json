@@ -14,7 +14,7 @@
         "carousel",
         "particles"
     ],
-    "license": "UNLICENSED",
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/VladyslavPilkevych/zerogravity-ui.git"
