@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, type CSSProperties } from "react"
 
-import { cssUrl, cx, useIsomorphicLayoutEffect } from "../internal"
+import { cssUrl, cx, useIsomorphicLayoutEffect, usePrefersReducedMotion } from "../internal"
 import { buildPattern, type StencilFill } from "./patterns"
 import "./Stencil.css"
 
@@ -30,6 +30,16 @@ export interface StencilProps {
     outlineColor?: string
     className?: string
     style?: CSSProperties
+}
+
+interface LetterFont {
+    size: string
+    weight: string
+    style: string
+    stretch: string
+    family: string
+    spacing: string
+    variations: string
 }
 
 const WAVE_REACH = 2.2
@@ -63,6 +73,10 @@ export function Stencil({
     const measureRef = useRef<CanvasRenderingContext2D | null>(null)
     const frameRef = useRef(0)
     const pointerRef = useRef(-1)
+    const centersRef = useRef<number[]>([])
+    const maskSigRef = useRef<string[]>([])
+
+    const reducedMotion = usePrefersReducedMotion()
 
     const characters = useMemo(() => Array.from(text), [text])
 
@@ -83,11 +97,49 @@ export function Stencil({
         const root = rootRef.current
         if (!root) return
 
+        const letters = lettersRef.current
         const rootBox = root.getBoundingClientRect()
+        const boxes: (DOMRect | null)[] = []
+        const fonts: (LetterFont | null)[] = []
+        const centers = centersRef.current
+        centers.length = letters.length
 
-        lettersRef.current.forEach((letter, index) => {
-            if (!letter) return
+        for (let index = 0; index < letters.length; index += 1) {
+            const letter = letters[index]
+            if (!letter) {
+                boxes.push(null)
+                fonts.push(null)
+                continue
+            }
             const box = letter.getBoundingClientRect()
+            boxes.push(box)
+            centers[index] = box.left - rootBox.left + box.width / 2
+
+            if (!masksRef.current[index] || box.width === 0) {
+                fonts.push(null)
+                continue
+            }
+
+            const computed = window.getComputedStyle(letter)
+            fonts.push({
+                size: computed.fontSize,
+                weight: computed.fontWeight,
+                style: computed.fontStyle,
+                stretch: computed.fontStretch,
+                family: computed.fontFamily.replace(/"/g, "'"),
+                spacing: computed.letterSpacing === "normal" ? "0" : computed.letterSpacing,
+                variations:
+                    computed.fontVariationSettings !== "normal"
+                        ? computed.fontVariationSettings
+                        : "",
+            })
+        }
+
+        for (let index = 0; index < letters.length; index += 1) {
+            const letter = letters[index]
+            const box = boxes[index]
+            if (!letter || !box) continue
+
             const offset = box.left - rootBox.left
             letter.style.setProperty("--stencil-offset", continuous ? `${-offset}` : "0")
             if (fill === "image") {
@@ -95,28 +147,33 @@ export function Stencil({
             }
 
             const mask = masksRef.current[index]
-            if (!mask || box.width === 0) return
+            const metrics = fonts[index]
+            if (!mask || !metrics) continue
 
-            const computed = window.getComputedStyle(letter)
             const glyph = letter.dataset.glyph ?? ""
-            const family = computed.fontFamily.replace(/"/g, "'")
+            const { family, spacing, variations } = metrics
+            const font = `${metrics.style} ${metrics.weight} ${metrics.size} ${family}`
+            const signature = `${glyph}|${box.width}|${box.height}|${font}|${metrics.stretch}|${spacing}|${variations}`
+
+            if (maskSigRef.current[index] === signature) continue
+            maskSigRef.current[index] = signature
 
             if (!measureRef.current) {
                 measureRef.current = document.createElement("canvas").getContext("2d")
             }
 
-            const fontSize = parseFloat(computed.fontSize) || 16
+            const fontSize = parseFloat(metrics.size) || 16
             let ascent = fontSize * 0.8
             let descent = fontSize * 0.2
             let advance = box.width
 
             const gauge = measureRef.current
             if (gauge) {
-                gauge.font = `${computed.fontStyle} ${computed.fontWeight} ${computed.fontSize} ${family}`
-                const metrics = gauge.measureText(glyph)
-                if (metrics.fontBoundingBoxAscent) ascent = metrics.fontBoundingBoxAscent
-                if (metrics.fontBoundingBoxDescent) descent = metrics.fontBoundingBoxDescent
-                if (metrics.width) advance = metrics.width
+                gauge.font = font
+                const glyphBox = gauge.measureText(glyph)
+                if (glyphBox.fontBoundingBoxAscent) ascent = glyphBox.fontBoundingBoxAscent
+                if (glyphBox.fontBoundingBoxDescent) descent = glyphBox.fontBoundingBoxDescent
+                if (glyphBox.width) advance = glyphBox.width
             }
 
             const maskWidth = Math.max(box.width, advance)
@@ -126,14 +183,12 @@ export function Stencil({
                 `y="${baseline}"`,
                 `text-anchor="start"`,
                 `font-family="${family}"`,
-                `font-size="${computed.fontSize}"`,
-                `font-weight="${computed.fontWeight}"`,
-                `font-style="${computed.fontStyle}"`,
-                `font-stretch="${computed.fontStretch}"`,
-                `letter-spacing="${computed.letterSpacing === "normal" ? "0" : computed.letterSpacing}"`,
-                computed.fontVariationSettings !== "normal"
-                    ? `font-variation-settings="${computed.fontVariationSettings}"`
-                    : "",
+                `font-size="${metrics.size}"`,
+                `font-weight="${metrics.weight}"`,
+                `font-style="${metrics.style}"`,
+                `font-stretch="${metrics.stretch}"`,
+                `letter-spacing="${spacing}"`,
+                variations ? `font-variation-settings="${variations}"` : "",
                 `fill="#000"`,
             ]
                 .filter(Boolean)
@@ -147,7 +202,7 @@ export function Stencil({
             mask.style.width = `${maskWidth}px`
             mask.style.maskImage = url
             mask.style.webkitMaskImage = url
-        })
+        }
     }, [continuous, fill])
 
     useIsomorphicLayoutEffect(() => {
@@ -199,35 +254,50 @@ export function Stencil({
 
     useEffect(() => {
         if (hover !== "wave" && hover !== "expand") return
+        if (hover === "wave" && reducedMotion) return
         const root = rootRef.current
         if (!root) return
 
-        const schedule = (index: number) => {
-            pointerRef.current = index
+        let pointerX = 0
+        let hasPointer = false
+
+        const resolve = () => {
+            if (!hasPointer) return -1
+            const centers = centersRef.current
+            const local = pointerX - root.getBoundingClientRect().left
+            let nearest = -1
+            let best = Infinity
+            for (let i = 0; i < centers.length; i += 1) {
+                if (!lettersRef.current[i]) continue
+                const distance = Math.abs(local - centers[i])
+                if (distance < best) {
+                    best = distance
+                    nearest = i
+                }
+            }
+            return nearest
+        }
+
+        const schedule = () => {
             if (frameRef.current !== 0) return
             frameRef.current = requestAnimationFrame(() => {
                 frameRef.current = 0
+                pointerRef.current = resolve()
                 applyWave(pointerRef.current)
                 if (hover === "expand") layout()
             })
         }
 
         const onMove = (event: PointerEvent) => {
-            let nearest = -1
-            let best = Infinity
-            lettersRef.current.forEach((letter, i) => {
-                if (!letter) return
-                const box = letter.getBoundingClientRect()
-                const distance = Math.abs(event.clientX - (box.left + box.width / 2))
-                if (distance < best) {
-                    best = distance
-                    nearest = i
-                }
-            })
-            schedule(nearest)
+            pointerX = event.clientX
+            hasPointer = true
+            schedule()
         }
 
-        const onLeave = () => schedule(-1)
+        const onLeave = () => {
+            hasPointer = false
+            schedule()
+        }
 
         root.addEventListener("pointermove", onMove, { passive: true })
         root.addEventListener("pointerleave", onLeave, { passive: true })
@@ -239,7 +309,7 @@ export function Stencil({
             frameRef.current = 0
             applyWave(-1)
         }
-    }, [hover, applyWave, layout, characters])
+    }, [hover, applyWave, layout, characters, reducedMotion])
 
     const rootStyle: CSSProperties = {
         ...style,

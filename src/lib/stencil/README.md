@@ -72,9 +72,16 @@ tile restarting inside each glyph. Set `continuous={false}` to restart the
 pattern per letter.
 
 Measurement happens in a layout effect and again on resize through a
-`ResizeObserver` — never while scrolling or hovering. `ResizeObserver` is
-feature-detected, so a missing implementation costs the resize update rather
-than throwing.
+`ResizeObserver` — never while scrolling, and never on a raw pointer event.
+`ResizeObserver` is feature-detected, so a missing implementation costs the
+resize update rather than throwing.
+
+Each measurement pass reads every letter box and its computed font first, then
+writes, so the two never interleave into a layout–write–layout cycle. Letter
+centres are cached during that pass; `wave` resolves the hovered letter from the
+cache inside one animation frame instead of measuring each letter on every
+pointer event. `expand` is the one mode that re-measures per frame, because
+hovering changes the letter widths.
 
 ## Images and video
 
@@ -100,6 +107,12 @@ Masks are recomputed once `document.fonts` reports loading is done, so a web fon
 that arrives after first paint does not leave the mask measured against the
 fallback.
 
+Rebuilding a mask means measuring the glyph on a canvas and serialising an SVG
+data URI, so each letter keeps a signature of the inputs that affect it — glyph,
+box size, and the resolved font properties. A measurement pass that produces the
+same signature reuses the existing mask instead of regenerating it, which keeps
+resize and font-load passes free of redundant string work.
+
 ## Animation
 
 `animate` sets how many seconds one pattern tile takes to travel. It is a CSS
@@ -112,7 +125,14 @@ the static position are expressed against the same custom property.
 The root carries `role="img"` and `aria-label={text}`, and every letter span is
 `aria-hidden`, so assistive tech reads the word once rather than spelling it
 out. Under `prefers-reduced-motion: reduce` the pattern animation, the hover
-transitions and the wave effect are all disabled.
+transitions and the wave effect are all disabled. `wave` also stops attaching its
+pointer listener in that case, so it costs nothing rather than driving a custom
+property no rule reads.
+
+Only `wave` promotes the letters to their own compositing layers, because it is
+the one mode that transforms every letter at once. The single-letter hover modes
+leave promotion to the browser rather than holding a layer per character for the
+lifetime of the headline.
 
 Video mask layers are decorative: they are `aria-hidden`, carry `tabIndex={-1}`
 so they never take focus, and render without controls. The word stays readable to

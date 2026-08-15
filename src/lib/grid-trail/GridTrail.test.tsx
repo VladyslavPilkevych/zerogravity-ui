@@ -4,6 +4,8 @@ import { act, render } from "@testing-library/react"
 import { installCanvasHarness, installFrameHarness, type FrameHarness } from "../../test/frames"
 import { mediaState } from "../../test/environment"
 import { GridTrail } from "./GridTrail"
+import { GridTrailEngine } from "./engine"
+import { GRID_TRAIL_DEFAULTS } from "./types"
 
 function movePointer(x: number, y: number) {
     const event = new Event("pointermove") as PointerEvent
@@ -104,5 +106,79 @@ describe("GridTrail", () => {
         expect(remove.mock.calls.filter(([type]) => type === "pointermove").length).toBeGreaterThan(
             0,
         )
+    })
+
+    it("measures the host once instead of on every pointer move", () => {
+        const host = document.createElement("div")
+        document.body.appendChild(host)
+        const canvas = document.createElement("canvas")
+        host.appendChild(canvas)
+
+        const original = Element.prototype.getBoundingClientRect
+        let reads = 0
+        Element.prototype.getBoundingClientRect = function patched(this: Element) {
+            reads += 1
+            return {
+                x: 0,
+                y: 0,
+                left: 0,
+                top: 0,
+                right: 800,
+                bottom: 600,
+                width: 800,
+                height: 600,
+                toJSON: () => ({}),
+            } as DOMRect
+        }
+
+        const engine = new GridTrailEngine(canvas, host, { ...GRID_TRAIL_DEFAULTS })
+
+        const move = () => {
+            for (let i = 0; i < 50; i += 1) {
+                host.dispatchEvent(
+                    new PointerEvent("pointermove", { clientX: 10 + i, clientY: 20 }),
+                )
+            }
+        }
+
+        reads = 0
+        move()
+        expect(reads).toBe(1)
+
+        window.dispatchEvent(new Event("scroll"))
+        reads = 0
+        move()
+        expect(reads).toBe(1)
+
+        Element.prototype.getBoundingClientRect = original
+        engine.destroy()
+        host.remove()
+    })
+
+    it("releases every window listener it registers", () => {
+        const balance = new Map<string, number>()
+        const add = window.addEventListener
+        const remove = window.removeEventListener
+        const bump = (key: string, delta: number) =>
+            balance.set(key, (balance.get(key) ?? 0) + delta)
+
+        window.addEventListener = function patched(type: string, ...rest: unknown[]) {
+            bump(type, 1)
+            return add.call(window, type, ...(rest as [EventListener]))
+        } as typeof window.addEventListener
+        window.removeEventListener = function patched(type: string, ...rest: unknown[]) {
+            bump(type, -1)
+            return remove.call(window, type, ...(rest as [EventListener]))
+        } as typeof window.removeEventListener
+
+        const host = document.createElement("div")
+        document.body.appendChild(host)
+        render(<GridTrail container={{ current: host }} />).unmount()
+        host.remove()
+
+        window.addEventListener = add
+        window.removeEventListener = remove
+
+        expect(Array.from(balance.entries()).filter(([, count]) => count !== 0)).toEqual([])
     })
 })

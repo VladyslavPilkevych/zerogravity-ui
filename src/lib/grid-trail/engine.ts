@@ -37,6 +37,7 @@ export class GridTrailEngine {
     private lineColor = GRID_TRAIL_DEFAULTS.gridColor
 
     private resizeObserver: ResizeObserver | null = null
+    private hostRect: DOMRect | null = null
 
     constructor(canvas: HTMLCanvasElement, host: HTMLElement | null, config: GridTrailConfig) {
         this.canvas = canvas
@@ -59,6 +60,12 @@ export class GridTrailEngine {
             passive: true,
         })
         document.addEventListener("visibilitychange", this.handleVisibility)
+        if (host) {
+            window.addEventListener("scroll", this.invalidateHostRect, {
+                passive: true,
+                capture: true,
+            })
+        }
 
         this.paint()
     }
@@ -86,13 +93,19 @@ export class GridTrailEngine {
     destroy(): void {
         this.destroyed = true
         this.stop()
-        this.resizeObserver?.disconnect()
-        this.resizeObserver = null
-        window.removeEventListener("resize", this.handleResize)
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect()
+            this.resizeObserver = null
+        } else {
+            window.removeEventListener("resize", this.handleResize)
+        }
 
         const target: EventTarget = this.host ?? window
         target.removeEventListener("pointermove", this.handlePointerMove as EventListener)
         document.removeEventListener("visibilitychange", this.handleVisibility)
+        if (this.host) {
+            window.removeEventListener("scroll", this.invalidateHostRect, { capture: true })
+        }
         this.cells.clear()
     }
 
@@ -120,7 +133,12 @@ export class GridTrailEngine {
         this.ctx?.setTransform(ratio, 0, 0, ratio, 0, 0)
     }
 
+    private invalidateHostRect = (): void => {
+        this.hostRect = null
+    }
+
     private handleResize = (): void => {
+        this.hostRect = null
         this.measure()
         if (this.frame === null) this.paint()
     }
@@ -141,7 +159,8 @@ export class GridTrailEngine {
         let y = event.clientY
 
         if (this.host) {
-            const rect = this.host.getBoundingClientRect()
+            if (!this.hostRect) this.hostRect = this.host.getBoundingClientRect()
+            const rect = this.hostRect
             x -= rect.left
             y -= rect.top
             if (x < 0 || y < 0 || x > rect.width || y > rect.height) return
@@ -195,6 +214,7 @@ export class GridTrailEngine {
     }
 
     private tick = (now: number): void => {
+        this.hostRect = null
         const elapsed = this.last === 0 ? 16 : now - this.last
         this.last = now
 

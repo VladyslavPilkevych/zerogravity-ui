@@ -76,6 +76,28 @@ describe("Stencil", () => {
         expect(videos.container.querySelector(".stencil-media")).not.toBeNull()
     })
 
+    it("resolves the hovered letter from cached geometry, not a layout read per letter", () => {
+        const { container } = render(<Stencil text="PERFORMANCE" hover="wave" />)
+        const root = container.querySelector(".stencil") as HTMLElement
+
+        const original = Element.prototype.getBoundingClientRect
+        let reads = 0
+        Element.prototype.getBoundingClientRect = function patched(this: Element) {
+            reads += 1
+            return original.call(this)
+        }
+
+        for (let i = 0; i < 20; i += 1) {
+            root.dispatchEvent(
+                new PointerEvent("pointermove", { clientX: 10 + i * 5, bubbles: true }),
+            )
+        }
+
+        Element.prototype.getBoundingClientRect = original
+
+        expect(reads).toBe(0)
+    })
+
     it("keeps the consumer className alongside its own", () => {
         const { container } = render(<Stencil text="A" className="headline" />)
 

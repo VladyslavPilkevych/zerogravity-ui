@@ -22,7 +22,6 @@
     -webkit-background-clip: text;
     color: transparent;
     transform-origin: 50% 80%;
-    will-change: transform;
     transition:
         transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
         filter 0.28s ease,
@@ -79,6 +78,7 @@
     transform: translateY(calc(var(--stencil-wave) * var(--stencil-strength) * -0.22em))
         scale(calc(1 + var(--stencil-wave) * var(--stencil-strength) * 0.12));
     transition: transform 0.18s ease-out;
+    will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -92,6 +92,7 @@
 
     .stencil-hover-wave .stencil-letter {
         transform: none;
+        will-change: auto;
     }
 }
 

@@ -116,6 +116,7 @@ export class AntigravityEngine {
 
     private observer: IntersectionObserver | null = null
     private resizeObserver: ResizeObserver | null = null
+    private pointerRect: DOMRect | null = null
 
     private statsHandler: ((stats: AntigravityStats) => void) | null = null
     private statsFrames = 0
@@ -168,6 +169,10 @@ export class AntigravityEngine {
 
         window.addEventListener("pointermove", this.handlePointerMove, { passive: true })
         window.addEventListener("pointerdown", this.handlePointerMove, { passive: true })
+        window.addEventListener("scroll", this.invalidatePointerRect, {
+            passive: true,
+            capture: true,
+        })
         window.addEventListener("blur", this.handlePointerRelease)
         document.addEventListener("pointerout", this.handlePointerOut, { passive: true })
         document.addEventListener("visibilitychange", this.handleVisibility)
@@ -442,7 +447,12 @@ export class AntigravityEngine {
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
+    private invalidatePointerRect = (): void => {
+        this.pointerRect = null
+    }
+
     private handleResize = (): void => {
+        this.pointerRect = null
         const prevDpr = this.dpr
         this.measure()
         if (this.dpr !== prevDpr) this.buildGlow()
@@ -466,7 +476,8 @@ export class AntigravityEngine {
             return
         }
 
-        const rect = this.container.getBoundingClientRect()
+        if (!this.pointerRect) this.pointerRect = this.container.getBoundingClientRect()
+        const rect = this.pointerRect
         const x = event.clientX - rect.left
         const y = event.clientY - rect.top
 
@@ -511,6 +522,7 @@ export class AntigravityEngine {
 
     private tick = (now: number): void => {
         if (!this.running) return
+        this.pointerRect = null
 
         const delta = this.lastTime === 0 ? 1 / 60 : (now - this.lastTime) / 1000
         this.lastTime = now
@@ -544,6 +556,7 @@ export class AntigravityEngine {
         this.resizeObserver?.disconnect()
         window.removeEventListener("pointermove", this.handlePointerMove)
         window.removeEventListener("pointerdown", this.handlePointerMove)
+        window.removeEventListener("scroll", this.invalidatePointerRect, { capture: true })
         window.removeEventListener("blur", this.handlePointerRelease)
         document.removeEventListener("pointerout", this.handlePointerOut)
         document.removeEventListener("visibilitychange", this.handleVisibility)
