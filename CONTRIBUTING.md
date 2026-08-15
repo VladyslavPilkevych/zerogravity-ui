@@ -8,8 +8,12 @@ pnpm install
 pnpm dev
 ```
 
-Node 20 or newer, pnpm 10 or newer. Only pnpm is supported — do not commit an
+Node 22 or newer, pnpm 10 or newer. Only pnpm is supported — do not commit a
 `package-lock.json` or `yarn.lock`.
+
+The Node floor is real rather than cautious: the jsdom test environment pulls in
+undici, which needs Node 22.19+. On an older runtime the unit tests fail with an
+opaque `markAsUncloneable is not a function` error instead of a version message.
 
 ## Before opening a pull request
 
@@ -131,7 +135,8 @@ maintenance.
 
 1. Confirm the [release blockers](README.md#release-blockers) are resolved: an
    available package name, and `private` removed from `package.json`.
-2. `pnpm release:check` — lint, format, typecheck, tests, then the library build.
+2. `pnpm release:check` — lint, format, typecheck, unit and browser tests, then
+   the library build, package validation and the packed-consumer tests.
 3. `pnpm audit` — no known vulnerabilities.
 4. Move the `## [Unreleased]` entries in `CHANGELOG.md` under a new version
    heading with today's date, and add the comparison links at the bottom.

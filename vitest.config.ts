@@ -32,6 +32,18 @@ export default defineConfig({
             {
                 extends: true,
                 plugins: [storybookTest({ configDir: path.join(dirname, ".storybook") })],
+                optimizeDeps: {
+                    include: [
+                        "react",
+                        "react/jsx-runtime",
+                        "react/jsx-dev-runtime",
+                        "react-dom",
+                        "react-dom/client",
+                        "storybook/test",
+                        "storybook/internal/preview-api",
+                        "@storybook/addon-a11y/preview",
+                    ],
+                },
                 test: {
                     name: "storybook",
                     browser: {
