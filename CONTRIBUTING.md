@@ -17,8 +17,14 @@ Node 20 or newer, pnpm 10 or newer. Only pnpm is supported — do not commit an
 pnpm check
 ```
 
-That runs lint, format check, typecheck and the test suite. CI runs the same
-commands plus `pnpm build`.
+That runs lint, format check, typecheck, unit tests and the Storybook browser
+tests. CI additionally runs the Playwright smoke suite, package validation,
+packed-consumer tests and Chromatic.
+
+Git hooks are installed automatically: ESLint and Prettier run on staged files at
+commit time, typecheck and unit tests at push time.
+
+The full layer-by-layer guide is in [TESTING.md](TESTING.md).
 
 Run `pnpm build` separately, and never while `pnpm dev` is running: both write
 to `.next` and the dev server starts serving 500s afterwards.
@@ -56,6 +62,40 @@ attributes — over implementation details.
 
 The harnesses in `src/test` provide a controllable `requestAnimationFrame`, a
 canvas stub for jsdom, and switchable media-query state.
+
+Which layer a test belongs in, and how stories stay deterministic, is covered in
+[TESTING.md](TESTING.md).
+
+## Repository settings for `main`
+
+These cannot be configured from the repository itself and must be set in GitHub.
+
+Branch protection:
+
+- Require a pull request before merging.
+- Require status checks to pass, and require the branch to be up to date.
+- Prevent force pushes and branch deletion.
+- Optionally require conversation resolution.
+
+Required status checks:
+
+- `Static quality`
+- `Unit tests`
+- `Library build and package validation`
+- `Packaged consumer tests`
+- `Next.js playground build`
+- `Storybook browser and accessibility tests`
+- `Playwright smoke tests`
+
+`Chromatic visual review` and `Dependency audit` are deliberately **not**
+required. Visual diffs need a human decision rather than a hard gate, and an
+advisory published upstream should not block an unrelated pull request. Review
+both before merging anyway.
+
+Secrets:
+
+- `CHROMATIC_PROJECT_TOKEN` — from the Chromatic project settings. Without it the
+  visual job reports that it was skipped instead of failing.
 
 ## Adding a component
 

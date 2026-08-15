@@ -1,7 +1,13 @@
 import { defineConfig } from "tsup"
 
 export default defineConfig({
-    entry: ["src/lib/**/*.ts", "src/lib/**/*.tsx", "src/lib/**/*.css", "!src/lib/**/*.test.*"],
+    entry: [
+        "src/lib/**/*.ts",
+        "src/lib/**/*.tsx",
+        "src/lib/**/*.css",
+        "!src/lib/**/*.test.*",
+        "!src/lib/**/*.stories.*",
+    ],
     outDir: "dist",
     format: ["esm"],
     target: "es2022",

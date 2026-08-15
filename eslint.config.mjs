@@ -4,7 +4,16 @@ import tseslint from "typescript-eslint"
 
 export default tseslint.config(
     {
-        ignores: [".next/**", "node_modules/**", "out/**", "dist/**", "next-env.d.ts"],
+        ignores: [
+            ".next/**",
+            "node_modules/**",
+            "out/**",
+            "dist/**",
+            "storybook-static/**",
+            "playwright-report/**",
+            "test-results/**",
+            "next-env.d.ts",
+        ],
     },
     js.configs.recommended,
     ...tseslint.configs.recommended,
@@ -50,7 +59,22 @@ export default tseslint.config(
         },
     },
     {
+        files: ["scripts/**/*.mjs", "e2e/**/*.ts", "playwright.config.ts"],
+        rules: {
+            "no-console": "off",
+            "react-hooks/rules-of-hooks": "off",
+        },
+    },
+    {
+        files: ["test/consumer/**/*.{ts,tsx}"],
+        rules: {
+            "@typescript-eslint/no-unused-expressions": "off",
+            "@typescript-eslint/no-unused-vars": "off",
+        },
+    },
+    {
         files: ["src/lib/**/*.{ts,tsx}"],
+        ignores: ["src/lib/**/*.stories.tsx"],
         rules: {
             "no-restricted-imports": [
                 "error",
