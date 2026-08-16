@@ -8,8 +8,12 @@ pnpm install
 pnpm dev
 ```
 
-Node 20 or newer, pnpm 10 or newer. Only pnpm is supported — do not commit an
+Node 22 or newer, pnpm 10 or newer. Only pnpm is supported — do not commit a
 `package-lock.json` or `yarn.lock`.
+
+The Node floor is real rather than cautious: the jsdom test environment pulls in
+undici, which needs Node 22.19+. On an older runtime the unit tests fail with an
+opaque `markAsUncloneable is not a function` error instead of a version message.
 
 ## Before opening a pull request
 
@@ -17,8 +21,14 @@ Node 20 or newer, pnpm 10 or newer. Only pnpm is supported — do not commit an
 pnpm check
 ```
 
-That runs lint, format check, typecheck and the test suite. CI runs the same
-commands plus `pnpm build`.
+That runs lint, format check, typecheck, unit tests and the Storybook browser
+tests. CI additionally runs the Playwright smoke suite, package validation,
+packed-consumer tests and Chromatic.
+
+Git hooks are installed automatically: ESLint and Prettier run on staged files at
+commit time, typecheck and unit tests at push time.
+
+The full layer-by-layer guide is in [TESTING.md](TESTING.md).
 
 Run `pnpm build` separately, and never while `pnpm dev` is running: both write
 to `.next` and the dev server starts serving 500s afterwards.
@@ -57,6 +67,40 @@ attributes — over implementation details.
 The harnesses in `src/test` provide a controllable `requestAnimationFrame`, a
 canvas stub for jsdom, and switchable media-query state.
 
+Which layer a test belongs in, and how stories stay deterministic, is covered in
+[TESTING.md](TESTING.md).
+
+## Repository settings for `main`
+
+These cannot be configured from the repository itself and must be set in GitHub.
+
+Branch protection:
+
+- Require a pull request before merging.
+- Require status checks to pass, and require the branch to be up to date.
+- Prevent force pushes and branch deletion.
+- Optionally require conversation resolution.
+
+Required status checks:
+
+- `Static quality`
+- `Unit tests`
+- `Library build and package validation`
+- `Packaged consumer tests`
+- `Next.js playground build`
+- `Storybook browser and accessibility tests`
+- `Playwright smoke tests`
+
+`Chromatic visual review` and `Dependency audit` are deliberately **not**
+required. Visual diffs need a human decision rather than a hard gate, and an
+advisory published upstream should not block an unrelated pull request. Review
+both before merging anyway.
+
+Secrets:
+
+- `CHROMATIC_PROJECT_TOKEN` — from the Chromatic project settings. Without it the
+  visual job reports that it was skipped instead of failing.
+
 ## Adding a component
 
 The steps are listed at the end of the [README](README.md).
@@ -91,7 +135,8 @@ maintenance.
 
 1. Confirm the [release blockers](README.md#release-blockers) are resolved: an
    available package name, and `private` removed from `package.json`.
-2. `pnpm release:check` — lint, format, typecheck, tests, then the library build.
+2. `pnpm release:check` — lint, format, typecheck, unit and browser tests, then
+   the library build, package validation and the packed-consumer tests.
 3. `pnpm audit` — no known vulnerabilities.
 4. Move the `## [Unreleased]` entries in `CHANGELOG.md` under a new version
    heading with today's date, and add the comparison links at the bottom.

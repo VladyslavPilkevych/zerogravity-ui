@@ -33,3 +33,9 @@ npm-debug.log*
 
 # packed tarballs
 *.tgz
+
+storybook-static/
+playwright-report/
+test-results/
+blob-report/
+.playwright/

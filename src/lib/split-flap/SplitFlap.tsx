@@ -182,12 +182,15 @@ export function SplitFlap({
         ["--sf-step" as string]: `${stepDuration}ms`,
     } as CSSProperties
 
+    const label = cells.join("").trim()
+
     return (
         <div
             className={cx("split-flap", className)}
             style={rootStyle}
-            role="img"
-            aria-label={cells.join("").trim()}
+            role={label ? "img" : undefined}
+            aria-label={label || undefined}
+            aria-hidden={label ? undefined : true}
         >
             {cells.map((char, index) => (
                 <Flap

@@ -46,7 +46,7 @@
     },
     "packageManager": "pnpm@10.16.1",
     "engines": {
-        "node": ">=20",
+        "node": ">=22",
         "pnpm": ">=10"
     },
     "scripts": {
@@ -54,15 +54,23 @@
         "build": "next build",
         "build:lib": "tsup",
         "start": "next start",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "typecheck": "tsc --noEmit",
-        "test": "vitest run",
-        "test:watch": "vitest",
-        "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
-        "release:check": "pnpm check && pnpm build:lib",
+        "test": "vitest run --project=unit",
+        "test:watch": "vitest --project=unit",
+        "test:browser": "vitest run --project=storybook",
+        "test:e2e": "playwright test",
+        "test:types": "tsc --project tsconfig.types.json",
+        "test:consumer": "node scripts/consumer-test.mjs",
+        "check:package": "node scripts/check-package.mjs",
+        "chromatic": "chromatic",
+        "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:browser",
+        "release:check": "pnpm check && pnpm build:lib && pnpm check:package && pnpm test:consumer",
         "prepack": "pnpm build:lib"
     },
     "peerDependencies": {
@@ -73,26 +81,42 @@
         "next": "^15.5.23"
     },
     "devDependencies": {
+        "@arethetypeswrong/cli": "^0.18.5",
         "@eslint/js": "^9.39.5",
+        "@playwright/test": "^1.62.1",
+        "@storybook/addon-a11y": "^10.5.8",
+        "@storybook/addon-vitest": "^10.5.8",
+        "@storybook/react-vite": "^10.5.8",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/jest-dom": "^7.0.0",
         "@testing-library/react": "^16.3.2",
         "@types/node": "^22.15.3",
         "@types/react": "^19.1.9",
         "@types/react-dom": "^19.1.7",
+        "@vitejs/plugin-react": "^6.0.5",
+        "@vitest/browser": "^4.1.10",
+        "@vitest/browser-playwright": "^4.1.10",
+        "chromatic": "^18.2.0",
         "eslint": "^9.39.5",
         "eslint-plugin-react-hooks": "^6.1.1",
         "jsdom": "^30.0.1",
+        "lefthook": "^2.1.10",
+        "playwright": "^1.62.1",
         "prettier": "^3.9.6",
+        "publint": "^0.3.23",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
+        "storybook": "^10.5.8",
         "tsup": "^8.5.1",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.67.0",
-        "vitest": "^3.2.7"
+        "vite": "^7.3.6",
+        "vitest": "^4.1.10"
     },
     "pnpm": {
         "onlyBuiltDependencies": [
+            "esbuild",
+            "lefthook",
             "sharp"
         ],
         "overrides": {

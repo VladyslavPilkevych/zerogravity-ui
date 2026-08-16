@@ -1,0 +1,9 @@
+{
+    "$schema": "https://www.chromatic.com/config-file.schema.json",
+    "storybookBaseDir": ".",
+    "storybookBuildDir": "storybook-static",
+    "onlyChanged": true,
+    "exitZeroOnChanges": true,
+    "exitOnceUploaded": true,
+    "skip": "dependabot/**"
+}

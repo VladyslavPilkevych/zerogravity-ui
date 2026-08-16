@@ -1,0 +1,19 @@
+pre-commit:
+    parallel: true
+    jobs:
+        - name: eslint
+          glob: "*.{js,mjs,ts,tsx}"
+          run: pnpm exec eslint --no-warn-ignored {staged_files}
+
+        - name: prettier
+          glob: "*.{js,mjs,ts,tsx,css,json,md,yml,yaml}"
+          run: pnpm exec prettier --check {staged_files}
+
+pre-push:
+    parallel: true
+    jobs:
+        - name: typecheck
+          run: pnpm typecheck
+
+        - name: unit tests
+          run: pnpm test
