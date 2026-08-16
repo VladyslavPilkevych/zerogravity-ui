@@ -1,0 +1,123 @@
+.xp-louvre {
+    --louvre-progress: 0;
+    position: relative;
+    width: 100%;
+}
+
+.xp-louvre-viewport {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.xp-louvre-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    perspective: var(--louvre-perspective);
+}
+
+.xp-louvre-back,
+.xp-louvre-blinds {
+    position: absolute;
+    inset: 0;
+}
+
+.xp-louvre-back {
+    opacity: clamp(0, calc(var(--louvre-progress) * 2.2 - 0.1), 1);
+}
+
+.xp-louvre-blinds {
+    display: flex;
+    transform-style: preserve-3d;
+}
+
+.xp-louvre-horizontal .xp-louvre-blinds {
+    flex-direction: column;
+}
+
+.xp-louvre-slat {
+    position: relative;
+    flex: 1 1 0;
+    margin-bottom: var(--louvre-gap);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    --louvre-local: calc(
+        var(--louvre-progress) * (1 + var(--louvre-phase)) - (var(--i) / var(--louvre-count)) *
+            var(--louvre-phase)
+    );
+    --louvre-open: clamp(0, var(--louvre-local), 1);
+    transform: rotateX(calc(var(--louvre-open) * -92deg));
+    transform-origin: 50% 50%;
+    opacity: clamp(0, calc(1 - var(--louvre-open) * 1.25), 1);
+}
+
+.xp-louvre-vertical .xp-louvre-blinds {
+    flex-direction: row;
+}
+
+.xp-louvre-vertical .xp-louvre-slat {
+    margin-bottom: 0;
+    margin-right: var(--louvre-gap);
+    transform: rotateY(calc(var(--louvre-open) * 92deg));
+}
+
+.xp-louvre-face {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.xp-louvre-face::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: calc(var(--louvre-open) * var(--louvre-shade));
+    pointer-events: none;
+}
+
+.xp-louvre-front {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: calc(100% * var(--louvre-count));
+}
+
+.xp-louvre-horizontal .xp-louvre-front {
+    top: calc(-100% * var(--slice));
+}
+
+.xp-louvre-vertical .xp-louvre-front {
+    top: 0;
+    left: calc(-100% * var(--slice));
+    width: calc(100% * var(--louvre-count));
+    height: 100%;
+}
+
+.xp-louvre-still .xp-louvre-viewport {
+    position: relative;
+    height: auto;
+}
+
+.xp-louvre-still .xp-louvre-scene {
+    perspective: none;
+}
+
+.xp-louvre-still .xp-louvre-blinds {
+    display: none;
+}
+
+.xp-louvre-still .xp-louvre-back {
+    position: relative;
+    inset: auto;
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-louvre-slat {
+        transition: none;
+    }
+}

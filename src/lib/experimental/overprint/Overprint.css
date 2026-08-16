@@ -1,0 +1,30 @@
+.xp-overprint {
+    --overprint-shift: 0;
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+    isolation: isolate;
+}
+
+.xp-overprint-text {
+    color: transparent;
+}
+
+.xp-overprint-plate {
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: var(--overprint-blend);
+    transform: translate3d(
+        calc(var(--plate) * var(--overprint-spread) * (0.35 + var(--overprint-shift))),
+        calc(var(--plate) * var(--overprint-spread) * var(--overprint-shift) * -0.5),
+        0
+    );
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-overprint-plate {
+        transform: translate3d(calc(var(--plate) * var(--overprint-spread) * 0.35), 0, 0);
+        will-change: auto;
+    }
+}

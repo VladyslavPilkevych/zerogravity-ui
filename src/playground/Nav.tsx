@@ -16,6 +16,17 @@ const LINKS = [
     { href: "/aperture", label: "Aperture" },
 ]
 
+const EXPERIMENTS = [
+    { href: "/x/louvre", label: "Louvre" },
+    { href: "/x/lodestone", label: "Lodestone" },
+    { href: "/x/facet", label: "Facet" },
+    { href: "/x/vellum", label: "Vellum" },
+    { href: "/x/kern", label: "Kern" },
+    { href: "/x/overprint", label: "Overprint" },
+    { href: "/x/diorama", label: "Diorama" },
+    { href: "/x/wash", label: "Wash" },
+]
+
 export function Nav() {
     const pathname = usePathname()
 
@@ -27,6 +38,20 @@ export function Nav() {
                     key={link.href}
                     href={link.href}
                     className={pathname === link.href ? "pg-nav-link pg-nav-active" : "pg-nav-link"}
+                >
+                    {link.label}
+                </Link>
+            ))}
+            <span className="pg-nav-divider" aria-hidden="true" />
+            {EXPERIMENTS.map((link) => (
+                <Link
+                    key={link.href}
+                    href={link.href}
+                    className={
+                        pathname === link.href
+                            ? "pg-nav-link pg-nav-x pg-nav-active"
+                            : "pg-nav-link pg-nav-x"
+                    }
                 >
                     {link.label}
                 </Link>

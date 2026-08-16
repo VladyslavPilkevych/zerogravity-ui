@@ -12,6 +12,7 @@
         "src/lib/**/*.test.ts",
         "src/lib/**/*.test.tsx",
         "src/lib/**/*.stories.ts",
-        "src/lib/**/*.stories.tsx"
+        "src/lib/**/*.stories.tsx",
+        "src/lib/experimental/**"
     ]
 }

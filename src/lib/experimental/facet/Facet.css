@@ -1,0 +1,84 @@
+.xp-facet {
+    position: relative;
+    width: 100%;
+    isolation: isolate;
+    background: var(--facet-ground);
+}
+
+.xp-facet-surface {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--facet-cols), 1fr);
+    grid-template-rows: repeat(var(--facet-rows), 1fr);
+    overflow: hidden;
+    --facet-lx: 0.5;
+    --facet-ly: 0.3;
+}
+
+.xp-facet-shard {
+    --dx: calc(var(--facet-lx) - var(--cx));
+    --dy: calc(var(--facet-ly) - var(--cy));
+    --falloff: clamp(0, calc(1 - (var(--dx) * var(--dx) + var(--dy) * var(--dy)) * 5), 1);
+    --lit: calc(var(--facet-intensity) * var(--falloff));
+    --mix: calc(16 + var(--lit) * 44 + var(--shade) * var(--facet-variation));
+    --sweep: calc((var(--cx) * var(--facet-dx) + var(--cy) * var(--facet-dy) + 1) * 0.5);
+    background: color-mix(in oklab, var(--facet-tone) calc(var(--mix) * 1%), var(--facet-ground));
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    transition-property: background;
+    transition-duration: calc(var(--facet-fade) * var(--pace));
+    transition-timing-function: cubic-bezier(0.4, 0, 0.25, 1);
+    transition-delay: calc(var(--facet-fade) * 0.45 * clamp(0, var(--sweep), 1));
+}
+
+.xp-facet-b {
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.xp-facet-flip.xp-facet-a {
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.xp-facet-flip.xp-facet-b {
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+.xp-facet-bloom {
+    position: absolute;
+    top: -40%;
+    left: -30%;
+    width: 90%;
+    height: 180%;
+    pointer-events: none;
+    background: radial-gradient(
+        closest-side,
+        color-mix(in oklab, var(--facet-tone) 26%, transparent),
+        transparent
+    );
+    filter: blur(40px);
+    animation: xp-facet-drift 38s ease-in-out infinite alternate;
+}
+
+@keyframes xp-facet-drift {
+    from {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+        transform: translate3d(70%, 12%, 0) scale(1.25);
+    }
+}
+
+.xp-facet-content {
+    position: relative;
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-facet-shard {
+        transition: none;
+    }
+
+    .xp-facet-bloom {
+        animation: none;
+    }
+}

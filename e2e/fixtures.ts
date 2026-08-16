@@ -11,6 +11,17 @@ export const ROUTES = [
     { path: "/trailing-cursor", name: "TrailingCursor" },
 ] as const
 
+export const EXPERIMENTAL_ROUTES = [
+    { path: "/x/louvre", name: "Louvre" },
+    { path: "/x/lodestone", name: "Lodestone" },
+    { path: "/x/facet", name: "Facet" },
+    { path: "/x/vellum", name: "Vellum" },
+    { path: "/x/kern", name: "Kern" },
+    { path: "/x/overprint", name: "Overprint" },
+    { path: "/x/diorama", name: "Diorama" },
+    { path: "/x/wash", name: "Wash" },
+] as const
+
 const ALLOWED = [/Download the React DevTools/i, /\[Fast Refresh\]/i, /favicon\.ico/i] as const
 
 function isAllowed(message: string) {

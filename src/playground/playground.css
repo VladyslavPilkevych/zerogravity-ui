@@ -1005,3 +1005,18 @@ kbd {
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.6);
 }
+
+.pg-nav-divider {
+    width: 1px;
+    height: 18px;
+    margin: 0 4px;
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.pg-nav-x {
+    color: rgba(255, 255, 255, 0.44);
+}
+
+.pg-nav-x.pg-nav-active {
+    color: rgba(255, 255, 255, 0.92);
+}
