@@ -25,6 +25,7 @@ const EXPERIMENTS = [
     { href: "/x/overprint", label: "Overprint" },
     { href: "/x/diorama", label: "Diorama" },
     { href: "/x/wash", label: "Wash" },
+    { href: "/x/tessera", label: "Tessera" },
 ]
 
 export function Nav() {

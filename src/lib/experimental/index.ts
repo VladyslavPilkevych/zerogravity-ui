@@ -16,6 +16,16 @@ export type { LouvreProps } from "./louvre"
 export { Overprint } from "./overprint"
 export type { OverprintProps } from "./overprint"
 
+export { TesseraProvider, useTessera, useTesseraPhase } from "./tessera"
+export type {
+    TesseraController,
+    TesseraNavigate,
+    TesseraPhase,
+    TesseraProviderProps,
+    TesseraRunOptions,
+    TesseraSequence,
+} from "./tessera"
+
 export { Vellum } from "./vellum"
 export type { VellumHighlight, VellumProps } from "./vellum"
 

@@ -20,9 +20,15 @@ export const EXPERIMENTAL_ROUTES = [
     { path: "/x/overprint", name: "Overprint" },
     { path: "/x/diorama", name: "Diorama" },
     { path: "/x/wash", name: "Wash" },
+    { path: "/x/tessera", name: "Tessera" },
 ] as const
 
-const ALLOWED = [/Download the React DevTools/i, /\[Fast Refresh\]/i, /favicon\.ico/i] as const
+const ALLOWED = [
+    /Download the React DevTools/i,
+    /\[Fast Refresh\]/i,
+    /favicon\.ico/i,
+    /was preloaded using link preload but not used/i,
+] as const
 
 function isAllowed(message: string) {
     return ALLOWED.some((pattern) => pattern.test(message))
