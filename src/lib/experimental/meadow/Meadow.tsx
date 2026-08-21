@@ -7,9 +7,11 @@ import {
     MEADOW_ART,
     MEADOW_CAST,
     MEADOW_CLOUDS,
+    MEADOW_COMETS,
     MEADOW_PLANTS,
     MeadowCloud,
     MeadowHills,
+    MeadowMoon,
     MeadowSun,
     type MeadowItem,
     type MeadowPlantSpot,
@@ -17,6 +19,7 @@ import {
 import {
     MEADOW_DENSITY,
     planCast,
+    planStars,
     type MeadowDensity,
     type MeadowKind,
     type MeadowPlanEntry,
@@ -41,6 +44,7 @@ export interface MeadowProps {
     items?: readonly MeadowItem[]
     density?: MeadowDensity
     scene?: MeadowScene
+    darkMode?: boolean
     animated?: boolean
     trails?: boolean
     seed?: number
@@ -53,6 +57,9 @@ const TIGHT_QUERY = "(max-width: 1080px)"
 const SMALL_QUERY = "(max-width: 700px)"
 const SMALL_CAST = 3
 const ECHOES = [0.13, 0.27] as const
+const STARS = 18
+const SMALL_STARS = 11
+const NIGHT_OFF: readonly (keyof MeadowScene)[] = ["birds", "butterflies"]
 
 const TOGGLE: Record<MeadowKind, keyof MeadowScene> = {
     balloon: "balloon",
@@ -68,6 +75,7 @@ export function Meadow({
     items = MEADOW_CAST,
     density = "cosy",
     scene,
+    darkMode = false,
     animated = true,
     trails = true,
     seed = 5,
@@ -80,7 +88,8 @@ export function Meadow({
     const small = useMediaQuery(SMALL_QUERY)
 
     const still = !animated || (respectReducedMotion && reduced)
-    const shows = (part: keyof MeadowScene) => scene?.[part] !== false
+    const shows = (part: keyof MeadowScene) =>
+        scene?.[part] ?? !(darkMode && NIGHT_OFF.includes(part))
 
     const base = MEADOW_DENSITY[density] ?? MEADOW_DENSITY.cosy
     const count = small ? Math.min(base, SMALL_CAST) : base
@@ -93,20 +102,59 @@ export function Meadow({
         (plant) => (plant.kind === "tuft" ? shows("hills") : shows("flowers")),
     )
 
-    const sky = shows("sun") || shows("clouds")
+    const stars = darkMode && shows("stars") ? planStars(small ? SMALL_STARS : STARS, seed) : []
+    const comets = darkMode && !small && shows("stars") ? MEADOW_COMETS : []
+    const sky = shows("sun") || shows("clouds") || stars.length > 0
     const land = shows("hills") || plants.length > 0
     const near = plants.filter((plant) => plant.near)
 
     return (
-        <div className={cx("xp-meadow", still && "xp-meadow-still", className)} style={style}>
+        <div
+            className={cx(
+                "xp-meadow",
+                darkMode && "xp-meadow-night",
+                still && "xp-meadow-still",
+                className,
+            )}
+            style={style}
+        >
             {sky ? (
                 <div className="xp-meadow-layer xp-meadow-far" aria-hidden="true">
                     <div className="xp-meadow-drift">
+                        {stars.map((star, index) => (
+                            <div
+                                key={index}
+                                className="xp-meadow-star"
+                                style={{
+                                    ["--m-x" as string]: star.x,
+                                    ["--m-y" as string]: star.y,
+                                    ["--m-size" as string]: star.size,
+                                    ["--m-tone" as string]: star.tone,
+                                    ["--m-beat" as string]: star.beat,
+                                }}
+                            />
+                        ))}
+
+                        {comets.map((comet, index) => (
+                            <div
+                                key={index}
+                                className="xp-meadow-comet"
+                                style={{
+                                    ["--m-x" as string]: comet.x,
+                                    ["--m-y" as string]: comet.y,
+                                    ["--m-size" as string]: comet.size,
+                                    ["--m-beat" as string]: comet.beat,
+                                    ["--m-delay" as string]: comet.delay,
+                                    ["--m-tilt" as string]: comet.tilt,
+                                }}
+                            />
+                        ))}
+
                         {shows("sun") ? (
                             <>
                                 <div className="xp-meadow-glow" />
-                                <div className="xp-meadow-sun">
-                                    <MeadowSun />
+                                <div className="xp-meadow-orb">
+                                    {darkMode ? <MeadowMoon /> : <MeadowSun />}
                                 </div>
                             </>
                         ) : null}
@@ -160,6 +208,7 @@ export function Meadow({
                             entry={entry}
                             content={allowed[entry.item].content}
                             trail={trails && entry.kind === "mascot"}
+                            glow={darkMode && entry.kind === "mascot"}
                         />
                     ))}
                 </div>
@@ -202,9 +251,10 @@ interface CreatureProps {
     entry: MeadowPlanEntry
     content: ReactNode
     trail: boolean
+    glow: boolean
 }
 
-function Creature({ entry, content, trail }: CreatureProps) {
+function Creature({ entry, content, trail, glow }: CreatureProps) {
     return (
         <div
             className="xp-meadow-object"
@@ -240,6 +290,7 @@ function Creature({ entry, content, trail }: CreatureProps) {
                   ))
                 : null}
             <div className="xp-meadow-track" data-motion={entry.motion}>
+                {glow ? <div className="xp-meadow-halo" /> : null}
                 <div className="xp-meadow-body" data-motion={entry.motion}>
                     {content}
                 </div>

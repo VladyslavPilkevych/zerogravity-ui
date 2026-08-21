@@ -2,8 +2,33 @@
     --meadow-sky-top: #fdf9f2;
     --meadow-sky-mid: #fdf3e6;
     --meadow-sky-low: #fbe8d8;
-    --meadow-sun: #f7b267;
-    --meadow-ink: #4a4038;
+    --meadow-wash: rgba(247, 178, 103, 0.26);
+    --meadow-glow: rgba(250, 205, 148, 0.34);
+    --meadow-glow-soft: rgba(250, 205, 148, 0.12);
+    --meadow-cloud: #ffffff;
+    --meadow-cloud-tone: 1;
+    --meadow-hill-far: #e9f2df;
+    --meadow-hill-mid: #d6e8c8;
+    --meadow-hill-near: #c3dcb1;
+    --meadow-stem: #a3c48d;
+    --meadow-pollen: #f7b267;
+    --meadow-bud: #f4bfc9;
+    --meadow-spark: #f9c47e;
+    --meadow-petal-pink: #f2b9c5;
+    --meadow-petal-coral: #f4b39a;
+    --meadow-petal-cream: #fbeacf;
+    --meadow-leaf: #a3c48d;
+    --meadow-leaf-deep: #8fb87a;
+    --meadow-body: #fffaf1;
+    --meadow-outline: #dfcdb4;
+    --meadow-face: #6f625a;
+    --meadow-blush: #f7cdd5;
+    --meadow-trail-core: rgba(244, 191, 201, 0.85);
+    --meadow-trail-edge: rgba(246, 207, 182, 0.35);
+    --meadow-ink: #3f362e;
+    --meadow-ink-soft: #6d5f52;
+    --meadow-edge: rgba(63, 54, 46, 0.2);
+    --meadow-veil: rgba(255, 255, 255, 0.6);
 
     position: relative;
     display: grid;
@@ -11,7 +36,7 @@
     isolation: isolate;
     min-height: 34rem;
     background:
-        radial-gradient(58% 46% at 78% 12%, rgba(247, 178, 103, 0.26) 0%, transparent 68%),
+        radial-gradient(58% 46% at 78% 12%, var(--meadow-wash) 0%, transparent 68%),
         linear-gradient(
             176deg,
             var(--meadow-sky-top) 0%,
@@ -19,6 +44,39 @@
             var(--meadow-sky-low) 100%
         );
     color: var(--meadow-ink);
+}
+
+.xp-meadow-night {
+    --meadow-sky-top: #191a2e;
+    --meadow-sky-mid: #1f1f3a;
+    --meadow-sky-low: #2a2445;
+    --meadow-wash: rgba(150, 165, 235, 0.16);
+    --meadow-glow: rgba(178, 192, 255, 0.22);
+    --meadow-glow-soft: rgba(178, 192, 255, 0.08);
+    --meadow-cloud: #333c63;
+    --meadow-cloud-tone: 0.58;
+    --meadow-hill-far: #2b3850;
+    --meadow-hill-mid: #232e44;
+    --meadow-hill-near: #1c2536;
+    --meadow-stem: #4f6b62;
+    --meadow-pollen: #c9a86a;
+    --meadow-bud: #8e7ba8;
+    --meadow-spark: #ddd4ff;
+    --meadow-petal-pink: #8d7796;
+    --meadow-petal-coral: #946f77;
+    --meadow-petal-cream: #9b93bd;
+    --meadow-leaf: #4e6b62;
+    --meadow-leaf-deep: #3f5a55;
+    --meadow-body: #f2f1ff;
+    --meadow-outline: #8b85bd;
+    --meadow-face: #3a3457;
+    --meadow-blush: #c6a4c6;
+    --meadow-trail-core: rgba(190, 202, 255, 0.8);
+    --meadow-trail-edge: rgba(150, 165, 235, 0.28);
+    --meadow-ink: #eceaf7;
+    --meadow-ink-soft: #b3aed0;
+    --meadow-edge: rgba(236, 234, 247, 0.24);
+    --meadow-veil: rgba(255, 255, 255, 0.08);
 }
 
 .xp-meadow-layer {
@@ -95,14 +153,14 @@
     }
 }
 
-.xp-meadow-sun {
+.xp-meadow-orb {
     position: absolute;
     top: -6%;
     right: 4%;
     width: clamp(128px, 17vw, 208px);
 }
 
-.xp-meadow-sun svg {
+.xp-meadow-orb svg {
     display: block;
     width: 100%;
     height: auto;
@@ -116,8 +174,8 @@
     aspect-ratio: 1;
     background: radial-gradient(
         circle,
-        rgba(250, 205, 148, 0.34) 0%,
-        rgba(250, 205, 148, 0.12) 40%,
+        var(--meadow-glow) 0%,
+        var(--meadow-glow-soft) 40%,
         transparent 70%
     );
     animation: xp-meadow-breathe 12s ease-in-out infinite alternate;
@@ -151,8 +209,8 @@
     left: calc(var(--m-x) * 1%);
     top: calc(var(--m-y) * 1%);
     width: calc(var(--m-size) * 1px);
-    color: #ffffff;
-    opacity: var(--m-tone);
+    color: var(--meadow-cloud);
+    opacity: calc(var(--m-tone) * var(--meadow-cloud-tone));
     animation: xp-meadow-cloud-drift calc(var(--m-beat) * 1s) ease-in-out infinite alternate;
 }
 
@@ -204,23 +262,23 @@
 }
 
 .xp-meadow-tint-pink {
-    color: #f2b9c5;
+    color: var(--meadow-petal-pink);
 }
 
 .xp-meadow-tint-coral {
-    color: #f4b39a;
+    color: var(--meadow-petal-coral);
 }
 
 .xp-meadow-tint-cream {
-    color: #fbeacf;
+    color: var(--meadow-petal-cream);
 }
 
 .xp-meadow-tint-green {
-    color: #a3c48d;
+    color: var(--meadow-leaf);
 }
 
 .xp-meadow-tint-deep {
-    color: #8fb87a;
+    color: var(--meadow-leaf-deep);
 }
 
 @keyframes xp-meadow-sway {
@@ -289,8 +347,8 @@
     border-radius: 50%;
     background: radial-gradient(
         circle,
-        rgba(244, 191, 201, 0.85) 0%,
-        rgba(246, 207, 182, 0.35) 44%,
+        var(--meadow-trail-core) 0%,
+        var(--meadow-trail-edge) 44%,
         transparent 72%
     );
     opacity: var(--m-fade);
@@ -451,8 +509,78 @@
     transform: translate3d(calc(var(--m-rest) * 1%), 0, 0);
 }
 
+.xp-meadow-star {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #e8ecff;
+    opacity: var(--m-tone);
+    animation: xp-meadow-twinkle calc(var(--m-beat) * 1s) ease-in-out infinite alternate;
+    animation-delay: calc(var(--m-beat) * -0.5s);
+}
+
+.xp-meadow-comet {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+        90deg,
+        rgba(214, 224, 255, 0) 0%,
+        rgba(214, 224, 255, 0.2) 40%,
+        rgba(232, 238, 255, 0.95) 100%
+    );
+    opacity: 0;
+    animation: xp-meadow-comet calc(var(--m-beat) * 1s) linear infinite;
+    animation-delay: calc(var(--m-delay) * 1s);
+}
+
+@keyframes xp-meadow-comet {
+    0%,
+    86% {
+        transform: translate3d(0, 0, 0) rotate(calc(var(--m-tilt) * 1deg));
+        opacity: 0;
+    }
+    88% {
+        opacity: 0;
+    }
+    91% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate3d(200px, calc(var(--m-tilt) * 3.7px), 0)
+            rotate(calc(var(--m-tilt) * 1deg));
+        opacity: 0;
+    }
+}
+
+.xp-meadow-halo {
+    position: absolute;
+    top: calc(var(--m-size) * -0.15px);
+    left: calc(var(--m-size) * -0.14px);
+    width: calc(var(--m-size) * 1.28px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(198, 210, 255, 0.32) 0%,
+        rgba(198, 210, 255, 0.1) 44%,
+        transparent 68%
+    );
+}
+
 .xp-meadow-still .xp-meadow-echo {
     display: none;
+}
+
+.xp-meadow-still .xp-meadow-star,
+.xp-meadow-still .xp-meadow-comet {
+    animation: none;
 }
 
 @media (max-width: 1080px) {
@@ -460,7 +588,7 @@
         width: calc(var(--m-size) * 0.6px);
     }
 
-    .xp-meadow-sun {
+    .xp-meadow-orb {
         width: clamp(112px, 19vw, 168px);
     }
 }
@@ -479,7 +607,7 @@
         height: clamp(120px, 34vw, 190px);
     }
 
-    .xp-meadow-sun {
+    .xp-meadow-orb {
         width: clamp(104px, 30vw, 140px);
     }
 }

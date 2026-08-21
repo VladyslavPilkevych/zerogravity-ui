@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 
 import { MEADOW_CAST } from "./art"
-import { MEADOW_DENSITY, planCast, type MeadowSpec } from "./plan"
+import { MEADOW_DENSITY, planCast, planStars, type MeadowSpec } from "./plan"
 
 const SPECS: MeadowSpec[] = [
     { motion: "bob", x: 12, y: 24, size: 90, depth: 0.8 },
@@ -140,5 +140,44 @@ describe("the built-in cast", () => {
     it("keeps the cast small enough to stay calm", () => {
         expect(MEADOW_DENSITY.calm).toBeLessThanOrEqual(3)
         expect(MEADOW_DENSITY.lively).toBeLessThanOrEqual(7)
+    })
+})
+
+describe("planStars", () => {
+    it("hangs the requested number of stars", () => {
+        expect(planStars(18, 5)).toHaveLength(18)
+        expect(planStars(0, 5)).toHaveLength(0)
+    })
+
+    it("is deterministic for a given seed", () => {
+        expect(planStars(18, 5)).toEqual(planStars(18, 5))
+    })
+
+    it("gives a different sky for a different seed", () => {
+        expect(planStars(18, 5)).not.toEqual(planStars(18, 6))
+    })
+
+    it("never calls the global random source", () => {
+        const random = vi.spyOn(Math, "random")
+
+        planStars(18, 5)
+
+        expect(random).not.toHaveBeenCalled()
+        random.mockRestore()
+    })
+
+    it("keeps stars in the sky, above the hills, and never twice as bright", () => {
+        for (const star of planStars(30, 5)) {
+            expect(star.x).toBeGreaterThanOrEqual(2)
+            expect(star.x).toBeLessThanOrEqual(98)
+            expect(star.y).toBeGreaterThanOrEqual(2)
+            expect(star.y).toBeLessThanOrEqual(58)
+            expect(star.tone).toBeLessThanOrEqual(0.85)
+            expect(star.beat).toBeGreaterThan(2)
+        }
+    })
+
+    it("keeps the first stars in place when the count grows", () => {
+        expect(planStars(18, 5).slice(0, 11)).toEqual(planStars(11, 5))
     })
 })

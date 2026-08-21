@@ -4,6 +4,35 @@ import type { MeadowSpec } from "./plan"
 
 const svgProps = { focusable: "false", role: "presentation" } as const
 
+export function MeadowMoon() {
+    return (
+        <svg viewBox="0 0 200 200" {...svgProps}>
+            <circle cx="100" cy="100" r="46" fill="#e6e6fb" />
+            <circle cx="100" cy="100" r="46" fill="#cfd0f0" opacity="0.55" />
+            <circle cx="112" cy="86" r="34" fill="#f2f2ff" />
+            <g fill="#c3c4e8" opacity="0.6">
+                <circle cx="86" cy="112" r="9" />
+                <circle cx="108" cy="126" r="6" />
+                <circle cx="78" cy="90" r="5" />
+            </g>
+        </svg>
+    )
+}
+
+export interface MeadowCometSpot {
+    x: number
+    y: number
+    size: number
+    beat: number
+    delay: number
+    tilt: number
+}
+
+export const MEADOW_COMETS: readonly MeadowCometSpot[] = [
+    { x: 56, y: 3, size: 126, beat: 17, delay: -4, tilt: 15 },
+    { x: 14, y: 10, size: 98, beat: 26, delay: -15, tilt: 18 },
+]
+
 export function MeadowSun() {
     return (
         <svg viewBox="0 0 200 200" {...svgProps}>
@@ -41,15 +70,15 @@ export function MeadowHills() {
         <svg viewBox="0 0 1200 340" preserveAspectRatio="none" {...svgProps}>
             <path
                 d="M0 148C168 92 306 116 462 140 640 168 782 104 962 120 1082 130 1152 148 1200 158V340H0Z"
-                fill="#e9f2df"
+                fill="var(--meadow-hill-far)"
             />
             <path
                 d="M0 206C148 166 262 194 424 206 616 220 762 176 924 190 1064 202 1142 216 1200 222V340H0Z"
-                fill="#d6e8c8"
+                fill="var(--meadow-hill-mid)"
             />
             <path
                 d="M0 262C204 244 424 258 646 264 866 270 1044 258 1200 264V340H0Z"
-                fill="#c3dcb1"
+                fill="var(--meadow-hill-near)"
             />
         </svg>
     )
@@ -60,12 +89,17 @@ export function MeadowFlower() {
         <svg viewBox="0 0 48 80" {...svgProps}>
             <path
                 d="M24 78C24 60 20 48 15 38"
-                stroke="#a3c48d"
+                stroke="var(--meadow-stem)"
                 strokeWidth="2.6"
                 strokeLinecap="round"
                 fill="none"
             />
-            <path d="M22 58C16 56 12 50 13 45" stroke="#a3c48d" strokeWidth="2.2" fill="none" />
+            <path
+                d="M22 58C16 56 12 50 13 45"
+                stroke="var(--meadow-stem)"
+                strokeWidth="2.2"
+                fill="none"
+            />
             <g fill="currentColor">
                 <circle cx="15" cy="24" r="8" />
                 <circle cx="27" cy="20" r="8" />
@@ -73,7 +107,7 @@ export function MeadowFlower() {
                 <circle cx="21" cy="36" r="8" />
                 <circle cx="9" cy="34" r="7" />
             </g>
-            <circle cx="21" cy="28" r="6" fill="#f7b267" />
+            <circle cx="21" cy="28" r="6" fill="var(--meadow-pollen)" />
         </svg>
     )
 }
@@ -107,7 +141,7 @@ export function MeadowSprig() {
                 <ellipse cx="33" cy="28" rx="9" ry="5.4" transform="rotate(28 33 28)" />
                 <ellipse cx="17" cy="48" rx="7.5" ry="4.6" transform="rotate(-24 17 48)" />
             </g>
-            <circle cx="24" cy="18" r="5" fill="#f4bfc9" />
+            <circle cx="24" cy="18" r="5" fill="var(--meadow-bud)" />
         </svg>
     )
 }
@@ -173,17 +207,17 @@ function MeadowBlob() {
         <svg viewBox="0 0 72 66" {...svgProps}>
             <path
                 d="M36 4c17 0 28 11 28 26 0 17-13 32-28 32S8 47 8 30C8 15 19 4 36 4Z"
-                fill="#fffaf1"
-                stroke="#dfcdb4"
+                fill="var(--meadow-body)"
+                stroke="var(--meadow-outline)"
                 strokeWidth="2.6"
             />
-            <ellipse cx="21" cy="38" rx="5" ry="3.4" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="51" cy="38" rx="5" ry="3.4" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="27" cy="30" rx="3.4" ry="4.4" fill="#6f625a" />
-            <ellipse cx="45" cy="30" rx="3.4" ry="4.4" fill="#6f625a" />
+            <ellipse cx="21" cy="38" rx="5" ry="3.4" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="51" cy="38" rx="5" ry="3.4" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="27" cy="30" rx="3.4" ry="4.4" fill="var(--meadow-face)" />
+            <ellipse cx="45" cy="30" rx="3.4" ry="4.4" fill="var(--meadow-face)" />
             <path
                 d="M32 40c2 2.4 6 2.4 8 0"
-                stroke="#6f625a"
+                stroke="var(--meadow-face)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 fill="none"
@@ -197,17 +231,17 @@ function MeadowGhost() {
         <svg viewBox="0 0 60 68" {...svgProps}>
             <path
                 d="M30 3c14 0 23 11 23 25v22c0 4-4 6-7 3-3-3-7-3-10 0s-7 3-10 0-7-3-10 0c-3 3-9 1-9-3V28C7 14 16 3 30 3Z"
-                fill="#fffaf1"
-                stroke="#e0cfb8"
+                fill="var(--meadow-body)"
+                stroke="var(--meadow-outline)"
                 strokeWidth="2.6"
             />
-            <ellipse cx="17" cy="35" rx="4.4" ry="3" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="43" cy="35" rx="4.4" ry="3" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="23" cy="27" rx="3.2" ry="4.2" fill="#6f625a" />
-            <ellipse cx="37" cy="27" rx="3.2" ry="4.2" fill="#6f625a" />
+            <ellipse cx="17" cy="35" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="43" cy="35" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="23" cy="27" rx="3.2" ry="4.2" fill="var(--meadow-face)" />
+            <ellipse cx="37" cy="27" rx="3.2" ry="4.2" fill="var(--meadow-face)" />
             <path
                 d="M27 36c1.6 2 4.4 2 6 0"
-                stroke="#6f625a"
+                stroke="var(--meadow-face)"
                 strokeWidth="1.9"
                 strokeLinecap="round"
                 fill="none"
@@ -234,7 +268,7 @@ function MeadowStar() {
         <svg viewBox="0 0 40 40" {...svgProps}>
             <path
                 d="M20 2c1.4 10.4 7.2 16.2 18 18-10.8 1.8-16.6 7.6-18 18-1.4-10.4-7.2-16.2-18-18C12.8 18.2 18.6 12.4 20 2Z"
-                fill="#f9c47e"
+                fill="var(--meadow-spark)"
             />
         </svg>
     )
@@ -245,13 +279,13 @@ function MeadowSleepy() {
         <svg viewBox="0 0 78 58" {...svgProps}>
             <path
                 d="M39 4c19 0 34 10 34 24 0 15-15 26-34 26S5 43 5 28C5 14 20 4 39 4Z"
-                fill="#fff6ea"
-                stroke="#e3d0b6"
+                fill="var(--meadow-body)"
+                stroke="var(--meadow-outline)"
                 strokeWidth="2.6"
             />
-            <ellipse cx="22" cy="36" rx="5" ry="3.2" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="56" cy="36" rx="5" ry="3.2" fill="#f7cdd5" opacity="0.9" />
-            <g stroke="#6f625a" strokeWidth="2.2" strokeLinecap="round" fill="none">
+            <ellipse cx="22" cy="36" rx="5" ry="3.2" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="56" cy="36" rx="5" ry="3.2" fill="var(--meadow-blush)" opacity="0.9" />
+            <g stroke="var(--meadow-face)" strokeWidth="2.2" strokeLinecap="round" fill="none">
                 <path d="M23 27c2.4 3 6.4 3 8.8 0" />
                 <path d="M46 27c2.4 3 6.4 3 8.8 0" />
                 <path d="M35 38c2.4 2 5.6 2 8 0" />
@@ -265,14 +299,14 @@ function MeadowWink() {
         <svg viewBox="0 0 54 74" {...svgProps}>
             <path
                 d="M27 3c13 0 22 10 22 23v31c0 4-4 6-7 3-3-3-6-3-9 0s-6 3-9 0-6-3-9 0c-3 3-8 1-8-3V26C7 13 14 3 27 3Z"
-                fill="#fffaf1"
-                stroke="#dfcdb4"
+                fill="var(--meadow-body)"
+                stroke="var(--meadow-outline)"
                 strokeWidth="2.6"
             />
-            <ellipse cx="15" cy="37" rx="4.4" ry="3" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="39" cy="37" rx="4.4" ry="3" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="20" cy="29" rx="3.2" ry="4.2" fill="#6f625a" />
-            <g stroke="#6f625a" strokeWidth="2.2" strokeLinecap="round" fill="none">
+            <ellipse cx="15" cy="37" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="39" cy="37" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="20" cy="29" rx="3.2" ry="4.2" fill="var(--meadow-face)" />
+            <g stroke="var(--meadow-face)" strokeWidth="2.2" strokeLinecap="round" fill="none">
                 <path d="M30 30c2.4-2.6 6-2.6 8 0" />
                 <path d="M24 39c2 2.2 5 2.2 7 0" />
             </g>
@@ -285,15 +319,15 @@ function MeadowSprite() {
         <svg viewBox="0 0 48 50" {...svgProps}>
             <path
                 d="M24 3c12 0 20 8 20 19s-9 25-20 25S4 33 4 22C4 11 12 3 24 3Z"
-                fill="#fdf6ec"
-                stroke="#e5d4bd"
+                fill="var(--meadow-body)"
+                stroke="var(--meadow-outline)"
                 strokeWidth="2.4"
             />
-            <ellipse cx="14" cy="28" rx="3.6" ry="2.4" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="34" cy="28" rx="3.6" ry="2.4" fill="#f7cdd5" opacity="0.9" />
-            <ellipse cx="18" cy="22" rx="2.8" ry="3.6" fill="#6f625a" />
-            <ellipse cx="30" cy="22" rx="2.8" ry="3.6" fill="#6f625a" />
-            <ellipse cx="24" cy="31" rx="2.6" ry="3" fill="#6f625a" />
+            <ellipse cx="14" cy="28" rx="3.6" ry="2.4" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="34" cy="28" rx="3.6" ry="2.4" fill="var(--meadow-blush)" opacity="0.9" />
+            <ellipse cx="18" cy="22" rx="2.8" ry="3.6" fill="var(--meadow-face)" />
+            <ellipse cx="30" cy="22" rx="2.8" ry="3.6" fill="var(--meadow-face)" />
+            <ellipse cx="24" cy="31" rx="2.6" ry="3" fill="var(--meadow-face)" />
         </svg>
     )
 }

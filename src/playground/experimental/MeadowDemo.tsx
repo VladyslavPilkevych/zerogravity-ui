@@ -10,6 +10,7 @@ import { useExperiment } from "./useExperiment"
 
 const DEFAULTS = {
     density: "cosy",
+    darkMode: false,
     animated: true,
     trails: true,
     seed: 5,
@@ -39,6 +40,7 @@ const CONTROLS: ControlGroup[] = [
                 options: ["calm", "cosy", "lively"],
             },
             { kind: "number", path: "seed", label: "Seed", min: 1, max: 99, step: 1 },
+            { kind: "boolean", path: "darkMode", label: "Night" },
             { kind: "boolean", path: "animated", label: "Animated" },
             { kind: "boolean", path: "trails", label: "Mascot trails" },
         ],
@@ -82,6 +84,7 @@ export function MeadowDemo() {
             >
                 <Meadow
                     density={config.density as MeadowDensity}
+                    darkMode={config.darkMode}
                     animated={config.animated}
                     trails={config.trails}
                     seed={config.seed}

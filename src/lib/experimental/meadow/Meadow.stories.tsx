@@ -19,13 +19,13 @@ const hero = (
             style={{
                 padding: "7px 16px",
                 borderRadius: 999,
-                border: "1px solid rgba(74,64,56,0.16)",
-                background: "rgba(255,255,255,0.6)",
+                border: "1px solid var(--meadow-edge)",
+                background: "var(--meadow-veil)",
                 fontSize: 12,
                 fontWeight: 600,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "#6d5f52",
+                color: "var(--meadow-ink-soft)",
             }}
         >
             Ages 4–10
@@ -36,7 +36,7 @@ const hero = (
                 fontSize: 54,
                 lineHeight: 1.04,
                 letterSpacing: "-0.035em",
-                color: "#3f362e",
+                color: "var(--meadow-ink)",
             }}
         >
             A little world that grows with them
@@ -47,7 +47,7 @@ const hero = (
                 margin: 0,
                 fontSize: 17,
                 lineHeight: 1.65,
-                color: "#6d5f52",
+                color: "var(--meadow-ink-soft)",
             }}
         >
             Ten warm minutes a day of stories, sounds and small puzzles — made with teachers, loved
@@ -60,8 +60,8 @@ const hero = (
                     padding: "14px 28px",
                     border: "none",
                     borderRadius: 999,
-                    background: "#3f362e",
-                    color: "#fdf6ec",
+                    background: "var(--meadow-ink)",
+                    color: "var(--meadow-sky-top)",
                     font: "inherit",
                     fontWeight: 650,
                     cursor: "pointer",
@@ -73,10 +73,10 @@ const hero = (
                 type="button"
                 style={{
                     padding: "14px 26px",
-                    border: "1.5px solid rgba(63,54,46,0.28)",
+                    border: "1.5px solid var(--meadow-edge)",
                     borderRadius: 999,
-                    background: "rgba(255,255,255,0.55)",
-                    color: "#3f362e",
+                    background: "var(--meadow-veil)",
+                    color: "var(--meadow-ink)",
                     font: "inherit",
                     fontWeight: 600,
                     cursor: "pointer",
@@ -206,6 +206,27 @@ const CUSTOM_ITEMS: MeadowItem[] = [
         depth: 0.4,
     },
 ]
+
+export const Night: Story = {
+    args: { darkMode: true },
+}
+
+export const NightDense: Story = {
+    args: { darkMode: true, density: "lively" },
+}
+
+export const NightCalm: Story = {
+    args: { darkMode: true, density: "calm" },
+}
+
+export const NightNoStars: Story = {
+    args: { darkMode: true, scene: { stars: false } },
+}
+
+export const NightReducedMotion: Story = {
+    args: { darkMode: true, density: "lively", animated: false },
+    parameters: { chromatic: { disableSnapshot: false } },
+}
 
 export const CustomItems: Story = {
     args: { items: CUSTOM_ITEMS, density: "lively" },

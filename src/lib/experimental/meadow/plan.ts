@@ -115,3 +115,29 @@ export function planCast(
 
     return entries
 }
+
+export interface MeadowStar {
+    x: number
+    y: number
+    size: number
+    tone: number
+    beat: number
+}
+
+export function planStars(count: number, seed: number): MeadowStar[] {
+    const stars: MeadowStar[] = []
+
+    for (let index = 0; index < count; index += 1) {
+        const random = rngFor(seed + 977, index)
+
+        stars.push({
+            x: round(2 + random() * 96, 2),
+            y: round(2 + random() * 56, 2),
+            size: round(1.6 + random() * 2.4, 2),
+            tone: round(0.35 + random() * 0.5, 2),
+            beat: round(2.6 + random() * 4.2, 2),
+        })
+    }
+
+    return stars
+}

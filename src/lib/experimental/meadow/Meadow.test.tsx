@@ -40,7 +40,7 @@ function scene(container: HTMLElement) {
             ".xp-meadow-tint-pink, .xp-meadow-tint-coral, .xp-meadow-tint-cream",
         ),
         echoes: container.querySelectorAll(".xp-meadow-echo"),
-        sun: container.querySelector(".xp-meadow-sun"),
+        orb: container.querySelector(".xp-meadow-orb"),
         hills: container.querySelector(".xp-meadow-hills"),
     }
 }
@@ -77,7 +77,7 @@ describe("Meadow", () => {
         const { container } = render(<Meadow>hero</Meadow>)
         const parts = scene(container)
 
-        expect(parts.sun).not.toBeNull()
+        expect(parts.orb).not.toBeNull()
         expect(parts.hills).not.toBeNull()
         expect(parts.clouds.length).toBeGreaterThan(2)
         expect(parts.plants.length).toBeGreaterThan(5)
@@ -133,7 +133,7 @@ describe("Meadow", () => {
 
     it("can drop each piece of scenery on its own", () => {
         const cases: Array<[keyof MeadowScene, (parts: ReturnType<typeof scene>) => void]> = [
-            ["sun", (parts) => expect(parts.sun).toBeNull()],
+            ["sun", (parts) => expect(parts.orb).toBeNull()],
             ["clouds", (parts) => expect(parts.clouds).toHaveLength(0)],
             ["hills", (parts) => expect(parts.hills).toBeNull()],
             ["flowers", (parts) => expect(parts.flowers).toHaveLength(0)],
@@ -150,7 +150,7 @@ describe("Meadow", () => {
         const { container } = render(<Meadow scene={{ sun: false }}>hero</Meadow>)
         const parts = scene(container)
 
-        expect(parts.sun).toBeNull()
+        expect(parts.orb).toBeNull()
         expect(parts.clouds.length).toBeGreaterThan(2)
         expect(parts.hills).not.toBeNull()
         expect(parts.objects).toHaveLength(4)
@@ -286,7 +286,7 @@ describe("Meadow", () => {
 
         expect(parts.root.className).toContain("xp-meadow-still")
         expect(parts.objects).toHaveLength(7)
-        expect(parts.sun).not.toBeNull()
+        expect(parts.orb).not.toBeNull()
         expect(parts.plants.length).toBeGreaterThan(5)
     })
 
@@ -391,6 +391,171 @@ describe("Meadow", () => {
             if (layer.classList.contains("xp-meadow-air")) continue
             expect(layer.querySelector(":scope > .xp-meadow-drift")).not.toBeNull()
         }
+    })
+
+    it("keeps the daytime scene untouched by default", () => {
+        const { container } = render(<Meadow>hero</Meadow>)
+
+        expect(container.querySelector(".xp-meadow")?.className).not.toContain("xp-meadow-night")
+        expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(0)
+        expect(container.querySelectorAll(".xp-meadow-comet")).toHaveLength(0)
+        expect(container.querySelectorAll(".xp-meadow-halo")).toHaveLength(0)
+    })
+
+    it("does not switch to night when darkMode is false", () => {
+        const { container } = render(<Meadow darkMode={false}>hero</Meadow>)
+
+        expect(container.querySelector(".xp-meadow")?.className).not.toContain("xp-meadow-night")
+        expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(0)
+    })
+
+    it("swaps the sun for a moon at night", () => {
+        const day = render(<Meadow>hero</Meadow>)
+        const dayPaths = day.container.querySelector(".xp-meadow-orb")?.innerHTML ?? ""
+        day.unmount()
+
+        const { container } = render(<Meadow darkMode>hero</Meadow>)
+        const nightPaths = container.querySelector(".xp-meadow-orb")?.innerHTML ?? ""
+
+        expect(container.querySelector(".xp-meadow-orb")).not.toBeNull()
+        expect(nightPaths).not.toBe(dayPaths)
+        expect(nightPaths).not.toContain("xp-meadow-rays")
+    })
+
+    it("hangs a field of stars and a couple of shooting stars at night", () => {
+        const { container } = render(<Meadow darkMode>hero</Meadow>)
+
+        expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(18)
+        expect(container.querySelectorAll(".xp-meadow-comet")).toHaveLength(2)
+    })
+
+    it("keeps the night sky clear of the hills", () => {
+        const { container } = render(<Meadow darkMode>hero</Meadow>)
+
+        for (const star of container.querySelectorAll<HTMLElement>(".xp-meadow-star")) {
+            expect(Number(star.style.getPropertyValue("--m-y"))).toBeLessThan(60)
+        }
+    })
+
+    it("sends the birds and butterflies home at night", () => {
+        const { container } = render(
+            <Meadow darkMode density="lively">
+                hero
+            </Meadow>,
+        )
+        const kinds = Array.from(container.querySelectorAll(".xp-meadow-object")).map((node) =>
+            node.getAttribute("data-kind"),
+        )
+
+        expect(kinds).not.toContain("bird")
+        expect(kinds).not.toContain("butterfly")
+        expect(kinds).toContain("mascot")
+    })
+
+    it("still lets a consumer ask for butterflies at night", () => {
+        const { container } = render(
+            <Meadow darkMode density="lively" scene={{ butterflies: true }}>
+                hero
+            </Meadow>,
+        )
+        const kinds = Array.from(container.querySelectorAll(".xp-meadow-object")).map((node) =>
+            node.getAttribute("data-kind"),
+        )
+
+        expect(kinds).toContain("butterfly")
+    })
+
+    it("gives every mascot a soft glow at night and none by day", () => {
+        const night = render(
+            <Meadow darkMode density="lively">
+                hero
+            </Meadow>,
+        )
+        const mascots = night.container.querySelectorAll('.xp-meadow-object[data-kind="mascot"]')
+
+        expect(mascots.length).toBeGreaterThan(0)
+        for (const mascot of mascots) {
+            expect(mascot.querySelectorAll(".xp-meadow-halo")).toHaveLength(1)
+        }
+        for (const other of night.container.querySelectorAll(
+            '.xp-meadow-object:not([data-kind="mascot"])',
+        )) {
+            expect(other.querySelectorAll(".xp-meadow-halo")).toHaveLength(0)
+        }
+        night.unmount()
+
+        const day = render(<Meadow density="lively">hero</Meadow>)
+        expect(day.container.querySelectorAll(".xp-meadow-halo")).toHaveLength(0)
+    })
+
+    it("plans the same night sky for the same seed", () => {
+        const read = (container: HTMLElement) =>
+            Array.from(container.querySelectorAll(".xp-meadow-star")).map((node) =>
+                node.getAttribute("style"),
+            )
+
+        const first = render(
+            <Meadow darkMode seed={9}>
+                hero
+            </Meadow>,
+        )
+        const before = read(first.container)
+        first.unmount()
+
+        const same = render(
+            <Meadow darkMode seed={9}>
+                hero
+            </Meadow>,
+        )
+        const again = read(same.container)
+        same.unmount()
+
+        const other = render(
+            <Meadow darkMode seed={10}>
+                hero
+            </Meadow>,
+        )
+
+        expect(again).toEqual(before)
+        expect(read(other.container)).not.toEqual(before)
+    })
+
+    it("keeps the night composition but stops the sky moving under reduced motion", () => {
+        mediaState.reducedMotion = true
+        const { container } = render(
+            <Meadow darkMode density="lively">
+                hero
+            </Meadow>,
+        )
+        const parts = scene(container)
+
+        expect(parts.root.className).toContain("xp-meadow-night")
+        expect(parts.root.className).toContain("xp-meadow-still")
+        expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(18)
+        expect(container.querySelectorAll(".xp-meadow-comet")).toHaveLength(2)
+        expect(parts.orb).not.toBeNull()
+        expect(container.querySelectorAll(".xp-meadow-halo").length).toBeGreaterThan(0)
+    })
+
+    it("thins the night sky on narrow screens", () => {
+        mediaState.narrow = true
+        const { container } = render(<Meadow darkMode>hero</Meadow>)
+
+        expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(11)
+        expect(container.querySelectorAll(".xp-meadow-comet")).toHaveLength(0)
+        expect(scene(container).objects).toHaveLength(3)
+    })
+
+    it("drops the stars and shooting stars with the stars toggle", () => {
+        const { container } = render(
+            <Meadow darkMode scene={{ stars: false }}>
+                hero
+            </Meadow>,
+        )
+
+        expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(0)
+        expect(container.querySelectorAll(".xp-meadow-comet")).toHaveLength(0)
+        expect(scene(container).orb).not.toBeNull()
     })
 
     it("does no scripted animation work", () => {

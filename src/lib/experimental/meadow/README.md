@@ -87,6 +87,7 @@ seconds and its glow breathes.
 | `items`                | built-in cast | Characters and where each one sits        |
 | `density`              | `"cosy"`      | `calm` 2, `cosy` 4, `lively` 7 characters |
 | `scene`                | everything on | Which built-in pieces are drawn           |
+| `darkMode`             | `false`       | Swap the day scene for a night one        |
 | `animated`             | `true`        | `false` freezes the whole scene           |
 | `trails`               | `true`        | Soft wisp behind each mascot              |
 | `seed`                 | `5`           | Reproducible timing                       |
@@ -122,6 +123,46 @@ Switching a group off frees its slots, so the remaining cast fills the stage up
 to `density`. Turn enough off and the scene simply gets smaller — nothing is
 invented to replace it. When every piece of a layer is off, that layer is not
 rendered at all.
+
+## Night
+
+`darkMode` switches the same scene to a calm night version. Nothing is
+duplicated: every colour in the scene is a custom property declared on the root
+and re-declared under `.xp-meadow-night`, so the SVG, the layers and the
+consumer's copy all follow one palette. A browser test asserts the daytime
+tokens still resolve to their original values.
+
+What changes:
+
+- the sun becomes a **moon** with soft craters, in the same slot
+- the sky turns deep indigo through violet, clouds become dark silhouettes at
+  lower opacity, and hills become deep blue-greens
+- a field of **18 small stars** (11 on narrow screens) twinkles in the far layer,
+  seeded from `seed` so it is reproducible
+- two **shooting stars** cross the upper sky, visible for about a tenth of their
+  17s and 26s cycles, so they read as occasional rather than constant
+- flowers, grass and the sparkle shift to muted, cooler tints; the hot-air
+  balloon deliberately keeps its warm colours and reads as a lantern
+- **birds and butterflies go home.** Their `scene` defaults flip to off at night,
+  but an explicit `scene={{ butterflies: true }}` still wins
+
+### Mascot glow
+
+Each mascot gains one extra `div` behind it holding a soft radial gradient in
+moonlight blue. It sits inside the character's track, so it moves with them for
+free. There is deliberately **no `filter`, `blur` or `box-shadow`** — a gradient
+is a single cheap paint, while a blurred filter on a permanently animated element
+is one of the most expensive things a scene like this can do.
+
+### Night and reduced motion
+
+The star twinkle and both shooting stars stop; the shooting stars rest at
+`opacity: 0`, so they disappear rather than freezing mid-streak. The moon, the
+star field, the glow and the whole composition stay exactly where they are.
+
+Shooting stars are the one part of the scene whose appearance depends on when you
+look. The animated stories are already excluded from Chromatic; the snapshotted
+`NightReducedMotion` story has them switched off, so visual baselines stay stable.
 
 ## Mascots
 
@@ -216,7 +257,8 @@ only — never information.
 
 ## Performance
 
-Around 200 DOM nodes for the full default scene, all of them static after mount.
+Around 200 DOM nodes for the full daytime scene, and about 220 at night once the
+star field and shooting stars are added — all static after mount.
 Motion is CSS animations on `transform` and `opacity` only; the repeat pause for
 gliding characters is baked into the keyframes rather than scheduled. There is
 one 1px blur on the two distant clouds and no other filters — no `backdrop-filter`,
