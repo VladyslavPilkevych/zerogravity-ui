@@ -3,6 +3,7 @@
     --ric-block: #f6a94b;
     --ric-ball: #fdf3e3;
     --ric-paddle: #6fd6e8;
+    --ric-bonus: #8ef2a4;
     --ric-glow: 1;
 
     position: relative;
@@ -63,4 +64,12 @@
 
 .xp-ricochet[data-phase="playing"] .xp-ricochet-hint {
     opacity: 0;
+}
+
+.xp-ricochet[data-game="shooter"] .xp-ricochet-stage {
+    cursor: crosshair;
+}
+
+.xp-ricochet[data-game="shooter"][data-hide-cursor="true"] .xp-ricochet-stage {
+    cursor: none;
 }

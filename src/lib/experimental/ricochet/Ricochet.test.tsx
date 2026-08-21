@@ -175,6 +175,88 @@ describe("Ricochet", () => {
         expect(queryByText("404")).toBeNull()
     })
 
+    it("marks which game is running", () => {
+        const { container, rerender } = render(<Ricochet />)
+        expect(shell(container).dataset.game).toBe("breakout")
+
+        rerender(<Ricochet game="shooter" />)
+        expect(shell(container).dataset.game).toBe("shooter")
+    })
+
+    it("describes the controls of the running game", () => {
+        const { getByRole, rerender } = render(<Ricochet text="404" />)
+        expect(getByRole("group").getAttribute("aria-label")).toContain("paddle")
+
+        rerender(<Ricochet text="404" game="shooter" />)
+        expect(getByRole("group").getAttribute("aria-label")).toContain("ship")
+    })
+
+    it("hints at the controls of the running game", () => {
+        const first = render(<Ricochet />)
+        expect(first.container.querySelector(".xp-ricochet-hint")?.textContent).toBe("move to play")
+
+        const second = render(<Ricochet game="shooter" />)
+        expect(second.container.querySelector(".xp-ricochet-hint")?.textContent).toBe(
+            "move and shoot",
+        )
+    })
+
+    it("leaves only one loop running after a game switch", () => {
+        const pending = new Set<number>()
+        let next = 1
+        const start = vi
+            .spyOn(globalThis, "requestAnimationFrame")
+            .mockImplementation((): number => {
+                const id = next
+                next += 1
+                pending.add(id)
+                return id
+            })
+        const stop = vi
+            .spyOn(globalThis, "cancelAnimationFrame")
+            .mockImplementation((id: number) => {
+                pending.delete(id)
+            })
+
+        const { rerender, unmount } = render(<Ricochet game="breakout" />)
+        expect(pending.size).toBe(1)
+
+        rerender(<Ricochet game="shooter" />)
+        expect(pending.size).toBe(1)
+
+        rerender(<Ricochet game="breakout" />)
+        expect(pending.size).toBe(1)
+
+        unmount()
+        expect(pending.size).toBe(0)
+
+        start.mockRestore()
+        stop.mockRestore()
+    })
+
+    it("never starts a loop for either game under reduced motion", () => {
+        mediaState.reducedMotion = true
+        const start = vi.spyOn(globalThis, "requestAnimationFrame")
+
+        const { getByText } = render(<Ricochet game="shooter" text="404" />)
+
+        expect(start).not.toHaveBeenCalled()
+        expect(getByText("404")).toBeInTheDocument()
+        start.mockRestore()
+    })
+
+    it("rebuilds when the game changes, not just when the text does", () => {
+        const watch = vi.spyOn(globalThis.ResizeObserver.prototype, "observe")
+
+        const { rerender } = render(<Ricochet game="breakout" />)
+        expect(watch).toHaveBeenCalledTimes(1)
+
+        rerender(<Ricochet game="shooter" />)
+        expect(watch).toHaveBeenCalledTimes(2)
+
+        watch.mockRestore()
+    })
+
     it("renders the same markup twice for the same props", () => {
         const first = render(<Ricochet text="404" variant="mono" />)
         const before = shell(first.container).outerHTML

@@ -5,6 +5,9 @@ import { Ricochet } from "./Ricochet"
 
 const frame = { height: 460 }
 
+/** Nothing moves before the serve, which is what keeps a snapshot stable. */
+const STILL = { autoStart: false, interactive: false, hint: "" } as const
+
 const meta = {
     title: "Experimental/Ricochet",
     component: Ricochet,
@@ -17,9 +20,47 @@ type Story = StoryObj<typeof meta>
 
 /** Nothing moves before the serve, so this frame is safe to snapshot. */
 export const Static404: Story = {
-    args: { autoStart: false, interactive: false, hint: "" },
+    args: { ...STILL },
     play: async ({ canvas }) => {
         await expect(canvas.getByText("404")).toBeInTheDocument()
+    },
+}
+
+export const Breakout: Story = {
+    args: { game: "breakout", ...STILL },
+}
+
+export const Shooter: Story = {
+    args: { game: "shooter", ...STILL },
+    play: async ({ canvas }) => {
+        const shell = canvas.getByRole("group").closest(".xp-ricochet")
+
+        await expect(shell).toHaveAttribute("data-game", "shooter")
+    },
+}
+
+export const ShooterCustomWord: Story = {
+    args: { game: "shooter", text: "OOPS", ...STILL },
+}
+
+/** Bonuses on every block, so the drop is on screen instead of left to chance. */
+export const BreakoutWithPowerUps: Story = {
+    args: { game: "breakout", powerUps: true, powerUpChance: 1, autoStart: true },
+    parameters: { chromatic: { disableSnapshot: true } },
+    play: async ({ canvas }) => {
+        const shell = canvas.getByRole("group").closest(".xp-ricochet")
+
+        await waitFor(() => expect(shell).toHaveAttribute("data-phase", "playing"))
+    },
+}
+
+export const MultiBall: Story = {
+    args: { game: "breakout", powerUpChance: 1, speed: 1.4, autoStart: true },
+    parameters: { chromatic: { disableSnapshot: true } },
+    play: async ({ canvas }) => {
+        const shell = canvas.getByRole("group").closest(".xp-ricochet")
+
+        await waitFor(() => expect(shell).toHaveAttribute("data-phase", "playing"))
     },
 }
 
@@ -34,11 +75,11 @@ export const Playing404: Story = {
 }
 
 export const CustomWord: Story = {
-    args: { text: "LOST", autoStart: false, interactive: false, hint: "" },
+    args: { text: "LOST", ...STILL },
 }
 
 export const CustomNumber: Story = {
-    args: { text: "500", autoStart: false, interactive: false, hint: "" },
+    args: { text: "500", ...STILL },
 }
 
 /**
@@ -46,7 +87,7 @@ export const CustomNumber: Story = {
  * so Chromatic gets a still frame of the end state instead of a timed rally.
  */
 export const Cleared: Story = {
-    args: { text: " ", autoStart: false, interactive: false, hint: "" },
+    args: { text: " ", ...STILL },
     play: async ({ canvas }) => {
         const shell = canvas.getByRole("group").closest(".xp-ricochet")
 
@@ -59,15 +100,15 @@ export const Cleared: Story = {
  * renders: the whole text standing still, no loop, no cursor hiding, no focus stop.
  */
 export const ReducedMotion: Story = {
-    args: { autoStart: false, interactive: false, hint: "" },
+    args: { ...STILL },
 }
 
 export const Mono: Story = {
-    args: { variant: "mono", autoStart: false, interactive: false, hint: "" },
+    args: { variant: "mono", ...STILL },
 }
 
 export const Soft: Story = {
-    args: { variant: "soft", autoStart: false, interactive: false, hint: "" },
+    args: { variant: "soft", ...STILL },
 }
 
 export const CustomPalette: Story = {
@@ -75,14 +116,12 @@ export const CustomPalette: Story = {
         color: "#b6e26a",
         ballColor: "#ffffff",
         paddleColor: "#f2779a",
-        autoStart: false,
-        interactive: false,
-        hint: "",
+        ...STILL,
     },
 }
 
 export const FinePixels: Story = {
-    args: { pixelSize: 12, autoStart: false, interactive: false, hint: "" },
+    args: { pixelSize: 12, ...STILL },
 }
 
 export const PageNotFound: Story = {

@@ -453,6 +453,14 @@
     margin-top: 4px;
 }
 
+.xpg-ricochet-tag {
+    margin-right: 2px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.42);
+}
+
 .xpg-ricochet-preset {
     padding: 9px 18px;
     border: 1px solid rgba(255, 255, 255, 0.16);

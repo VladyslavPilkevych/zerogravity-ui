@@ -45,7 +45,7 @@ export { Raster, RASTER_GLYPH_SETS, RASTER_DEMO_IMAGE } from "./raster"
 export type { RasterGlyphSet, RasterMode, RasterProps } from "./raster"
 
 export { Ricochet, SUPPORTED_CHARACTERS } from "./ricochet"
-export type { RicochetProps, RicochetVariant } from "./ricochet"
+export type { RicochetMode, RicochetProps, RicochetVariant } from "./ricochet"
 
 export { TesseraProvider, useTessera, useTesseraPhase } from "./tessera"
 export type {

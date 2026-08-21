@@ -4,9 +4,9 @@ import {
     createGame,
     launch,
     layoutGame,
-    movePaddle,
-    nudgePaddle,
-    resetBall,
+    moveActor,
+    nudgeActor,
+    resetBalls,
     stepGame,
     type RicochetGame,
 } from "./engine"
@@ -46,7 +46,7 @@ describe("createGame", () => {
         for (const block of state.blocks) {
             expect(block.x).toBeGreaterThanOrEqual(0)
             expect(block.x + block.w).toBeLessThanOrEqual(state.width + 0.01)
-            expect(block.y + block.h).toBeLessThan(state.paddle.y)
+            expect(block.y + block.h).toBeLessThan(state.actor.y)
         }
     })
 
@@ -74,8 +74,8 @@ describe("createGame", () => {
         const state = game()
         run(state, 0.5)
 
-        expect(state.ball.vx).toBe(0)
-        expect(state.ball.vy).toBe(0)
+        expect(state.balls[0].vx).toBe(0)
+        expect(state.balls[0].vy).toBe(0)
         expect(state.phase).toBe("idle")
     })
 })
@@ -86,24 +86,36 @@ describe("launch", () => {
         launch(state)
 
         expect(state.phase).toBe("playing")
-        expect(state.ball.vy).toBeLessThan(0)
-        expect(Math.hypot(state.ball.vx, state.ball.vy)).toBeGreaterThan(100)
+        expect(state.balls[0].vy).toBeLessThan(0)
+        expect(Math.hypot(state.balls[0].vx, state.balls[0].vy)).toBeGreaterThan(100)
     })
 
     it("varies the serve angle but stays deterministic", () => {
         const first = game()
         launch(first)
-        const firstAngle = first.ball.vx
+        const firstAngle = first.balls[0].vx
 
+        // the respawn path: park the ball again, then serve it on the next angle
         const second = game()
         launch(second)
+        resetBalls(second)
         launch(second)
 
-        expect(second.ball.vx).not.toBeCloseTo(firstAngle)
+        expect(second.balls[0].vx).not.toBeCloseTo(firstAngle)
 
         const repeat = game()
         launch(repeat)
-        expect(repeat.ball.vx).toBeCloseTo(firstAngle)
+        expect(repeat.balls[0].vx).toBeCloseTo(firstAngle)
+    })
+
+    it("leaves a ball that is already travelling alone", () => {
+        const state = game()
+        launch(state)
+        const aim = { ...state.balls[0] }
+        launch(state)
+
+        expect(state.balls[0].vx).toBeCloseTo(aim.vx)
+        expect(state.balls[0].vy).toBeCloseTo(aim.vy)
     })
 
     it("refuses to serve once the board is cleared", () => {
@@ -119,41 +131,41 @@ describe("walls", () => {
     it("bounces off the left wall", () => {
         const state = game()
         launch(state)
-        state.ball.x = 10
-        state.ball.y = state.height * 0.7
-        state.ball.vx = -400
-        state.ball.vy = -40
+        state.balls[0].x = 10
+        state.balls[0].y = state.height * 0.7
+        state.balls[0].vx = -400
+        state.balls[0].vy = -40
 
         run(state, 0.2)
 
-        expect(state.ball.vx).toBeGreaterThan(0)
-        expect(state.ball.x).toBeGreaterThanOrEqual(state.ball.r - 0.01)
+        expect(state.balls[0].vx).toBeGreaterThan(0)
+        expect(state.balls[0].x).toBeGreaterThanOrEqual(state.balls[0].r - 0.01)
     })
 
     it("bounces off the right wall", () => {
         const state = game()
         launch(state)
-        state.ball.x = state.width - 10
-        state.ball.y = state.height * 0.7
-        state.ball.vx = 400
-        state.ball.vy = -40
+        state.balls[0].x = state.width - 10
+        state.balls[0].y = state.height * 0.7
+        state.balls[0].vx = 400
+        state.balls[0].vy = -40
 
         run(state, 0.2)
 
-        expect(state.ball.vx).toBeLessThan(0)
-        expect(state.ball.x + state.ball.r).toBeLessThanOrEqual(state.width + 0.01)
+        expect(state.balls[0].vx).toBeLessThan(0)
+        expect(state.balls[0].x + state.balls[0].r).toBeLessThanOrEqual(state.width + 0.01)
     })
 
     it("bounces off the ceiling", () => {
         const state = arena()
-        state.ball.x = state.width / 2
-        state.ball.y = 6
-        state.ball.vx = 20
-        state.ball.vy = -400
+        state.balls[0].x = state.width / 2
+        state.balls[0].y = 6
+        state.balls[0].vx = 20
+        state.balls[0].vy = -400
 
         run(state, 0.2)
 
-        expect(state.ball.vy).toBeGreaterThan(0)
+        expect(state.balls[0].vy).toBeGreaterThan(0)
     })
 
     it("stays inside the box over a long run", () => {
@@ -163,9 +175,11 @@ describe("walls", () => {
         for (let tick = 0; tick < 3000; tick += 1) {
             stepGame(state, 1 / 60)
             if (state.phase === "cleared") break
-            expect(state.ball.x).toBeGreaterThanOrEqual(-1)
-            expect(state.ball.x).toBeLessThanOrEqual(state.width + 1)
-            expect(state.ball.y).toBeGreaterThanOrEqual(-1)
+            for (const ball of state.balls) {
+                expect(ball.x).toBeGreaterThanOrEqual(-1)
+                expect(ball.x).toBeLessThanOrEqual(state.width + 1)
+                expect(ball.y).toBeGreaterThanOrEqual(-1)
+            }
         }
     })
 })
@@ -173,73 +187,73 @@ describe("walls", () => {
 describe("paddle", () => {
     it("sends the ball back up", () => {
         const state = arena()
-        state.paddle.x = state.width / 2
-        state.paddle.target = state.paddle.x
-        state.ball.x = state.width / 2
-        state.ball.y = state.paddle.y - state.ball.r - 2
-        state.ball.vx = 0
-        state.ball.vy = 400
+        state.actor.x = state.width / 2
+        state.actor.target = state.actor.x
+        state.balls[0].x = state.width / 2
+        state.balls[0].y = state.actor.y - state.balls[0].r - 2
+        state.balls[0].vx = 0
+        state.balls[0].vy = 400
 
         stepGame(state, 1 / 60)
 
-        expect(state.ball.vy).toBeLessThan(0)
+        expect(state.balls[0].vy).toBeLessThan(0)
         expect(state.phase).toBe("playing")
     })
 
     it("angles the bounce away from the point of contact", () => {
         const left = arena()
-        left.paddle.x = left.width / 2
-        left.paddle.target = left.paddle.x
-        left.ball.x = left.width / 2 - left.paddle.w / 2 + 2
-        left.ball.y = left.paddle.y - left.ball.r - 1
-        left.ball.vx = 0
-        left.ball.vy = 400
+        left.actor.x = left.width / 2
+        left.actor.target = left.actor.x
+        left.balls[0].x = left.width / 2 - left.actor.w / 2 + 2
+        left.balls[0].y = left.actor.y - left.balls[0].r - 1
+        left.balls[0].vx = 0
+        left.balls[0].vy = 400
         stepGame(left, 1 / 60)
 
-        expect(left.ball.vx).toBeLessThan(0)
+        expect(left.balls[0].vx).toBeLessThan(0)
 
         const right = arena()
-        right.paddle.x = right.width / 2
-        right.paddle.target = right.paddle.x
-        right.ball.x = right.width / 2 + right.paddle.w / 2 - 2
-        right.ball.y = right.paddle.y - right.ball.r - 1
-        right.ball.vx = 0
-        right.ball.vy = 400
+        right.actor.x = right.width / 2
+        right.actor.target = right.actor.x
+        right.balls[0].x = right.width / 2 + right.actor.w / 2 - 2
+        right.balls[0].y = right.actor.y - right.balls[0].r - 1
+        right.balls[0].vx = 0
+        right.balls[0].vy = 400
         stepGame(right, 1 / 60)
 
-        expect(right.ball.vx).toBeGreaterThan(0)
+        expect(right.balls[0].vx).toBeGreaterThan(0)
     })
 
     it("stays inside the box however far it is pushed", () => {
         const state = game()
 
-        movePaddle(state, -9000)
-        expect(state.paddle.target).toBeCloseTo(state.paddle.w / 2)
+        moveActor(state, -9000)
+        expect(state.actor.target).toBeCloseTo(state.actor.w / 2)
 
-        movePaddle(state, 9000)
-        expect(state.paddle.target).toBeCloseTo(state.width - state.paddle.w / 2)
+        moveActor(state, 9000)
+        expect(state.actor.target).toBeCloseTo(state.width - state.actor.w / 2)
     })
 
     it("moves by a step on a nudge", () => {
         const state = game()
-        const before = state.paddle.target
+        const before = state.actor.target
 
-        nudgePaddle(state, 1)
-        expect(state.paddle.target).toBeGreaterThan(before)
+        nudgeActor(state, 1)
+        expect(state.actor.target).toBeGreaterThan(before)
 
-        nudgePaddle(state, -1)
-        expect(state.paddle.target).toBeCloseTo(before)
+        nudgeActor(state, -1)
+        expect(state.actor.target).toBeCloseTo(before)
     })
 
     it("eases toward the pointer instead of snapping", () => {
         const state = game()
-        movePaddle(state, state.width - 40)
-        const start = state.paddle.x
+        moveActor(state, state.width - 40)
+        const start = state.actor.x
 
         stepGame(state, 1 / 60)
 
-        expect(state.paddle.x).toBeGreaterThan(start)
-        expect(state.paddle.x).toBeLessThan(state.paddle.target)
+        expect(state.actor.x).toBeGreaterThan(start)
+        expect(state.actor.x).toBeLessThan(state.actor.target)
     })
 })
 
@@ -249,23 +263,23 @@ describe("blocks", () => {
         launch(state)
 
         const target = state.blocks[0]
-        state.ball.x = target.x + target.w / 2
-        state.ball.y = target.y + target.h + state.ball.r - 1
-        state.ball.vx = 0
-        state.ball.vy = -400
+        state.balls[0].x = target.x + target.w / 2
+        state.balls[0].y = target.y + target.h + state.balls[0].r - 1
+        state.balls[0].vx = 0
+        state.balls[0].vy = -400
 
         stepGame(state, 1 / 60)
 
         expect(target.alive).toBe(false)
         expect(state.live).toBe(state.blocks.length - 1)
-        expect(state.ball.vy).toBeGreaterThan(0)
+        expect(state.balls[0].vy).toBeGreaterThan(0)
     })
 
     it("takes at most one block per slice so it cannot chain wildly", () => {
         const state = game()
         launch(state)
-        state.ball.x = state.blocks[0].x + state.blocks[0].w / 2
-        state.ball.y = state.blocks[0].y + state.blocks[0].h / 2
+        state.balls[0].x = state.blocks[0].x + state.blocks[0].w / 2
+        state.balls[0].y = state.blocks[0].y + state.blocks[0].h / 2
 
         const before = state.live
         stepGame(state, 1 / 60)
@@ -286,9 +300,9 @@ describe("blocks", () => {
         const state = game()
         launch(state)
         const target = state.blocks[0]
-        state.ball.x = target.x + target.w / 2
-        state.ball.y = target.y + target.h + state.ball.r - 1
-        state.ball.vy = -400
+        state.balls[0].x = target.x + target.w / 2
+        state.balls[0].y = target.y + target.h + state.balls[0].r - 1
+        state.balls[0].vy = -400
 
         stepGame(state, 1 / 60)
 
@@ -299,9 +313,9 @@ describe("blocks", () => {
         const state = game()
         launch(state)
         const target = state.blocks[0]
-        state.ball.x = target.x + target.w / 2
-        state.ball.y = target.y + target.h + state.ball.r - 1
-        state.ball.vy = -400
+        state.balls[0].x = target.x + target.w / 2
+        state.balls[0].y = target.y + target.h + state.balls[0].r - 1
+        state.balls[0].vy = -400
         stepGame(state, 1 / 60)
         expect(state.sparks.some((spark) => spark.life > 0)).toBe(true)
 
@@ -317,8 +331,8 @@ describe("misses", () => {
     it("marks a miss when the ball drops past the paddle", () => {
         const state = game()
         launch(state)
-        state.ball.y = state.height + 40
-        state.ball.vy = 400
+        state.balls[0].y = state.height + 40
+        state.balls[0].vy = 400
 
         stepGame(state, 1 / 60)
 
@@ -330,7 +344,7 @@ describe("misses", () => {
         launch(state)
         state.blocks[0].alive = false
         state.live -= 1
-        state.ball.y = state.height + 40
+        state.balls[0].y = state.height + 40
         stepGame(state, 1 / 60)
         expect(state.phase).toBe("missed")
 
@@ -353,9 +367,9 @@ describe("clearing", () => {
         }
 
         const last = state.blocks[0]
-        state.ball.x = last.x + last.w / 2
-        state.ball.y = last.y + last.h + state.ball.r - 1
-        state.ball.vy = -400
+        state.balls[0].x = last.x + last.w / 2
+        state.balls[0].y = last.y + last.h + state.balls[0].r - 1
+        state.balls[0].vy = -400
 
         stepGame(state, 1 / 60)
 
@@ -367,12 +381,12 @@ describe("clearing", () => {
     it("goes quiet once cleared", () => {
         const state = game("1")
         state.phase = "cleared"
-        const spot = { ...state.ball }
+        const spot = { ...state.balls[0] }
 
         run(state, 1)
 
-        expect(state.ball.x).toBe(spot.x)
-        expect(state.ball.y).toBe(spot.y)
+        expect(state.balls[0].x).toBe(spot.x)
+        expect(state.balls[0].y).toBe(spot.y)
     })
 })
 
@@ -391,57 +405,57 @@ describe("an empty board", () => {
         run(state, 1)
 
         expect(state.phase).toBe("cleared")
-        expect(state.ball.vx).toBe(0)
+        expect(state.balls[0].vx).toBe(0)
     })
 })
 
 describe("stability", () => {
     it("corrects a near-horizontal path wherever it came from", () => {
         const state = arena()
-        state.ball.x = state.width / 2
-        state.ball.y = state.height * 0.5
-        state.ball.vx = 400
-        state.ball.vy = 2
+        state.balls[0].x = state.width / 2
+        state.balls[0].y = state.height * 0.5
+        state.balls[0].vx = 400
+        state.balls[0].vy = 2
 
         stepGame(state, 1 / 60)
-        const speed = Math.hypot(state.ball.vx, state.ball.vy)
+        const speed = Math.hypot(state.balls[0].vx, state.balls[0].vy)
 
-        expect(Math.abs(state.ball.vy) / speed).toBeGreaterThan(0.3)
+        expect(Math.abs(state.balls[0].vy) / speed).toBeGreaterThan(0.3)
     })
 
     it("corrects it after a wall bounce too", () => {
         const state = arena()
-        state.ball.x = 8
-        state.ball.y = state.height * 0.5
-        state.ball.vx = -400
-        state.ball.vy = 1
+        state.balls[0].x = 8
+        state.balls[0].y = state.height * 0.5
+        state.balls[0].vx = -400
+        state.balls[0].vy = 1
 
         run(state, 0.3)
-        const speed = Math.hypot(state.ball.vx, state.ball.vy)
+        const speed = Math.hypot(state.balls[0].vx, state.balls[0].vy)
 
-        expect(Math.abs(state.ball.vy) / speed).toBeGreaterThan(0.3)
+        expect(Math.abs(state.balls[0].vy) / speed).toBeGreaterThan(0.3)
     })
 
     it("holds a steady speed across a long rally", () => {
         const state = game()
         launch(state)
-        const start = Math.hypot(state.ball.vx, state.ball.vy)
+        const start = Math.hypot(state.balls[0].vx, state.balls[0].vy)
 
         run(state, 8)
 
         if (state.phase === "playing") {
-            expect(Math.hypot(state.ball.vx, state.ball.vy)).toBeCloseTo(start, 0)
+            expect(Math.hypot(state.balls[0].vx, state.balls[0].vy)).toBeCloseTo(start, 0)
         }
     })
 
     it("clamps a huge frame gap instead of teleporting", () => {
         const state = game()
         launch(state)
-        const before = { x: state.ball.x, y: state.ball.y }
+        const before = { x: state.balls[0].x, y: state.balls[0].y }
 
         stepGame(state, 5)
 
-        expect(Math.hypot(state.ball.x - before.x, state.ball.y - before.y)).toBeLessThan(
+        expect(Math.hypot(state.balls[0].x - before.x, state.balls[0].y - before.y)).toBeLessThan(
             state.width,
         )
     })
@@ -450,7 +464,7 @@ describe("stability", () => {
         const state = game()
         launch(state)
         expect(() => stepGame(state, -2)).not.toThrow()
-        expect(Number.isFinite(state.ball.x)).toBe(true)
+        expect(Number.isFinite(state.balls[0].x)).toBe(true)
     })
 })
 
@@ -477,24 +491,24 @@ describe("layoutGame", () => {
 
         layoutGame(state, 300, 260, 20)
 
-        expect(state.ball.x).toBeGreaterThanOrEqual(0)
-        expect(state.ball.x).toBeLessThanOrEqual(300)
-        expect(state.paddle.x - state.paddle.w / 2).toBeGreaterThanOrEqual(-0.01)
-        expect(state.paddle.x + state.paddle.w / 2).toBeLessThanOrEqual(300.01)
+        expect(state.balls[0].x).toBeGreaterThanOrEqual(0)
+        expect(state.balls[0].x).toBeLessThanOrEqual(300)
+        expect(state.actor.x - state.actor.w / 2).toBeGreaterThanOrEqual(-0.01)
+        expect(state.actor.x + state.actor.w / 2).toBeLessThanOrEqual(300.01)
     })
 })
 
-describe("resetBall", () => {
+describe("resetBalls", () => {
     it("parks the ball above the middle of the paddle", () => {
         const state = game()
         launch(state)
         run(state, 1)
 
-        resetBall(state)
+        resetBalls(state)
 
-        expect(state.ball.x).toBeCloseTo(state.width / 2)
-        expect(state.ball.vx).toBe(0)
-        expect(state.ball.vy).toBe(0)
-        expect(state.ball.y).toBeLessThan(state.paddle.y)
+        expect(state.balls[0].x).toBeCloseTo(state.width / 2)
+        expect(state.balls[0].vx).toBe(0)
+        expect(state.balls[0].vy).toBe(0)
+        expect(state.balls[0].y).toBeLessThan(state.actor.y)
     })
 })
