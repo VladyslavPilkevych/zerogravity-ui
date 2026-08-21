@@ -10,8 +10,8 @@ Import them through the experimental barrel only:
 import { Facet, Lodestone } from "@/lib/experimental"
 ```
 
-The batch is Lodestone, Facet, Vellum, Kern, Overprint, Louvre, Diorama, Wash
-and Tessera.
+The batch is Lodestone, Facet, Vellum, Kern, Overprint, Louvre, Diorama, Wash,
+Tessera and Meadow.
 
 Each has a playground route under `/x/<name>` and stories under
 `Experimental/*`. Deleting a rejected prototype means deleting its folder, its

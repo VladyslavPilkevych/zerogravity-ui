@@ -13,6 +13,15 @@ const config: StorybookConfig = {
     typescript: {
         reactDocgen: "react-docgen-typescript",
     },
+    // tsconfig.json uses jsx: "preserve" for Next, which makes esbuild fall back to the
+    // classic runtime and emit React.createElement without importing React.
+    viteFinal: (config) => ({
+        ...config,
+        esbuild: {
+            ...(typeof config.esbuild === "object" ? config.esbuild : {}),
+            jsx: "automatic" as const,
+        },
+    }),
 }
 
 export default config

@@ -26,6 +26,7 @@ const EXPERIMENTS = [
     { href: "/x/diorama", label: "Diorama" },
     { href: "/x/wash", label: "Wash" },
     { href: "/x/tessera", label: "Tessera" },
+    { href: "/x/meadow", label: "Meadow" },
 ]
 
 export function Nav() {
