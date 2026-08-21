@@ -293,3 +293,39 @@
     font-weight: 600;
     cursor: pointer;
 }
+
+.xpg-assets {
+    display: grid;
+    gap: 26px;
+}
+
+.xpg-assets-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.xpg-assets-bar span {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.xpg-assets-pick {
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.82);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.xpg-assets-pick[aria-pressed="true"] {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}

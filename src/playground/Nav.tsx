@@ -27,6 +27,7 @@ const EXPERIMENTS = [
     { href: "/x/wash", label: "Wash" },
     { href: "/x/tessera", label: "Tessera" },
     { href: "/x/meadow", label: "Meadow" },
+    { href: "/x/meadow-assets", label: "Meadow assets" },
 ]
 
 export function Nav() {

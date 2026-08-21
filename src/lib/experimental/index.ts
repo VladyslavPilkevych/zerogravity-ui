@@ -13,7 +13,7 @@ export type { LodestoneProps } from "./lodestone"
 export { Louvre } from "./louvre"
 export type { LouvreProps } from "./louvre"
 
-export { Meadow, MEADOW_CAST } from "./meadow"
+export { Meadow, MEADOW_CAST, MEADOW_SPACE_CAST, MEADOW_VARIANT_SETS } from "./meadow"
 export type {
     MeadowDensity,
     MeadowItem,
@@ -21,6 +21,11 @@ export type {
     MeadowMotion,
     MeadowProps,
     MeadowScene,
+    MeadowScenePart,
+    MeadowTheme,
+    MeadowVariant,
+    MeadowVariantGroup,
+    MeadowVariantSet,
 } from "./meadow"
 
 export { Overprint } from "./overprint"

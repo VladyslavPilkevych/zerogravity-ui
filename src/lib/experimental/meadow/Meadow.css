@@ -79,6 +79,103 @@
     --meadow-veil: rgba(255, 255, 255, 0.08);
 }
 
+.xp-meadow-warm {
+    --meadow-sky-top: #fdeadd;
+    --meadow-sky-mid: #fbd7c2;
+    --meadow-sky-low: #f6bda8;
+    --meadow-wash: rgba(244, 146, 96, 0.3);
+    --meadow-glow: rgba(248, 168, 112, 0.42);
+    --meadow-glow-soft: rgba(248, 168, 112, 0.16);
+    --meadow-cloud: #fff2e6;
+    --meadow-cloud-tone: 0.92;
+    --meadow-hill-far: #dfe5c8;
+    --meadow-hill-mid: #c8d4b2;
+    --meadow-hill-near: #b0c39c;
+    --meadow-stem: #93b083;
+    --meadow-pollen: #ef9d5c;
+    --meadow-bud: #eeaebc;
+    --meadow-spark: #ffd79a;
+    --meadow-petal-pink: #eeaebc;
+    --meadow-petal-coral: #ef9f86;
+    --meadow-petal-cream: #fbe0c4;
+    --meadow-leaf: #93b083;
+    --meadow-leaf-deep: #7f9d72;
+    --meadow-body: #fff8ef;
+    --meadow-outline: #d9b79c;
+    --meadow-face: #6b5044;
+    --meadow-blush: #f4b3ad;
+    --meadow-trail-core: rgba(248, 186, 160, 0.85);
+    --meadow-trail-edge: rgba(244, 170, 150, 0.35);
+    --meadow-ink: #4a352c;
+    --meadow-ink-soft: #7d5c4c;
+    --meadow-edge: rgba(74, 53, 44, 0.22);
+    --meadow-veil: rgba(255, 255, 255, 0.5);
+}
+
+/* sunrise leans pink and cool, sunset leans deeper amber */
+.xp-meadow-dawn {
+    --meadow-sky-top: #fdeef0;
+    --meadow-sky-mid: #fcdcd6;
+    --meadow-sky-low: #f7c3b4;
+    --meadow-wash: rgba(240, 150, 140, 0.28);
+    --meadow-glow: rgba(252, 190, 160, 0.4);
+}
+
+.xp-meadow-dusk {
+    --meadow-sky-top: #fce4cf;
+    --meadow-sky-mid: #f8c3a0;
+    --meadow-sky-low: #eda07f;
+    --meadow-wash: rgba(230, 110, 70, 0.32);
+    --meadow-glow: rgba(246, 152, 92, 0.44);
+    --meadow-hill-far: #d3d9ba;
+    --meadow-hill-mid: #b9c6a4;
+    --meadow-hill-near: #9fb28c;
+}
+
+.xp-meadow-space {
+    --meadow-sky-top: #090a1a;
+    --meadow-sky-mid: #101128;
+    --meadow-sky-low: #191436;
+    --meadow-wash: rgba(140, 120, 220, 0.16);
+    --meadow-glow: rgba(170, 150, 255, 0.2);
+    --meadow-glow-soft: rgba(170, 150, 255, 0.07);
+    --meadow-cloud: #2b2b52;
+    --meadow-cloud-tone: 0.4;
+    --meadow-hill-far: #1d2140;
+    --meadow-hill-mid: #171a33;
+    --meadow-hill-near: #121428;
+    --meadow-stem: #4a5580;
+    --meadow-pollen: #b39ae0;
+    --meadow-bud: #9a86d6;
+    --meadow-spark: #dbe3ff;
+    --meadow-petal-pink: #7f6fae;
+    --meadow-petal-coral: #8a6f9e;
+    --meadow-petal-cream: #9b9ad2;
+    --meadow-leaf: #48557e;
+    --meadow-leaf-deep: #3a456a;
+    --meadow-body: #eef0ff;
+    --meadow-outline: #7d78c9;
+    --meadow-face: #2c2850;
+    --meadow-blush: #a98fd0;
+    --meadow-trail-core: rgba(178, 168, 255, 0.8);
+    --meadow-trail-edge: rgba(132, 126, 226, 0.28);
+    --meadow-ink: #eef0ff;
+    --meadow-ink-soft: #a9a6cf;
+    --meadow-edge: rgba(238, 240, 255, 0.24);
+    --meadow-veil: rgba(255, 255, 255, 0.07);
+
+    background:
+        radial-gradient(42% 34% at 16% 22%, rgba(126, 96, 190, 0.3) 0%, transparent 72%),
+        radial-gradient(38% 30% at 82% 68%, rgba(74, 122, 190, 0.26) 0%, transparent 74%),
+        radial-gradient(52% 40% at 62% 6%, rgba(170, 120, 200, 0.16) 0%, transparent 76%),
+        linear-gradient(
+            172deg,
+            var(--meadow-sky-top) 0%,
+            var(--meadow-sky-mid) 52%,
+            var(--meadow-sky-low) 100%
+        );
+}
+
 .xp-meadow-layer {
     position: absolute;
     inset: 0;
@@ -158,6 +255,31 @@
     top: -6%;
     right: 4%;
     width: clamp(128px, 17vw, 208px);
+}
+
+.xp-meadow-arc .xp-meadow-orb {
+    top: calc(var(--orb-y) * 1%);
+    right: auto;
+    left: calc(var(--orb-x) * 1%);
+    translate: -50% -50%;
+    transition:
+        top 900ms ease-out,
+        left 900ms ease-out;
+}
+
+.xp-meadow-arc .xp-meadow-glow {
+    top: calc(var(--orb-y) * 1% - 22%);
+    right: auto;
+    left: calc(var(--orb-x) * 1% - 22%);
+    transition:
+        top 900ms ease-out,
+        left 900ms ease-out;
+}
+
+.xp-meadow-still .xp-meadow-arc .xp-meadow-orb,
+.xp-meadow-arc.xp-meadow-still .xp-meadow-orb,
+.xp-meadow-arc.xp-meadow-still .xp-meadow-glow {
+    transition: none;
 }
 
 .xp-meadow-orb svg {
@@ -311,7 +433,12 @@
     width: calc(var(--m-size) * 1px);
 }
 
-.xp-meadow-object[data-flip="true"] .xp-meadow-body {
+.xp-meadow-object[data-flip="true"]:not([data-motion="glide"]) .xp-meadow-body {
+    scale: -1 1;
+}
+
+/* a gliding character mirrors its whole lane, so it faces the way it travels */
+.xp-meadow-object[data-motion="glide"][data-flip="true"] {
     scale: -1 1;
 }
 
@@ -509,6 +636,66 @@
     transform: translate3d(calc(var(--m-rest) * 1%), 0, 0);
 }
 
+.xp-meadow-planet {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    animation: xp-meadow-planet-drift calc(var(--m-beat) * 1s) ease-in-out infinite alternate;
+}
+
+.xp-meadow-planet[data-faint="true"] {
+    opacity: 0.55;
+}
+
+.xp-meadow-planet svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+@keyframes xp-meadow-planet-drift {
+    from {
+        transform: translate3d(-7px, 5px, 0);
+    }
+    to {
+        transform: translate3d(7px, -5px, 0);
+    }
+}
+
+.xp-meadow-orbit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--m-size) * var(--m-ring) * 1px);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+}
+
+.xp-meadow-orbit-ring {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(198, 190, 255, 0.28);
+    border-radius: 50%;
+}
+
+.xp-meadow-orbit-spin {
+    position: absolute;
+    inset: 0;
+    animation: xp-meadow-spin calc(var(--m-beat) * 1.6s) linear infinite;
+}
+
+.xp-meadow-orbit-dot {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #dde2ff;
+    translate: -50% -50%;
+}
+
 .xp-meadow-star {
     position: absolute;
     left: calc(var(--m-x) * 1%);
@@ -579,7 +766,9 @@
 }
 
 .xp-meadow-still .xp-meadow-star,
-.xp-meadow-still .xp-meadow-comet {
+.xp-meadow-still .xp-meadow-comet,
+.xp-meadow-still .xp-meadow-planet,
+.xp-meadow-still .xp-meadow-orbit-spin {
     animation: none;
 }
 

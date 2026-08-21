@@ -1,23 +1,17 @@
 import type { ReactNode } from "react"
 
 import type { MeadowSpec } from "./plan"
+import {
+    GhostClassic,
+    GhostKitten,
+    GhostRibbon,
+    MEADOW_MOON_VARIANTS,
+    MEADOW_SUN_VARIANTS,
+    UfoAntenna,
+    UfoSaucer,
+} from "./variants"
 
 const svgProps = { focusable: "false", role: "presentation" } as const
-
-export function MeadowMoon() {
-    return (
-        <svg viewBox="0 0 200 200" {...svgProps}>
-            <circle cx="100" cy="100" r="46" fill="#e6e6fb" />
-            <circle cx="100" cy="100" r="46" fill="#cfd0f0" opacity="0.55" />
-            <circle cx="112" cy="86" r="34" fill="#f2f2ff" />
-            <g fill="#c3c4e8" opacity="0.6">
-                <circle cx="86" cy="112" r="9" />
-                <circle cx="108" cy="126" r="6" />
-                <circle cx="78" cy="90" r="5" />
-            </g>
-        </svg>
-    )
-}
 
 export interface MeadowCometSpot {
     x: number
@@ -32,25 +26,6 @@ export const MEADOW_COMETS: readonly MeadowCometSpot[] = [
     { x: 56, y: 3, size: 126, beat: 17, delay: -4, tilt: 15 },
     { x: 14, y: 10, size: 98, beat: 26, delay: -15, tilt: 18 },
 ]
-
-export function MeadowSun() {
-    return (
-        <svg viewBox="0 0 200 200" {...svgProps}>
-            <g className="xp-meadow-rays" fill="#f7bd80" opacity="0.2">
-                {Array.from({ length: 12 }, (_, index) => (
-                    <path
-                        key={index}
-                        d="M100 8 L106 44 L94 44 Z"
-                        transform={`rotate(${index * 30} 100 100)`}
-                    />
-                ))}
-            </g>
-            <circle cx="100" cy="100" r="44" fill="#fbd190" />
-            <circle cx="100" cy="100" r="34" fill="#fde3b6" />
-            <circle cx="88" cy="88" r="14" fill="#fdeac6" opacity="0.85" />
-        </svg>
-    )
-}
 
 export function MeadowCloud() {
     return (
@@ -162,9 +137,19 @@ function MeadowBalloon() {
                 fill="#f9c7a3"
             />
             <ellipse cx="34" cy="26" rx="7" ry="11" fill="#fdeedd" opacity="0.5" />
-            <path d="M40 100v12M56 100v12" stroke="#c79a70" strokeWidth="2.4" />
-            <rect x="38" y="110" width="20" height="15" rx="4" fill="#c08b5c" />
-            <rect x="38" y="110" width="20" height="5" rx="2.5" fill="#a9764a" />
+            <path d="M39 100v14M57 100v14" stroke="#c79a70" strokeWidth="2.4" />
+            <path
+                d="M48 95c6.6 0 10.5 4.8 10.5 11v7.5c0 2.1-2 3-3.5 1.6-1.5-1.4-3.3-1.4-4.8 0-1.5 1.4-3.3 1.4-4.8 0-1.5-1.4-3.3-1.4-4.8 0-1.5 1.4-3.6.5-3.6-1.6V106c0-6.2 4-11 11-11Z"
+                fill="var(--meadow-body)"
+                stroke="var(--meadow-outline)"
+                strokeWidth="2"
+            />
+            <ellipse cx="44.6" cy="105" rx="2.3" ry="2.9" fill="var(--meadow-face)" />
+            <ellipse cx="51.4" cy="105" rx="2.3" ry="2.9" fill="var(--meadow-face)" />
+            <circle cx="43.8" cy="103.8" r="0.9" fill="#ffffff" opacity="0.92" />
+            <ellipse cx="48" cy="110.6" rx="1.9" ry="2.2" fill="var(--meadow-face)" />
+            <rect x="35" y="113" width="26" height="16" rx="4.5" fill="#c08b5c" />
+            <rect x="35" y="113" width="26" height="5" rx="2.5" fill="#a9764a" />
         </svg>
     )
 }
@@ -185,64 +170,6 @@ function MeadowButterfly() {
                 d="M27 13c-2-4-5-5-7-5M29 13c2-4 5-5 7-5"
                 stroke="#8a7a6e"
                 strokeWidth="1.4"
-                strokeLinecap="round"
-                fill="none"
-            />
-        </svg>
-    )
-}
-
-function MeadowPlane() {
-    return (
-        <svg viewBox="0 0 56 44" {...svgProps}>
-            <path d="M3 24 53 6 28 28Z" fill="#fdf5e8" />
-            <path d="M28 28 53 6 33 41Z" fill="#dbc9ac" />
-            <path d="M28 28l8 3" stroke="#cbbba2" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-    )
-}
-
-function MeadowBlob() {
-    return (
-        <svg viewBox="0 0 72 66" {...svgProps}>
-            <path
-                d="M36 4c17 0 28 11 28 26 0 17-13 32-28 32S8 47 8 30C8 15 19 4 36 4Z"
-                fill="var(--meadow-body)"
-                stroke="var(--meadow-outline)"
-                strokeWidth="2.6"
-            />
-            <ellipse cx="21" cy="38" rx="5" ry="3.4" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="51" cy="38" rx="5" ry="3.4" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="27" cy="30" rx="3.4" ry="4.4" fill="var(--meadow-face)" />
-            <ellipse cx="45" cy="30" rx="3.4" ry="4.4" fill="var(--meadow-face)" />
-            <path
-                d="M32 40c2 2.4 6 2.4 8 0"
-                stroke="var(--meadow-face)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                fill="none"
-            />
-        </svg>
-    )
-}
-
-function MeadowGhost() {
-    return (
-        <svg viewBox="0 0 60 68" {...svgProps}>
-            <path
-                d="M30 3c14 0 23 11 23 25v22c0 4-4 6-7 3-3-3-7-3-10 0s-7 3-10 0-7-3-10 0c-3 3-9 1-9-3V28C7 14 16 3 30 3Z"
-                fill="var(--meadow-body)"
-                stroke="var(--meadow-outline)"
-                strokeWidth="2.6"
-            />
-            <ellipse cx="17" cy="35" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="43" cy="35" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="23" cy="27" rx="3.2" ry="4.2" fill="var(--meadow-face)" />
-            <ellipse cx="37" cy="27" rx="3.2" ry="4.2" fill="var(--meadow-face)" />
-            <path
-                d="M27 36c1.6 2 4.4 2 6 0"
-                stroke="var(--meadow-face)"
-                strokeWidth="1.9"
                 strokeLinecap="round"
                 fill="none"
             />
@@ -274,63 +201,219 @@ function MeadowStar() {
     )
 }
 
-function MeadowSleepy() {
+function MeadowRobot() {
     return (
-        <svg viewBox="0 0 78 58" {...svgProps}>
-            <path
-                d="M39 4c19 0 34 10 34 24 0 15-15 26-34 26S5 43 5 28C5 14 20 4 39 4Z"
+        <svg viewBox="0 0 64 72" {...svgProps}>
+            <path d="M32 8V3" stroke="var(--meadow-outline)" strokeWidth="2.4" />
+            <circle cx="32" cy="2.6" r="2.8" fill="#7ad4ea" />
+            <rect x="6" y="42" width="52" height="24" rx="10" fill="#d9dcf4" />
+            <rect x="14" y="48" width="12" height="8" rx="3" fill="#7ad4ea" opacity="0.8" />
+            <rect
+                x="8"
+                y="10"
+                width="48"
+                height="36"
+                rx="14"
                 fill="var(--meadow-body)"
                 stroke="var(--meadow-outline)"
                 strokeWidth="2.6"
             />
-            <ellipse cx="22" cy="36" rx="5" ry="3.2" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="56" cy="36" rx="5" ry="3.2" fill="var(--meadow-blush)" opacity="0.9" />
-            <g stroke="var(--meadow-face)" strokeWidth="2.2" strokeLinecap="round" fill="none">
-                <path d="M23 27c2.4 3 6.4 3 8.8 0" />
-                <path d="M46 27c2.4 3 6.4 3 8.8 0" />
-                <path d="M35 38c2.4 2 5.6 2 8 0" />
+            <rect x="15" y="18" width="34" height="20" rx="9" fill="#3a4272" />
+            <ellipse cx="25" cy="28" rx="4.2" ry="4.8" fill="#cfe3ff" />
+            <ellipse cx="39" cy="28" rx="4.2" ry="4.8" fill="#cfe3ff" />
+            <circle cx="23.6" cy="26" r="1.4" fill="#ffffff" opacity="0.92" />
+            <circle cx="37.6" cy="26" r="1.4" fill="#ffffff" opacity="0.92" />
+            <path d="M4 24h4M56 24h4" stroke="var(--meadow-outline)" strokeWidth="2.6" />
+        </svg>
+    )
+}
+
+export function MeadowBlackHole() {
+    return (
+        <svg viewBox="0 0 200 200" {...svgProps}>
+            <circle cx="100" cy="100" r="86" fill="#1a1636" opacity="0.35" />
+            <ellipse
+                cx="100"
+                cy="100"
+                rx="80"
+                ry="24"
+                fill="none"
+                stroke="#8f7ad6"
+                strokeWidth="7"
+                opacity="0.32"
+            />
+            <ellipse
+                cx="100"
+                cy="100"
+                rx="62"
+                ry="17"
+                fill="none"
+                stroke="#c9a8f0"
+                strokeWidth="5"
+                opacity="0.4"
+            />
+            <circle cx="100" cy="100" r="40" fill="#0a0716" />
+            <circle
+                cx="100"
+                cy="100"
+                r="43"
+                fill="none"
+                stroke="#d8c2ff"
+                strokeWidth="2.5"
+                opacity="0.5"
+            />
+        </svg>
+    )
+}
+
+export function MeadowGasPlanet() {
+    return (
+        <svg viewBox="0 0 120 120" {...svgProps}>
+            <circle cx="60" cy="60" r="52" fill="#7466ae" />
+            <ellipse cx="60" cy="42" rx="46" ry="9" fill="#8f81c6" opacity="0.75" />
+            <ellipse cx="60" cy="66" rx="50" ry="7" fill="#5d508f" opacity="0.7" />
+            <ellipse cx="60" cy="84" rx="40" ry="6" fill="#8f81c6" opacity="0.5" />
+            <circle cx="42" cy="40" r="15" fill="#a89ada" opacity="0.45" />
+        </svg>
+    )
+}
+
+export function MeadowRingPlanet() {
+    return (
+        <svg viewBox="0 0 200 140" {...svgProps}>
+            <path
+                d="M6 70a94 26 0 0 0 188 0"
+                fill="none"
+                stroke="#b8a9e6"
+                strokeWidth="5"
+                strokeLinecap="round"
+                opacity="0.5"
+            />
+            <circle cx="100" cy="70" r="46" fill="#c98f86" />
+            <ellipse cx="100" cy="56" rx="40" ry="10" fill="#dda99c" opacity="0.6" />
+            <ellipse cx="100" cy="82" rx="42" ry="8" fill="#a9736d" opacity="0.6" />
+            <circle cx="84" cy="54" r="13" fill="#e6bfb2" opacity="0.45" />
+            <path
+                d="M6 70a94 26 0 0 1 188 0"
+                fill="none"
+                stroke="#d7cbf5"
+                strokeWidth="5"
+                strokeLinecap="round"
+                opacity="0.85"
+            />
+        </svg>
+    )
+}
+
+export function MeadowMoonlet() {
+    return (
+        <svg viewBox="0 0 80 80" {...svgProps}>
+            <circle cx="40" cy="40" r="32" fill="#cfd2ee" />
+            <circle cx="48" cy="32" r="24" fill="#e4e6fa" />
+            <g fill="#b3b7dd" opacity="0.65">
+                <circle cx="30" cy="50" r="7" />
+                <circle cx="47" cy="57" r="4.5" />
             </g>
         </svg>
     )
 }
 
-function MeadowWink() {
+function MeadowRocket() {
     return (
-        <svg viewBox="0 0 54 74" {...svgProps}>
+        <svg viewBox="0 0 76 46" {...svgProps}>
+            <path d="M2 23c5-4 9-3 12 0-3 3-7 4-12 0Z" fill="#f2a86a" />
+            <path d="M6 23c3-2 5-2 7 0-2 2-4 2-7 0Z" fill="#fbd79a" />
+            <path d="M22 11 17 2l12 9Z" fill="#8b85bd" />
+            <path d="M22 35 17 44l12-9Z" fill="#8b85bd" />
             <path
-                d="M27 3c13 0 22 10 22 23v31c0 4-4 6-7 3-3-3-6-3-9 0s-6 3-9 0-6-3-9 0c-3 3-8 1-8-3V26C7 13 14 3 27 3Z"
-                fill="var(--meadow-body)"
-                stroke="var(--meadow-outline)"
-                strokeWidth="2.6"
+                d="M20 11h20c9 0 20 6 26 12-6 6-17 12-26 12H20c-6 0-11-5-11-12s5-12 11-12Z"
+                fill="#eef0ff"
             />
-            <ellipse cx="15" cy="37" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="39" cy="37" rx="4.4" ry="3" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="20" cy="29" rx="3.2" ry="4.2" fill="var(--meadow-face)" />
-            <g stroke="var(--meadow-face)" strokeWidth="2.2" strokeLinecap="round" fill="none">
-                <path d="M30 30c2.4-2.6 6-2.6 8 0" />
-                <path d="M24 39c2 2.2 5 2.2 7 0" />
-            </g>
+            <path d="M40 11c9 0 20 6 26 12-6 6-17 12-26 12Z" fill="#d98d80" />
+            <circle cx="27" cy="23" r="6" fill="#6f8fd0" />
+            <circle cx="25" cy="21" r="2.2" fill="#c9dcff" opacity="0.8" />
         </svg>
     )
 }
 
-function MeadowSprite() {
+function MeadowAstronaut() {
     return (
-        <svg viewBox="0 0 48 50" {...svgProps}>
-            <path
-                d="M24 3c12 0 20 8 20 19s-9 25-20 25S4 33 4 22C4 11 12 3 24 3Z"
-                fill="var(--meadow-body)"
+        <svg viewBox="0 0 64 70" {...svgProps}>
+            <path d="M32 6v-4" stroke="var(--meadow-outline)" strokeWidth="2.4" />
+            <circle cx="32" cy="2.6" r="2.6" fill="var(--meadow-blush)" />
+            <rect x="20" y="44" width="24" height="20" rx="9" fill="#d9dcf4" />
+            <circle cx="32" cy="30" r="24" fill="var(--meadow-body)" />
+            <circle
+                cx="32"
+                cy="30"
+                r="24"
+                fill="none"
                 stroke="var(--meadow-outline)"
-                strokeWidth="2.4"
+                strokeWidth="2.6"
             />
-            <ellipse cx="14" cy="28" rx="3.6" ry="2.4" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="34" cy="28" rx="3.6" ry="2.4" fill="var(--meadow-blush)" opacity="0.9" />
-            <ellipse cx="18" cy="22" rx="2.8" ry="3.6" fill="var(--meadow-face)" />
-            <ellipse cx="30" cy="22" rx="2.8" ry="3.6" fill="var(--meadow-face)" />
-            <ellipse cx="24" cy="31" rx="2.6" ry="3" fill="var(--meadow-face)" />
+            <path d="M32 12c11 0 17 8 17 17s-7 15-17 15-17-6-17-15 6-17 17-17Z" fill="#3a4272" />
+            <ellipse cx="25" cy="28" rx="3" ry="3.8" fill="#dfe6ff" />
+            <ellipse cx="39" cy="28" rx="3" ry="3.8" fill="#dfe6ff" />
+            <path
+                d="M28 36c2 2 6 2 8 0"
+                stroke="#8fa4d8"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+            />
+            <ellipse cx="22" cy="20" rx="6" ry="4" fill="#7b86bd" opacity="0.5" />
         </svg>
     )
 }
+
+export interface MeadowPlanetSpot {
+    art: "gas" | "ring" | "moonlet" | "void"
+    x: number
+    y: number
+    size: number
+    beat: number
+    orbit?: number
+    dense?: boolean
+    faint?: boolean
+    compact?: { x: number; y: number; size: number }
+}
+
+export const MEADOW_PLANET_ART = {
+    gas: MeadowGasPlanet,
+    ring: MeadowRingPlanet,
+    moonlet: MeadowMoonlet,
+    void: MeadowBlackHole,
+} as const
+
+export const MEADOW_PLANETS: readonly MeadowPlanetSpot[] = [
+    {
+        art: "ring",
+        x: -8,
+        y: 58,
+        size: 268,
+        beat: 46,
+        compact: { x: -18, y: 79, size: 168 },
+    },
+    {
+        art: "gas",
+        x: 79,
+        y: 6,
+        size: 148,
+        beat: 38,
+        orbit: 1.34,
+        compact: { x: 74, y: 1, size: 104 },
+    },
+    { art: "moonlet", x: 20, y: 14, size: 46, beat: 30, dense: true },
+    {
+        art: "void",
+        x: 24,
+        y: -2,
+        size: 190,
+        beat: 62,
+        faint: true,
+        compact: { x: 20, y: -8, size: 120 },
+    },
+]
 
 export interface MeadowItem extends MeadowSpec {
     content: ReactNode
@@ -348,14 +431,14 @@ export const MEADOW_CAST: readonly MeadowItem[] = [
         compact: { x: 16, y: 8, size: 62 },
     },
     {
-        content: <MeadowBlob />,
+        content: <GhostClassic />,
         kind: "mascot",
         motion: "float",
         x: 87,
         y: 47,
-        size: 68,
+        size: 62,
         depth: 0.7,
-        compact: { x: 84, y: 95, size: 52 },
+        compact: { x: 84, y: 95, size: 48 },
     },
     {
         content: <MeadowButterfly />,
@@ -368,17 +451,7 @@ export const MEADOW_CAST: readonly MeadowItem[] = [
         compact: { x: 12, y: 94, size: 42 },
     },
     {
-        content: <MeadowPlane />,
-        kind: "plane",
-        motion: "glide",
-        x: 0,
-        y: 15,
-        size: 52,
-        depth: 0.55,
-        compact: { x: 0, y: 5, size: 34 },
-    },
-    {
-        content: <MeadowGhost />,
+        content: <GhostKitten />,
         kind: "mascot",
         motion: "hover",
         x: 90,
@@ -399,14 +472,14 @@ export const MEADOW_CAST: readonly MeadowItem[] = [
         compact: { x: 0, y: 4, size: 44 },
     },
     {
-        content: <MeadowSleepy />,
+        content: <GhostRibbon />,
         kind: "mascot",
         motion: "float",
         x: 11,
         y: 79,
-        size: 64,
+        size: 60,
         depth: 0.6,
-        compact: { x: 26, y: 91, size: 48 },
+        compact: { x: 26, y: 91, size: 46 },
     },
     {
         content: <MeadowStar />,
@@ -429,17 +502,17 @@ export const MEADOW_CAST: readonly MeadowItem[] = [
         compact: { x: 68, y: 91, size: 34 },
     },
     {
-        content: <MeadowWink />,
+        content: <GhostClassic />,
         kind: "mascot",
         motion: "hover",
         x: 8,
         y: 44,
-        size: 54,
+        size: 50,
         depth: 0.65,
-        compact: { x: 6, y: 87, size: 42 },
+        compact: { x: 6, y: 87, size: 40 },
     },
     {
-        content: <MeadowSprite />,
+        content: <GhostKitten />,
         kind: "mascot",
         motion: "float",
         x: 94,
@@ -447,6 +520,111 @@ export const MEADOW_CAST: readonly MeadowItem[] = [
         size: 42,
         depth: 0.5,
         compact: { x: 94, y: 84, size: 32 },
+    },
+]
+
+export const MEADOW_SPACE_CAST: readonly MeadowItem[] = [
+    {
+        content: <MeadowRocket />,
+        kind: "rocket",
+        motion: "glide",
+        x: 0,
+        y: 13,
+        size: 66,
+        depth: 0.7,
+        compact: { x: 0, y: 7, size: 46 },
+    },
+    {
+        content: <GhostClassic />,
+        kind: "mascot",
+        motion: "float",
+        x: 87,
+        y: 45,
+        size: 62,
+        depth: 0.7,
+        compact: { x: 84, y: 96, size: 46 },
+    },
+    {
+        content: <UfoSaucer />,
+        kind: "ufo",
+        motion: "glide",
+        x: 0,
+        y: 91,
+        size: 92,
+        depth: 0.55,
+        compact: { x: 0, y: 95, size: 62 },
+    },
+    {
+        content: <MeadowRobot />,
+        kind: "mascot",
+        motion: "hover",
+        x: 11,
+        y: 72,
+        size: 64,
+        depth: 0.75,
+        compact: { x: 22, y: 96, size: 44 },
+    },
+    {
+        content: <MeadowRocket />,
+        kind: "rocket",
+        motion: "glide",
+        x: 0,
+        y: 95,
+        size: 48,
+        depth: 0.4,
+        flip: true,
+        compact: { x: 0, y: 90, size: 36 },
+    },
+    {
+        content: <MeadowAstronaut />,
+        kind: "mascot",
+        motion: "float",
+        x: 8,
+        y: 28,
+        size: 58,
+        depth: 0.6,
+        compact: { x: 6, y: 8, size: 42 },
+    },
+    {
+        content: <UfoAntenna />,
+        kind: "ufo",
+        motion: "glide",
+        x: 0,
+        y: 6,
+        size: 70,
+        depth: 0.35,
+        flip: true,
+        compact: { x: 0, y: 3, size: 50 },
+    },
+    {
+        content: <GhostKitten />,
+        kind: "mascot",
+        motion: "hover",
+        x: 91,
+        y: 82,
+        size: 54,
+        depth: 0.65,
+        compact: { x: 92, y: 92, size: 42 },
+    },
+    {
+        content: <GhostRibbon />,
+        kind: "mascot",
+        motion: "float",
+        x: 94,
+        y: 24,
+        size: 44,
+        depth: 0.5,
+        compact: { x: 94, y: 84, size: 32 },
+    },
+    {
+        content: <MeadowStar />,
+        kind: "star",
+        motion: "twinkle",
+        x: 78,
+        y: 62,
+        size: 24,
+        depth: 0.4,
+        compact: { x: 93, y: 5, size: 18 },
     },
 ]
 
@@ -506,3 +684,7 @@ export const MEADOW_ART = {
     tuft: MeadowTuft,
     sprig: MeadowSprig,
 } as const
+
+/** Orbs come straight from the approved sets, indexed deterministically. */
+export const MEADOW_SUN_ART = MEADOW_SUN_VARIANTS.map((variant) => variant.Art)
+export const MEADOW_MOON_ART = MEADOW_MOON_VARIANTS.map((variant) => variant.Art)

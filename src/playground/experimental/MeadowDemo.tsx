@@ -1,7 +1,7 @@
 "use client"
 
 import { Meadow } from "@/lib/experimental"
-import type { MeadowDensity } from "@/lib/experimental"
+import type { MeadowDensity, MeadowTheme } from "@/lib/experimental"
 import { Panel } from "@/playground/panel/Panel"
 import type { ControlGroup } from "@/playground/panel/types"
 
@@ -10,7 +10,8 @@ import { useExperiment } from "./useExperiment"
 
 const DEFAULTS = {
     density: "cosy",
-    darkMode: false,
+    theme: "day",
+    timeAware: false,
     animated: true,
     trails: true,
     seed: 5,
@@ -19,18 +20,21 @@ const DEFAULTS = {
     hills: true,
     flowers: true,
     balloon: true,
-    plane: true,
     butterflies: true,
     birds: true,
     mascots: true,
     stars: true,
+    comets: true,
+    planets: true,
+    rockets: true,
+    ufos: true,
 }
 
 const CONTROLS: ControlGroup[] = [
     {
         id: "life",
         title: "Life",
-        hint: "how many characters drift through and how they move",
+        hint: "theme previews the scene; local time overrides it unless the theme is space",
         open: true,
         controls: [
             {
@@ -40,7 +44,13 @@ const CONTROLS: ControlGroup[] = [
                 options: ["calm", "cosy", "lively"],
             },
             { kind: "number", path: "seed", label: "Seed", min: 1, max: 99, step: 1 },
-            { kind: "boolean", path: "darkMode", label: "Night" },
+            {
+                kind: "select",
+                path: "theme",
+                label: "Theme",
+                options: ["day", "sunrise", "sunset", "night", "space"],
+            },
+            { kind: "boolean", path: "timeAware", label: "Follow local time" },
             { kind: "boolean", path: "animated", label: "Animated" },
             { kind: "boolean", path: "trails", label: "Mascot trails" },
         ],
@@ -64,11 +74,14 @@ const CONTROLS: ControlGroup[] = [
         open: false,
         controls: [
             { kind: "boolean", path: "balloon", label: "Balloon" },
-            { kind: "boolean", path: "plane", label: "Paper plane" },
             { kind: "boolean", path: "butterflies", label: "Butterflies" },
             { kind: "boolean", path: "birds", label: "Birds" },
             { kind: "boolean", path: "mascots", label: "Mascots" },
             { kind: "boolean", path: "stars", label: "Stars" },
+            { kind: "boolean", path: "comets", label: "Shooting stars" },
+            { kind: "boolean", path: "planets", label: "Planets" },
+            { kind: "boolean", path: "rockets", label: "Rockets" },
+            { kind: "boolean", path: "ufos", label: "UFOs" },
         ],
     },
 ]
@@ -84,7 +97,8 @@ export function MeadowDemo() {
             >
                 <Meadow
                     density={config.density as MeadowDensity}
-                    darkMode={config.darkMode}
+                    theme={config.theme as MeadowTheme}
+                    timeAware={config.timeAware}
                     animated={config.animated}
                     trails={config.trails}
                     seed={config.seed}
@@ -94,11 +108,14 @@ export function MeadowDemo() {
                         hills: config.hills,
                         flowers: config.flowers,
                         balloon: config.balloon,
-                        plane: config.plane,
                         butterflies: config.butterflies,
                         birds: config.birds,
                         mascots: config.mascots,
                         stars: config.stars,
+                        comets: config.comets,
+                        planets: config.planets,
+                        rockets: config.rockets,
+                        ufos: config.ufos,
                     }}
                     className="xpg-meadow-scene"
                 >

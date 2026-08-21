@@ -1,0 +1,72 @@
+.xp-assets-set {
+    display: block;
+    min-height: 0;
+    padding: 26px 24px 30px;
+    border-radius: 22px;
+}
+
+.xp-assets-head {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.xp-assets-head h3 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--meadow-ink);
+}
+
+.xp-assets-head p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--meadow-ink-soft);
+}
+
+.xp-assets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+    gap: 14px;
+}
+
+.xp-assets-tile {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 14px 12px 12px;
+    border: 1px solid var(--meadow-edge);
+    border-radius: 16px;
+    background: var(--meadow-veil);
+}
+
+.xp-assets-art {
+    display: grid;
+    place-items: center;
+    height: 112px;
+}
+
+.xp-assets-art svg {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+}
+
+.xp-assets-tile figcaption {
+    display: grid;
+    gap: 3px;
+    text-align: center;
+}
+
+.xp-assets-tile strong {
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--meadow-ink);
+}
+
+.xp-assets-tile small {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--meadow-ink-soft);
+}

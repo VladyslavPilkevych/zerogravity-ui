@@ -2,7 +2,105 @@ export type MeadowMotion = "float" | "bob" | "hover" | "glide" | "flit" | "twink
 
 export type MeadowDensity = "calm" | "cosy" | "lively"
 
-export type MeadowKind = "balloon" | "plane" | "butterfly" | "bird" | "mascot" | "star"
+export type MeadowKind = "balloon" | "butterfly" | "bird" | "mascot" | "star" | "rocket" | "ufo"
+
+export type MeadowTheme = "sunrise" | "day" | "sunset" | "night" | "space"
+
+/** the Earth-like states local time can resolve to; space is always explicit */
+export type MeadowDaypart = Exclude<MeadowTheme, "space">
+
+export type MeadowScenePart =
+    | "sun"
+    | "clouds"
+    | "hills"
+    | "flowers"
+    | "balloon"
+    | "butterflies"
+    | "birds"
+    | "mascots"
+    | "stars"
+    | "comets"
+    | "planets"
+    | "rockets"
+    | "ufos"
+
+export type MeadowScene = Partial<Record<MeadowScenePart, boolean>>
+
+export interface MeadowOrbSpot {
+    x: number
+    y: number
+}
+
+export interface MeadowThemeSpec {
+    surface: string
+    orb: "sun" | "moon" | null
+    stars: number
+    starSize: number
+    glow: boolean
+    /** whether the orb rides its clock arc in this scene */
+    arc: boolean
+    /** where the orb sits when there is no clock to follow */
+    orbAt?: MeadowOrbSpot
+    /** off by default, but a consumer can switch these back on */
+    quiet: readonly MeadowScenePart[]
+    /** never drawn in this theme, whatever the scene asks for */
+    forbid: readonly MeadowScenePart[]
+}
+
+export const MEADOW_THEMES: Record<MeadowTheme, MeadowThemeSpec> = {
+    sunrise: {
+        surface: "xp-meadow-warm xp-meadow-dawn",
+        orb: "sun",
+        stars: 0,
+        starSize: 0,
+        glow: false,
+        arc: true,
+        orbAt: { x: 11, y: 52 },
+        quiet: ["comets", "birds"],
+        forbid: ["planets", "rockets", "ufos"],
+    },
+    day: {
+        surface: "",
+        orb: "sun",
+        stars: 0,
+        starSize: 0,
+        glow: false,
+        arc: true,
+        quiet: ["comets"],
+        forbid: ["planets", "rockets", "ufos"],
+    },
+    sunset: {
+        surface: "xp-meadow-warm xp-meadow-dusk",
+        orb: "sun",
+        stars: 0,
+        starSize: 0,
+        glow: false,
+        arc: true,
+        orbAt: { x: 89, y: 52 },
+        quiet: ["comets", "butterflies"],
+        forbid: ["planets", "rockets", "ufos"],
+    },
+    night: {
+        surface: "xp-meadow-night",
+        orb: "moon",
+        stars: 18,
+        starSize: 2.4,
+        glow: true,
+        arc: true,
+        quiet: ["birds", "butterflies"],
+        forbid: ["planets", "rockets", "ufos"],
+    },
+    space: {
+        surface: "xp-meadow-space",
+        orb: null,
+        stars: 30,
+        starSize: 3.8,
+        glow: true,
+        arc: false,
+        quiet: [],
+        forbid: ["sun", "clouds", "hills", "flowers", "balloon", "birds", "butterflies"],
+    },
+}
 
 export interface MeadowSpec {
     motion: MeadowMotion
@@ -124,20 +222,84 @@ export interface MeadowStar {
     beat: number
 }
 
-export function planStars(count: number, seed: number): MeadowStar[] {
+export function planStars(count: number, seed: number, largest = 2.4, reach = 56): MeadowStar[] {
     const stars: MeadowStar[] = []
 
     for (let index = 0; index < count; index += 1) {
         const random = rngFor(seed + 977, index)
+        const depth = random()
 
         stars.push({
             x: round(2 + random() * 96, 2),
-            y: round(2 + random() * 56, 2),
-            size: round(1.6 + random() * 2.4, 2),
-            tone: round(0.35 + random() * 0.5, 2),
+            y: round(2 + random() * reach, 2),
+            size: round(1.3 + depth * largest, 2),
+            tone: round(0.3 + depth * 0.55, 2),
             beat: round(2.6 + random() * 4.2, 2),
         })
     }
 
     return stars
+}
+
+/**
+ * Local-clock boundaries, in hours. Everything time related reads these, so the
+ * hour values live here and nowhere else.
+ */
+export interface MeadowClock {
+    sunriseStart: number
+    dayStart: number
+    sunsetStart: number
+    nightStart: number
+}
+
+export const MEADOW_CLOCK: MeadowClock = {
+    sunriseStart: 5,
+    dayStart: 8,
+    sunsetStart: 18,
+    nightStart: 21,
+}
+
+/** Maps an hour of the local day, fractions allowed, onto a scene. */
+export function daypartForHour(hour: number, clock: MeadowClock = MEADOW_CLOCK): MeadowDaypart {
+    const at = ((hour % 24) + 24) % 24
+
+    if (at >= clock.nightStart || at < clock.sunriseStart) return "night"
+    if (at < clock.dayStart) return "sunrise"
+    if (at < clock.sunsetStart) return "day"
+    return "sunset"
+}
+
+export function hourOf(at: Date): number {
+    return at.getHours() + at.getMinutes() / 60
+}
+
+/**
+ * A stylised arc, not an ephemeris. Daylight runs left to right across the sky
+ * and peaks in the middle; the night window works the same way for the moon.
+ */
+export function orbSpot(hour: number, clock: MeadowClock = MEADOW_CLOCK): MeadowOrbSpot {
+    const at = ((hour % 24) + 24) % 24
+    const dark = at >= clock.nightStart || at < clock.sunriseStart
+
+    const span = dark
+        ? 24 - clock.nightStart + clock.sunriseStart
+        : clock.nightStart - clock.sunriseStart
+    const since = dark
+        ? at < clock.sunriseStart
+            ? at + (24 - clock.nightStart)
+            : at - clock.nightStart
+        : at - clock.sunriseStart
+
+    const progress = span <= 0 ? 0.5 : Math.min(1, Math.max(0, since / span))
+
+    return {
+        x: round(8 + progress * 84, 2),
+        y: round(58 - Math.sin(progress * Math.PI) * 50, 2),
+    }
+}
+
+/** Deterministic pick from an approved asset set. */
+export function pickVariant(count: number, seed: number, salt: number): number {
+    if (count <= 1) return 0
+    return Math.floor(rngFor(seed + salt, salt)() * count) % count
 }

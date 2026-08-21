@@ -119,7 +119,6 @@ export const LandscapeOnly: Story = {
     args: {
         scene: {
             balloon: false,
-            plane: false,
             butterflies: false,
             birds: false,
             mascots: false,
@@ -131,7 +130,7 @@ export const LandscapeOnly: Story = {
 export const MascotsOnly: Story = {
     args: {
         density: "lively",
-        scene: { balloon: false, plane: false, butterflies: false, birds: false, stars: false },
+        scene: { balloon: false, butterflies: false, birds: false, stars: false },
     },
 }
 
@@ -208,23 +207,74 @@ const CUSTOM_ITEMS: MeadowItem[] = [
 ]
 
 export const Night: Story = {
-    args: { darkMode: true },
+    args: { theme: "night" },
 }
 
 export const NightDense: Story = {
-    args: { darkMode: true, density: "lively" },
+    args: { theme: "night", density: "lively" },
 }
 
 export const NightCalm: Story = {
-    args: { darkMode: true, density: "calm" },
+    args: { theme: "night", density: "calm" },
 }
 
-export const NightNoStars: Story = {
-    args: { darkMode: true, scene: { stars: false } },
+export const Sunrise: Story = {
+    args: { theme: "sunrise" },
+}
+
+export const Sunset: Story = {
+    args: { theme: "sunset" },
+}
+
+/**
+ * Exercises the real timeAware path with a collapsed clock, so the scene it picks
+ * is the same whatever the local hour is. The orb still rides its live arc, so
+ * these two are render-only rather than snapshotted — the explicit Sunrise,
+ * Sunset, Day and Night stories cover the visuals deterministically.
+ */
+export const TimeAware: Story = {
+    args: {
+        timeAware: true,
+        clock: { sunriseStart: 0, dayStart: 24, sunsetStart: 24, nightStart: 24 },
+    },
+    parameters: { chromatic: { disableSnapshot: true } },
+}
+
+export const TimeAwareNight: Story = {
+    args: {
+        timeAware: true,
+        clock: { sunriseStart: 24, dayStart: 24, sunsetStart: 24, nightStart: 0 },
+    },
+    parameters: { chromatic: { disableSnapshot: true } },
+}
+
+export const Space: Story = {
+    args: { theme: "space" },
+}
+
+export const SpaceDense: Story = {
+    args: { theme: "space", density: "lively" },
+}
+
+export const SpaceCalm: Story = {
+    args: { theme: "space", density: "calm" },
+}
+
+export const SpaceNoPlanets: Story = {
+    args: { theme: "space", density: "lively", scene: { planets: false } },
+}
+
+export const SpaceNoUfos: Story = {
+    args: { theme: "space", density: "lively", scene: { ufos: false } },
 }
 
 export const NightReducedMotion: Story = {
-    args: { darkMode: true, density: "lively", animated: false },
+    args: { theme: "night", density: "lively", animated: false },
+    parameters: { chromatic: { disableSnapshot: false } },
+}
+
+export const SpaceReducedMotion: Story = {
+    args: { theme: "space", density: "lively", animated: false },
     parameters: { chromatic: { disableSnapshot: false } },
 }
 
@@ -249,6 +299,45 @@ export const PointerSafety: Story = {
 
         for (const layer of canvasElement.querySelectorAll(".xp-meadow-layer")) {
             await expect(layer.getAttribute("aria-hidden")).toBe("true")
+        }
+    },
+}
+
+export const GlideDirection: Story = {
+    args: { theme: "space", density: "lively" },
+    play: async ({ canvasElement }) => {
+        const lane = (flipped: boolean) =>
+            canvasElement.querySelector<HTMLElement>(
+                `.xp-meadow-object[data-motion="glide"]${flipped ? '[data-flip="true"]' : ":not([data-flip])"}`,
+            )
+
+        for (const flipped of [false, true]) {
+            const object = lane(flipped)
+            await expect(object).not.toBeNull()
+
+            const track = object!.querySelector<HTMLElement>(".xp-meadow-track")!
+            const body = object!.querySelector<HTMLElement>(".xp-meadow-body")!
+            const run = track.getAnimations()[0]
+            await expect(run).toBeTruthy()
+
+            const timing = run.effect?.getTiming()
+            const span = Number(timing?.duration ?? 0)
+            // currentTime counts from the delay, which is negative here to spread the cast out
+            const origin = Number(timing?.delay ?? 0)
+
+            await expect(getComputedStyle(object!).scale).toBe(flipped ? "-1 1" : "none")
+            await expect(getComputedStyle(body).scale).toBe("none")
+            run.pause()
+
+            run.currentTime = origin + span * 0.1
+            const from = body.getBoundingClientRect().left
+            run.currentTime = origin + span * 0.45
+            const to = body.getBoundingClientRect().left
+
+            if (flipped) await expect(to).toBeLessThan(from)
+            else await expect(to).toBeGreaterThan(from)
+
+            run.play()
         }
     },
 }

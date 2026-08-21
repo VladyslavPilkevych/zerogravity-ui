@@ -22,6 +22,7 @@ export const EXPERIMENTAL_ROUTES = [
     { path: "/x/wash", name: "Wash" },
     { path: "/x/tessera", name: "Tessera" },
     { path: "/x/meadow", name: "Meadow" },
+    { path: "/x/meadow-assets", name: "MeadowAssets" },
 ] as const
 
 const ALLOWED = [
