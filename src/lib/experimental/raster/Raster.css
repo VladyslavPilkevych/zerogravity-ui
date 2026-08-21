@@ -1,0 +1,175 @@
+.xp-raster {
+    --raster-blur: 22px;
+    --raster-bleed: 22;
+    --raster-radius: 18px;
+
+    position: relative;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--raster-radius);
+    background: #0c0d13;
+    isolation: isolate;
+}
+
+.xp-raster-plate {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 320ms ease;
+}
+
+.xp-raster-veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: opacity 320ms ease;
+}
+
+.xp-raster[data-mode="glass"] .xp-raster-plate,
+.xp-raster[data-mode="glyph"] .xp-raster-plate,
+.xp-raster[data-mode="pixel"] .xp-raster-plate {
+    opacity: 0;
+}
+
+/* blur: two masked copies build up toward the frame edge */
+.xp-raster-haze {
+    position: absolute;
+    inset: 0;
+    background-image: var(--raster-src);
+    background-position: center;
+    background-size: cover;
+}
+
+.xp-raster-haze[data-step="near"] {
+    filter: blur(calc(var(--raster-blur) * 0.3)) saturate(1.05);
+    mask-image: radial-gradient(circle at 50% 44%, transparent 26%, #000 68%);
+}
+
+.xp-raster-haze[data-step="far"] {
+    filter: blur(var(--raster-blur)) saturate(1.12);
+    mask-image: radial-gradient(circle at 50% 44%, transparent 52%, #000 100%);
+}
+
+/* glass: the slab itself, warped and lifted the way a thick lens lifts its content */
+.xp-raster-lens {
+    position: absolute;
+    top: calc(var(--raster-bleed) * -1px);
+    left: calc(var(--raster-bleed) * -1px);
+    width: calc(100% + var(--raster-bleed) * 2px);
+    height: calc(100% + var(--raster-bleed) * 2px);
+    object-fit: cover;
+    filter: var(--raster-warp) saturate(1.16) brightness(1.05);
+}
+
+/*
+ * Liquid glass bends hardest at its border. Two rings of the same picture, one
+ * magnified and one pulled in, masked to a band around all four edges — that
+ * reads as refraction rather than a flat warp.
+ */
+.xp-raster-bend {
+    position: absolute;
+    inset: 0;
+    background-image: var(--raster-src);
+    background-position: center;
+    background-size: cover;
+    mask-image:
+        linear-gradient(to right, #000 0, transparent 24%, transparent 76%, #000 100%),
+        linear-gradient(to bottom, #000 0, transparent 28%, transparent 72%, #000 100%);
+    mask-composite: add;
+}
+
+.xp-raster-bend[data-edge="inner"] {
+    scale: 1.2;
+    filter: saturate(1.22) brightness(1.1) blur(0.4px);
+    opacity: 0.85;
+}
+
+.xp-raster-bend[data-edge="outer"] {
+    scale: 0.94;
+    filter: saturate(1.1) brightness(0.96);
+    opacity: 0.5;
+    mask-image:
+        linear-gradient(to right, #000 0, transparent 12%, transparent 88%, #000 100%),
+        linear-gradient(to bottom, #000 0, transparent 14%, transparent 86%, #000 100%);
+    mask-composite: add;
+}
+
+.xp-raster-rim {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        142deg,
+        rgba(255, 255, 255, 0.24) 0%,
+        rgba(255, 255, 255, 0) 32%,
+        rgba(255, 255, 255, 0) 68%,
+        rgba(255, 255, 255, 0.12) 100%
+    );
+    box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -28px 44px -32px rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+}
+
+.xp-raster-sheen {
+    position: absolute;
+    inset: -30%;
+    background: linear-gradient(
+        108deg,
+        transparent 34%,
+        rgba(255, 255, 255, 0.1) 44%,
+        rgba(255, 255, 255, 0.24) 50%,
+        rgba(255, 255, 255, 0.08) 57%,
+        transparent 68%
+    );
+    filter: blur(6px);
+    animation: xp-raster-sheen 11s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes xp-raster-sheen {
+    from {
+        transform: translate3d(-16%, 0, 0);
+    }
+    to {
+        transform: translate3d(16%, 0, 0);
+    }
+}
+
+/* glyph and pixel */
+.xp-raster-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.xp-raster[data-mode="glyph"] .xp-raster-veil {
+    background: #090a11;
+}
+
+.xp-raster-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.xp-raster-interactive:hover .xp-raster-veil,
+.xp-raster-interactive:focus-within .xp-raster-veil {
+    opacity: 0;
+}
+
+.xp-raster-interactive:hover .xp-raster-plate,
+.xp-raster-interactive:focus-within .xp-raster-plate {
+    opacity: 1;
+}
+
+.xp-raster-still .xp-raster-sheen {
+    animation: none;
+}

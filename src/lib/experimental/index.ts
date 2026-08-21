@@ -31,6 +31,9 @@ export type {
 export { Overprint } from "./overprint"
 export type { OverprintProps } from "./overprint"
 
+export { Raster, RASTER_GLYPH_SETS, RASTER_DEMO_IMAGE } from "./raster"
+export type { RasterGlyphSet, RasterMode, RasterProps } from "./raster"
+
 export { TesseraProvider, useTessera, useTesseraPhase } from "./tessera"
 export type {
     TesseraController,
