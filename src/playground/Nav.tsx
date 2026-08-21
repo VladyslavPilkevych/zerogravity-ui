@@ -29,6 +29,7 @@ const EXPERIMENTS = [
     { href: "/x/meadow", label: "Meadow" },
     { href: "/x/meadow-assets", label: "Meadow assets" },
     { href: "/x/raster", label: "Raster" },
+    { href: "/x/loaders", label: "Loaders" },
 ]
 
 export function Nav() {

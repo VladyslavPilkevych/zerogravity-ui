@@ -357,3 +357,57 @@
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.55);
 }
+
+.xpg-loaders {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+}
+
+.xpg-loaders-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.xpg-loader-card {
+    display: grid;
+    align-content: space-between;
+    gap: 18px;
+    min-height: 190px;
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.xpg-loader-slot {
+    display: grid;
+    place-items: center;
+    min-height: 110px;
+}
+
+.xpg-loader-card h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+}
+
+.xpg-loader-card p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.xpg-loader-wide {
+    grid-column: 1 / -1;
+}
+
+.xpg-loader-frame {
+    height: 240px;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #0b0c14;
+}

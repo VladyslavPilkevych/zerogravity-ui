@@ -10,6 +10,16 @@ export type { KernProps } from "./kern"
 export { Lodestone } from "./lodestone"
 export type { LodestoneProps } from "./lodestone"
 
+export { PixelBar, PixelBlocks, PixelHeart, PixelPulse } from "./loaders"
+export type {
+    PixelBarProps,
+    PixelBlocksProps,
+    PixelBlocksVariant,
+    PixelHeartProps,
+    PixelHeartVariant,
+    PixelPulseProps,
+} from "./loaders"
+
 export { Louvre } from "./louvre"
 export type { LouvreProps } from "./louvre"
 
