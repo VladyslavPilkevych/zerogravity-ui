@@ -11,7 +11,7 @@ import { Facet, Lodestone } from "@/lib/experimental"
 ```
 
 The batch is Lodestone, Facet, Vellum, Kern, Overprint, Louvre, Diorama, Wash,
-Tessera, Meadow, Raster and the pixel loaders.
+Tessera, Meadow, Raster, Ricochet and the pixel loaders.
 
 Each has a playground route under `/x/<name>` and stories under
 `Experimental/*`. Deleting a rejected prototype means deleting its folder, its

@@ -411,3 +411,61 @@
     border-radius: 18px;
     background: #0b0c14;
 }
+
+.xpg-ricochet {
+    display: grid;
+    gap: 22px;
+    width: 100%;
+}
+
+.xpg-ricochet-game {
+    height: min(62vh, 520px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.xpg-ricochet-copy {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.xpg-ricochet-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.xpg-ricochet-copy p {
+    max-width: 440px;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.66);
+}
+
+.xpg-ricochet-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.xpg-ricochet-preset {
+    padding: 9px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.84);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.xpg-ricochet-preset[aria-pressed="true"] {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+}
