@@ -35,7 +35,8 @@ to `.next` and the dev server starts serving 500s afterwards.
 
 ## Rules that the review will check
 
-**Boundaries.** `src/lib` must not import from `src/playground` or from Next.js.
+**Boundaries.** `src/lib` must not import from `src/docs`, `src/playground` or
+from Next.js.
 ESLint enforces this, but keep it in mind while moving code around.
 
 **Public surface.** A component's `index.ts` is its API. Engines, geometry, math
@@ -87,7 +88,7 @@ Required status checks:
 - `Unit tests`
 - `Library build and package validation`
 - `Packaged consumer tests`
-- `Next.js playground build`
+- `Next.js docs site build`
 - `Storybook browser and accessibility tests`
 - `Playwright smoke tests`
 
@@ -143,7 +144,7 @@ maintenance.
 5. `pnpm version <patch|minor|major>` — bumps `package.json` and creates the
    `v<version>` commit and tag.
 6. `pnpm pack` and inspect the tarball: `dist/`, `README.md`, `CHANGELOG.md`,
-   `LICENSE` and `package.json`, and nothing from `src/`, the playground or the
+   `LICENSE` and `package.json`, and nothing from `src/`, the docs site or the
    test suite.
 7. Smoke-test the tarball in a throwaway consumer — one Vite app and one Next.js
    App Router app — installing the `.tgz` directly. Check that imports and types

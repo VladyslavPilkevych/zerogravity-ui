@@ -4,6 +4,9 @@ export type { DioramaPlane, DioramaProps } from "./diorama"
 export { Facet } from "./facet"
 export type { FacetProps } from "./facet"
 
+export { Kbd } from "./kbd"
+export type { KbdPlatform, KbdProps } from "./kbd"
+
 export { Kern } from "./kern"
 export type { KernProps } from "./kern"
 

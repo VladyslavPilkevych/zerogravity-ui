@@ -59,7 +59,9 @@ export const STENCIL_CONTROLS: ControlGroup[] = [
         hint: "what shows through the letters",
         open: true,
         controls: [
+            { kind: "text", path: "text", label: "Word", maxLength: 18 },
             { kind: "select", path: "fill", label: "Pattern", options: FILLS },
+            { kind: "text", path: "image", label: "Image URL", placeholder: "https://…" },
             { kind: "palette", path: "colors", label: "Pattern colours" },
             {
                 kind: "number",

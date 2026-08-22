@@ -69,6 +69,15 @@ export const REEL_CONTROLS: ControlGroup[] = [
             },
             {
                 kind: "number",
+                path: "radius",
+                label: "Corner radius",
+                min: 0,
+                max: 48,
+                step: 2,
+                unit: "px",
+            },
+            {
+                kind: "number",
                 path: "spacing",
                 label: "Spacing",
                 min: 60,

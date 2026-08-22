@@ -1,13 +1,16 @@
-import { ROUTES, expect, test } from "./fixtures"
+import { DOCS_ROUTES, expect, test } from "./fixtures"
 
 test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" })
 })
 
-test("every route renders under prefers-reduced-motion", async ({ page, browserLog: guard }) => {
-    for (const route of ROUTES) {
+test("every docs page renders under prefers-reduced-motion", async ({
+    page,
+    browserLog: guard,
+}) => {
+    for (const route of DOCS_ROUTES) {
         await page.goto(route.path)
-        await expect(page.locator("nav.pg-nav")).toBeVisible()
+        await expect(page.locator(".dz-preview")).toBeVisible()
         await page.waitForLoadState("networkidle")
     }
 
@@ -15,8 +18,8 @@ test("every route renders under prefers-reduced-motion", async ({ page, browserL
 })
 
 test("pointer effects stay inert under reduced motion", async ({ page, browserLog: guard }) => {
-    await page.goto("/grid-trail")
-    await expect(page.locator("nav.pg-nav")).toBeVisible()
+    await page.goto("/docs/grid-trail")
+    await expect(page.locator(".dz-preview")).toBeVisible()
 
     expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
         true,
@@ -30,7 +33,7 @@ test("pointer effects stay inert under reduced motion", async ({ page, browserLo
 })
 
 test("Reel stays usable under reduced motion", async ({ page, browserLog: guard }) => {
-    await page.goto("/reel")
+    await page.goto("/docs/reel")
 
     const viewport = page.locator(".reel-viewport").first()
     await expect(viewport).toBeVisible()

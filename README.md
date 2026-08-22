@@ -127,20 +127,23 @@ are not reachable from the package and can change in a patch release.
 ```bash
 corepack enable
 pnpm install
-pnpm dev        # playground at http://localhost:3000
+pnpm dev        # docs site at http://localhost:3000
 ```
 
 The project uses **pnpm** and pins the version in `packageManager`.
 
-### Playground
+### Docs site
 
-- One route per component: `/`, `/aperture`, `/grid-trail`, `/reel`,
-  `/scroll-stack`, `/split-flap`, `/stencil`, `/trailing-cursor`.
-- The panel is generated from a schema, and every row is labelled with the real
+- `/` is a short landing page, `/docs` lists every component, and each component
+  has its own page at `/docs/<slug>`.
+- The sidebar groups components by category and filters as you type.
+  <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd> jumps to the search field.
+- Each page is preview, customize, usage, props and dependencies, all generated
+  from one registry entry in `src/docs/registry.ts`.
+- Controls are generated from a schema, and every row is labelled with the real
   prop path (`pulse.waveform`, `formation.radius`).
-- At the bottom of the panel is ready-to-paste JSX containing only the props that
-  differ from the defaults, with a copy button.
-- `H` hides the panel.
+- The usage snippet contains only the props that differ from the defaults, and
+  updates as you move the controls. It is read-only, with a copy button.
 
 Anything changed by hand becomes a sticky override. Switching presets applies the
 preset underneath those edits, so tweaks survive until **Reset**:
@@ -166,18 +169,24 @@ src/
 │   ├── trailing-cursor/
 │   └── index.ts                the public entry point
 │
-├── playground/             development and documentation only
-│   ├── panel/                  schema-driven control panel
-│   └── <component>/            demo + control schema per component
+├── docs/                   the documentation site: registry, shell, search
+│   ├── registry.ts             one entry per component, the source of truth
+│   └── components/             header, sidebar, preview, code, props table
 │
-├── app/                    Next.js App Router, hosts the playground
+├── playground/             demo sources, development only
+│   ├── panel/                  schema-driven controls
+│   ├── previews/               one live preview per component
+│   └── <component>/schema.ts   defaults, controls and presets
+│
+├── app/                    Next.js App Router, hosts the docs site
 └── test/                   test harnesses (rAF, canvas, media queries)
 ```
 
 Each component owns its folder: the component, its types, its CSS, a `README.md`
 and an `index.ts` that defines its public surface.
 
-- `src/playground` may import from `src/lib`. The reverse never happens.
+- `src/docs` and `src/playground` may import from `src/lib`. The reverse never
+  happens.
 - `src/lib` imports React and browser APIs, never Next.js. An ESLint rule fails
   the build if either boundary is crossed.
 - Cross-component imports inside the library go to the specific module, not to
@@ -238,8 +247,12 @@ resolved.
 1. `src/lib/<component>/` with the component, an `index.ts` describing its public
    surface, and a `README.md` with the prop table.
 2. Re-export the intended API from `src/lib/index.ts`.
-3. `src/playground/<component>/schema.ts` plus a demo that renders `Panel`.
-4. A route in `src/app/<component>/page.tsx` and a link in `src/playground/Nav.tsx`.
+3. A control schema (`src/playground/<component>/schema.ts`, or an entry in
+   `src/playground/experimental/schemas.ts`) and a preview in
+   `src/playground/previews/`.
+4. An entry in `src/docs/registry.ts` and its preview in `src/docs/previews.tsx`.
+   The route, the sidebar, search, the props table and the usage snippet all come
+   from that one entry.
 5. A test next to the component covering rendering, keyboard or pointer
    behaviour, cleanup, and reduced-motion.
 

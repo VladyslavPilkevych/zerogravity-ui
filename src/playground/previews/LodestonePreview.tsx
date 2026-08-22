@@ -1,0 +1,37 @@
+"use client"
+
+import { Lodestone } from "@/lib/experimental"
+import type { PreviewApi } from "@/docs/useDocsConfig"
+
+const ACTIONS = ["Get started", "Read the docs", "View source", "Book a demo", "Pricing"]
+
+export function LodestonePreview({ config }: PreviewApi) {
+    const c = config as {
+        radius: number
+        strength: number
+        maxDisplacement: number
+        minGap: number
+        release: number
+        lift: number
+        buttons: number
+        spacing: number
+    }
+
+    return (
+        <div className="xpg-buttons" style={{ gap: c.spacing }}>
+            {Array.from({ length: c.buttons }, (_, index) => (
+                <Lodestone
+                    key={index}
+                    radius={c.radius}
+                    strength={c.strength}
+                    maxDisplacement={c.maxDisplacement}
+                    minGap={c.minGap}
+                    release={c.release}
+                    lift={c.lift}
+                >
+                    {ACTIONS[index % ACTIONS.length]}
+                </Lodestone>
+            ))}
+        </div>
+    )
+}

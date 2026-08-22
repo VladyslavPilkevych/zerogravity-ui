@@ -4,8 +4,7 @@ test("the Meadow asset gallery shows the approved variants on a live palette", a
     page,
     browserLog: guard,
 }) => {
-    await page.goto("/x/meadow-assets")
-    await expect(page.locator("nav.pg-nav")).toBeVisible()
+    await page.goto("/docs/meadow-assets")
 
     const art = page.locator("svg[data-variant]")
     await expect(art).toHaveCount(13)
@@ -46,14 +45,11 @@ test("the gallery switches backdrops without overflowing the page", async ({
     page,
     browserLog: guard,
 }) => {
-    await page.goto("/x/meadow-assets")
+    await page.goto("/docs/meadow-assets")
 
-    for (const name of ["Night", "Space", "Day"]) {
-        await page.getByRole("button", { name, exact: true }).click()
-        await expect(page.getByRole("button", { name, exact: true })).toHaveAttribute(
-            "aria-pressed",
-            "true",
-        )
+    for (const name of ["night", "space", "day"]) {
+        await page.getByLabel("Backdrop").selectOption(name)
+        await expect(page.getByLabel("Backdrop")).toHaveValue(name)
 
         const overflow = await page.evaluate(
             () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

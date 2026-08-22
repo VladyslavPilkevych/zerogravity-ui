@@ -24,11 +24,11 @@ async function watchRouteSwap(page: Page) {
     }, HEADING)
 }
 
-test("Tessera swaps the route only while the viewport is fully covered", async ({
+test("Tessera swaps the route only once its containing block is fully covered", async ({
     page,
     browserLog: guard,
 }) => {
-    await page.goto("/x/tessera")
+    await page.goto("/docs/tessera")
 
     const heading = page.locator(HEADING)
     const overlay = page.locator(".xp-tessera")
@@ -43,30 +43,42 @@ test("Tessera swaps the route only while the viewport is fully covered", async (
     await expect(overlay.locator(".xp-tessera-tile")).toHaveCount(24)
     await expect(heading).toHaveText("Studio Tessera")
 
-    const capturesPointer = await page.evaluate(() => {
-        const node = document.elementFromPoint(
-            Math.floor(window.innerWidth / 2),
-            Math.floor(window.innerHeight / 2),
-        )
-        return Boolean(node?.closest(".xp-tessera"))
-    })
-    expect(capturesPointer).toBe(true)
-
+    // the docs frame is transformed, so it becomes the containing block for the
+    // fixed overlay; in an untransformed app that block is the viewport
     const coverage = await overlay.evaluate((node) => {
         const box = node.getBoundingClientRect()
+        const host = node.closest(".dz-preview") ?? document.documentElement
+        const frame = host.getBoundingClientRect()
+        // a fixed child fills the padding box of its containing block
+        const edge = parseFloat(getComputedStyle(host).borderLeftWidth) || 0
+        const style = getComputedStyle(node)
+        const centre = document.elementFromPoint(
+            Math.round(frame.left + frame.width / 2),
+            Math.round(frame.top + frame.height / 2),
+        )
+
         return {
+            position: style.position,
+            inset: [style.top, style.right, style.bottom, style.left].join(" "),
             left: Math.round(box.left),
             top: Math.round(box.top),
             width: Math.round(box.width),
             height: Math.round(box.height),
-            viewportWidth: document.documentElement.clientWidth,
-            viewportHeight: document.documentElement.clientHeight,
+            frameLeft: Math.round(frame.left + edge),
+            frameTop: Math.round(frame.top + edge),
+            frameWidth: Math.round(frame.width - edge * 2),
+            frameHeight: Math.round(frame.height - edge * 2),
+            capturesPointer: Boolean(centre?.closest(".xp-tessera")),
         }
     })
-    expect(coverage.left).toBe(0)
-    expect(coverage.top).toBe(0)
-    expect(coverage.width).toBe(coverage.viewportWidth)
-    expect(coverage.height).toBe(coverage.viewportHeight)
+
+    expect(coverage.position).toBe("fixed")
+    expect(coverage.inset).toBe("0px 0px 0px 0px")
+    expect(coverage.left).toBe(coverage.frameLeft)
+    expect(coverage.top).toBe(coverage.frameTop)
+    expect(coverage.width).toBe(coverage.frameWidth)
+    expect(coverage.height).toBe(coverage.frameHeight)
+    expect(coverage.capturesPointer).toBe(true)
 
     await expect(heading).toHaveText("The Shop")
     await expect(page.locator("body")).toHaveAttribute("data-swap-phase", "covered")
@@ -80,7 +92,7 @@ test("Tessera leaves no overlay behind after repeated navigation", async ({
     page,
     browserLog: guard,
 }) => {
-    await page.goto("/x/tessera")
+    await page.goto("/docs/tessera")
 
     const heading = page.locator(HEADING)
     const overlay = page.locator(".xp-tessera")
@@ -114,7 +126,7 @@ test("Tessera still hides the route swap under reduced motion", async ({
     browserLog: guard,
 }) => {
     await page.emulateMedia({ reducedMotion: "reduce" })
-    await page.goto("/x/tessera")
+    await page.goto("/docs/tessera")
 
     expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
         true,

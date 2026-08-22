@@ -16,7 +16,7 @@ Meadow no longer has at all.
 
 ## Where to review them
 
-- **Playground:** `/x/meadow-assets`. Every group is shown as a labelled grid,
+- **Docs:** `/docs/meadow-assets`. Every group is shown as a labelled grid,
   with a Day / Night / Space switch so you can see each asset on the backdrop it
   would actually sit on.
 - **Storybook:** `Experimental/Meadow Assets` — one story per group, plus

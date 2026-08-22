@@ -143,7 +143,7 @@ The approved artwork lives in `variants/` and is what the scene actually draws:
 **Ghost 1, 5, 6**, **UFO 1, 3, 6**, **Moon 1, 3** and **Sun 1, 3, 4, 5, 6**.
 Rejected variants are deleted, and Meadow has no airplanes. Ghosts and UFOs are
 placed by name; the orb is picked from the approved set by `seed`, so it is
-stable for SSR, tests and Chromatic. Preview them at `/x/meadow-assets` or under
+stable for SSR, tests and Chromatic. Preview them at `/docs/meadow-assets` or under
 `Experimental/Meadow Assets` in Storybook.
 
 ## Following the clock

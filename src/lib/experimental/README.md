@@ -13,9 +13,12 @@ import { Facet, Lodestone } from "@/lib/experimental"
 The batch is Lodestone, Facet, Vellum, Kern, Overprint, Louvre, Diorama, Wash,
 Tessera, Meadow, Raster, Ricochet and the pixel loaders.
 
-Each has a playground route under `/x/<name>` and stories under
-`Experimental/*`. Deleting a rejected prototype means deleting its folder, its
-demo in `src/playground/experimental`, and its route in `src/app/x`.
+Each has a documentation page under `/docs/<name>` and stories under
+`Experimental/*`. Deleting a rejected prototype means deleting its folder and its
+preview in `src/playground/previews`.
 
 Promoting one means moving the folder into `src/lib`, adding it to
 `src/lib/index.ts`, and removing the build exclusions for it.
+
+Deleting a rejected prototype also means removing its entry from
+`src/docs/registry.ts` and its preview from `src/docs/previews.tsx`.

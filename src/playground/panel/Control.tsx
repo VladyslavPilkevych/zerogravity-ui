@@ -1,6 +1,6 @@
 "use client"
 
-import { memo } from "react"
+import { memo, useId } from "react"
 
 import type { ChangeHandler, ControlDef } from "./types"
 
@@ -22,10 +22,12 @@ function format(value: number, step: number): string {
     return value.toFixed(3)
 }
 
-function Head({ def, display }: { def: ControlDef; display?: string }) {
+function Head({ def, id, display }: { def: ControlDef; id: string; display?: string }) {
     return (
         <div className="pg-row-head">
-            <span className="pg-label">{def.label}</span>
+            <label className="pg-label" htmlFor={id}>
+                {def.label}
+            </label>
             {display !== undefined ? <span className="pg-value">{display}</span> : null}
             <code className="pg-path">{def.path}</code>
         </div>
@@ -33,6 +35,8 @@ function Head({ def, display }: { def: ControlDef; display?: string }) {
 }
 
 export const Control = memo(function Control({ def, value, onChange }: ControlProps) {
+    const id = useId()
+
     switch (def.kind) {
         case "number": {
             const current = typeof value === "number" && Number.isFinite(value) ? value : def.min
@@ -40,11 +44,13 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
                 <div className="pg-row">
                     <Head
                         def={def}
+                        id={id}
                         display={`${format(current, def.step)}${def.unit ? ` ${def.unit}` : ""}`}
                     />
                     <div className="pg-row-body">
                         <input
                             type="range"
+                            aria-label={`${def.label} slider`}
                             min={def.min}
                             max={def.max}
                             step={def.step}
@@ -54,6 +60,7 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
                             }
                         />
                         <input
+                            id={id}
                             type="number"
                             className="pg-number"
                             min={def.min}
@@ -75,10 +82,11 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
             const current = Number.isFinite(raw) ? raw : def.min
             return (
                 <div className="pg-row">
-                    <Head def={def} display={`${format(current, def.step)}${def.unit}`} />
+                    <Head def={def} id={id} display={`${format(current, def.step)}${def.unit}`} />
                     <div className="pg-row-body">
                         <input
                             type="range"
+                            aria-label={`${def.label} slider`}
                             min={def.min}
                             max={def.max}
                             step={def.step}
@@ -91,6 +99,7 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
                             }
                         />
                         <input
+                            id={id}
                             type="number"
                             className="pg-number"
                             min={def.min}
@@ -110,8 +119,9 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
         case "select":
             return (
                 <div className="pg-row">
-                    <Head def={def} />
+                    <Head def={def} id={id} />
                     <select
+                        id={id}
                         className="pg-select"
                         value={String(value)}
                         onChange={(event) => onChange(def.path, event.currentTarget.value)}
@@ -122,6 +132,22 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
                             </option>
                         ))}
                     </select>
+                </div>
+            )
+
+        case "text":
+            return (
+                <div className="pg-row">
+                    <Head def={def} id={id} />
+                    <input
+                        id={id}
+                        type="text"
+                        className="pg-text"
+                        value={typeof value === "string" ? value : ""}
+                        maxLength={def.maxLength}
+                        placeholder={def.placeholder}
+                        onChange={(event) => onChange(def.path, event.currentTarget.value)}
+                    />
                 </div>
             )
 
@@ -187,13 +213,14 @@ export const Control = memo(function Control({ def, value, onChange }: ControlPr
             const colors = Array.isArray(value) ? (value as string[]) : []
             return (
                 <div className="pg-row">
-                    <Head def={def} />
+                    <Head def={def} id={id} />
                     <div className="pg-palette">
                         {colors.map((color, index) => (
                             <div className="pg-swatch" key={`${index}-${color}`}>
                                 <input
                                     type="color"
                                     className="pg-color"
+                                    aria-label={`${def.label} ${index + 1}`}
                                     value={toHex(color)}
                                     onChange={(event) => {
                                         const next = colors.slice()
