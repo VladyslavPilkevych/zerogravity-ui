@@ -31,3 +31,21 @@ read normally; the per-glyph copies are `aria-hidden`.
 
 **Limitations.** The weight axis only responds on variable fonts; with a static
 font the spacing and lift still work. Long strings mean many DOM nodes.
+
+## Why this is not a Stencil mode
+
+Both split a string into per-letter spans and read the pointer, so merging Kern
+into `Stencil` as another `hover` mode was considered and rejected.
+
+Every Stencil letter is painted with `background-clip: text` over a pattern, and
+`StencilFill` has no plain option — a Stencil glyph is always a window onto a
+texture. Kern is the opposite: solid glyphs whose **variable-font weight**,
+tracking and lift respond to pointer distance. Making Kern a Stencil mode would
+have meant adding a plain fill to a stable component's public union, carrying
+five mode-specific props (`radius`, `spread`, `lift`, `weight`, `ease`) that mean
+nothing in Stencil's nine other hover modes, and running Kern through Stencil's
+canvas text measurement and mask pipeline for no benefit.
+
+The pointer models differ too: Stencil snaps to the nearest letter index within a
+fixed reach, Kern uses a pixel radius with an eased smoothstep. One `hover` prop
+would have hidden two incompatible distance models.

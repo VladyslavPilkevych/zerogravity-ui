@@ -4,6 +4,7 @@ import { Facet } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { PALETTES } from "../experimental/schemas"
+import { Hint } from "./parts"
 
 export function FacetPreview({ config }: PreviewApi) {
     const c = config as {
@@ -29,21 +30,7 @@ export function FacetPreview({ config }: PreviewApi) {
             ambientDuration={c.ambientDuration}
             className="xpg-hero"
         >
-            <div className="xpg-hero-copy">
-                <h2>Cut from light</h2>
-                <p>
-                    Colour flows across the facets instead of switching all at once, so the surface
-                    keeps moving without ever flashing.
-                </p>
-                <div className="xpg-buttons">
-                    <button type="button" className="xpg-cta">
-                        Primary action
-                    </button>
-                    <button type="button" className="xpg-cta xpg-cta-ghost">
-                        Secondary
-                    </button>
-                </div>
-            </div>
+            <Hint>Move cursor</Hint>
         </Facet>
     )
 }

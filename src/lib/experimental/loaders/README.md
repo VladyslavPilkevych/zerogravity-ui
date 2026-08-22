@@ -84,14 +84,15 @@ Props: `children`, `cell`, `overlay`, `scrim`.
 
 ## Shared props
 
-| Prop                   | Default     | Notes                                     |
-| ---------------------- | ----------- | ----------------------------------------- |
-| `label`                | `"Loading"` | Accessible name; `""` makes it decorative |
-| `color`                | `#f4a04f`   | Any CSS colour                            |
-| `speed`                | `1`         | Pace multiplier; `0` falls back to `1`    |
-| `paused`               | `false`     | Hold the resting state                    |
-| `respectReducedMotion` | `true`      | Honour `prefers-reduced-motion`           |
-| `className` / `style`  | —           | Passed to the root                        |
+| Prop                   | Default     | Notes                                                       |
+| ---------------------- | ----------- | ----------------------------------------------------------- |
+| `label`                | `"Loading"` | Accessible name; `""` makes it decorative                   |
+| `color`                | `#f4a04f`   | Any CSS colour                                              |
+| `speed`                | `1`         | Pace multiplier; `0` falls back to `1`                      |
+| `paused`               | `false`     | Hold the resting state                                      |
+| `gap`                  | natural     | Space between pixels, in pixel widths; `0` makes them touch |
+| `respectReducedMotion` | `true`      | Honour `prefers-reduced-motion`                             |
+| `className` / `style`  | —           | Passed to the root                                          |
 
 ## Accessibility
 

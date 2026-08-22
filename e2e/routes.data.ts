@@ -18,7 +18,6 @@ export const COMPONENT_SLUGS = [
     "facet",
     "wash",
     "meadow",
-    "meadow-assets",
     "tessera",
     "ricochet",
     "loaders",

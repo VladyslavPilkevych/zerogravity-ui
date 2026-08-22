@@ -4,7 +4,7 @@ import type { CSSProperties } from "react"
 
 import { cx } from "../../internal"
 import { HEART_COLS, HEART_PIXELS } from "./heartMap"
-import { beatOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
+import { beatOf, gapOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
 import "./loaders.css"
 
 export type PixelHeartVariant = "pulse" | "blink"
@@ -21,6 +21,7 @@ export function PixelHeart({
     color = "#f4a04f",
     speed = 1,
     paused = false,
+    gap,
     respectReducedMotion = true,
     className,
     style,
@@ -35,6 +36,7 @@ export function PixelHeart({
                 {
                     ...style,
                     "--l-size": size,
+                    "--l-gap": gapOf(gap, 0.066),
                     "--l-color": color,
                     "--l-cols": HEART_COLS,
                     "--l-beat": beatOf(variant === "blink" ? 1.1 : 1.5, speed),

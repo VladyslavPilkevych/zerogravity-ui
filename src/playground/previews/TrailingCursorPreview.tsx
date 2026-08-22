@@ -1,19 +1,22 @@
 "use client"
 
-import type { CSSProperties } from "react"
+import { useRef, type CSSProperties } from "react"
 
 import type { PointerFxPreset } from "@/lib/pointer-fx"
 import { TrailingCursor } from "@/lib/trailing-cursor"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import type { TrailingCursorDemoConfig } from "../trailing-cursor/schema"
+import { Hint } from "./parts"
 
 export function TrailingCursorPreview({ config }: PreviewApi) {
     const c = config as unknown as TrailingCursorDemoConfig
+    const scopeRef = useRef<HTMLDivElement>(null)
 
     return (
-        <div className="pg-fixed pg-cursor-root">
+        <div className="pg-surface" ref={scopeRef}>
             <TrailingCursor
+                container={scopeRef}
                 preset={c.preset as PointerFxPreset}
                 variant={c.variant}
                 dotColor={c.dotColor || undefined}
@@ -27,40 +30,7 @@ export function TrailingCursorPreview({ config }: PreviewApi) {
                 hideNativeCursor={c.hideNativeCursor}
                 mixBlendMode={c.mixBlendMode as CSSProperties["mixBlendMode"]}
             />
-
-            <div className="pg-cursor-stage">
-                <div className="pg-cursor-grid">
-                    <button type="button" className="pg-cursor-card">
-                        <strong>Interactive</strong>
-                        <span>the ring grows here</span>
-                    </button>
-
-                    <div className="pg-cursor-card" data-cursor-label="Open">
-                        <strong>data-cursor-label</strong>
-                        <span>text inside the ring</span>
-                    </div>
-
-                    <div className="pg-cursor-card" data-cursor-scale="2">
-                        <strong>data-cursor-scale</strong>
-                        <span>ring doubles in size</span>
-                    </div>
-
-                    <div className="pg-cursor-card" data-cursor-color="#22d3ee">
-                        <strong>data-cursor-color</strong>
-                        <span>recoloured while hovering</span>
-                    </div>
-
-                    <div className="pg-cursor-card" data-cursor="hidden">
-                        <strong>data-cursor=&quot;hidden&quot;</strong>
-                        <span>both layers disappear</span>
-                    </div>
-
-                    <label className="pg-cursor-card">
-                        <strong>A real input</strong>
-                        <input type="text" placeholder="focus me with Tab" />
-                    </label>
-                </div>
-            </div>
+            <Hint>Move cursor</Hint>
         </div>
     )
 }

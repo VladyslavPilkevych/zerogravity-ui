@@ -46,8 +46,13 @@ test("ScrollStack reacts to scrolling", async ({ page, browserLog: guard }) => {
 
     const transformBefore = await firstCard.evaluate((node) => getComputedStyle(node).transform)
 
-    await page.evaluate(() => window.scrollBy(0, window.innerHeight * 1.5))
-    await page.waitForFunction(() => window.scrollY > 0)
+    await page.evaluate(() => {
+        const port = document.querySelector(".pg-port") as HTMLElement
+        port.scrollTop = (port.scrollHeight - port.clientHeight) * 0.6
+    })
+    await page.waitForFunction(
+        () => (document.querySelector(".pg-port") as HTMLElement).scrollTop > 0,
+    )
 
     await expect
         .poll(async () => firstCard.evaluate((node) => getComputedStyle(node).transform), {

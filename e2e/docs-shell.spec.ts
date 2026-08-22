@@ -1,4 +1,5 @@
 import { expect, test } from "./fixtures"
+import { COMPONENT_SLUGS } from "./routes.data"
 
 test("search filters the sidebar as you type", async ({ page, browserLog: guard }) => {
     await page.goto("/docs")
@@ -6,7 +7,7 @@ test("search filters the sidebar as you type", async ({ page, browserLog: guard 
     const side = page.locator(".dz-side")
     const search = side.getByLabel("Search components")
 
-    await expect(side.getByRole("link")).toHaveCount(22)
+    await expect(side.getByRole("link")).toHaveCount(COMPONENT_SLUGS.length)
 
     await search.fill("carousel")
     await expect(side.getByRole("link", { name: /^Reel/ })).toBeVisible()

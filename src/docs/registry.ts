@@ -20,8 +20,6 @@ import {
     LODESTONE_DEFAULTS,
     LOUVRE_CONTROLS,
     LOUVRE_DEFAULTS,
-    MEADOW_ASSETS_CONTROLS,
-    MEADOW_ASSETS_DEFAULTS,
     MEADOW_CONTROLS,
     MEADOW_DEFAULTS,
     OVERPRINT_CONTROLS,
@@ -162,10 +160,10 @@ export const COMPONENTS: DocEntry[] = [
         ],
         children: "<article>Card one</article>",
         preview: {
-            pageScroll: true,
-            bleed: true,
+            port: true,
+            minHeight: 560,
             wide: true,
-            note: "Scroll the page to drive this component, exactly as it behaves in an app.",
+            note: "The demo drives the component from this frame. In an app it reads page scroll instead.",
         },
     },
     {
@@ -198,10 +196,10 @@ export const COMPONENTS: DocEntry[] = [
         ],
         children: "<div>Panel content</div>",
         preview: {
-            pageScroll: true,
-            bleed: true,
+            port: true,
+            minHeight: 560,
             wide: true,
-            note: "Scroll the page to drive this component, exactly as it behaves in an app.",
+            note: "The demo drives the component from this frame. In an app it reads page scroll instead.",
         },
     },
     {
@@ -229,10 +227,10 @@ export const COMPONENTS: DocEntry[] = [
             },
         ],
         preview: {
-            pageScroll: true,
-            bleed: true,
+            port: true,
+            minHeight: 560,
             wide: true,
-            note: "Scroll the page to drive this component, exactly as it behaves in an app.",
+            note: "The demo drives the component from this frame. In an app it reads page scroll instead.",
         },
     },
     {
@@ -350,14 +348,7 @@ export const COMPONENTS: DocEntry[] = [
             SPLIT_FLAP_PRESETS,
             SPLIT_FLAP_PRESET_VALUES as Record<string, Record<string, unknown>>,
         ),
-        omit: ["value"],
         extraProps: [
-            {
-                name: "value",
-                type: "string",
-                default: '""',
-                description: "The word to display in text mode.",
-            },
             {
                 name: "target",
                 type: "Date | number",
@@ -391,8 +382,8 @@ export const COMPONENTS: DocEntry[] = [
         defaults: OVERPRINT_DEFAULTS,
         controls: OVERPRINT_CONTROLS,
         preview: {
-            pageScroll: true,
-            note: "Scroll the page to drive this component, exactly as it behaves in an app.",
+            minHeight: 340,
+            note: "Scrolling the page shifts the plates apart; they converge again when it stops.",
         },
     },
     {
@@ -489,7 +480,7 @@ export const COMPONENTS: DocEntry[] = [
                 description: "Dent and sheen settings, or false to switch both off.",
             },
         ],
-        children: "<div>Flexible sheet</div>",
+        children: "<div>Card</div>",
         preview: { minHeight: 400 },
     },
     {
@@ -618,24 +609,6 @@ export const COMPONENTS: DocEntry[] = [
         ],
         children: "<div>Hero copy</div>",
         preview: { minHeight: 520, bleed: true, wide: true },
-    },
-    {
-        slug: "meadow-assets",
-        name: "Meadow assets",
-        description: "The artwork sets behind Meadow, laid out against each sky for review.",
-        category: "Scenes",
-        status: "experimental",
-        dependencies: [],
-        tags: ["gallery", "artwork", "variants", "meadow"],
-        defaults: MEADOW_ASSETS_DEFAULTS,
-        controls: MEADOW_ASSETS_CONTROLS,
-        omit: ["backdrop"],
-        preview: {
-            scroll: true,
-            minHeight: 560,
-            wide: true,
-            note: "A reference gallery for MEADOW_VARIANT_SETS, not a component of its own.",
-        },
     },
     {
         slug: "tessera",

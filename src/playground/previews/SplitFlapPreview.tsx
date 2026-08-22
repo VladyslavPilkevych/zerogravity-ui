@@ -25,19 +25,34 @@ function deadlineOnServer(): number | undefined {
 
 const WORDS = ["DEPARTURES", "NOW BOARDING", "GATE OPEN", "ANTIGRAVITY", "ZEROGRAVITY"]
 
-export function SplitFlapPreview({ config }: PreviewApi) {
+function nextNumber(value: string): string {
+    const next = (Number(value) + 1) % 10 ** value.length
+    return String(next).padStart(value.length, "0")
+}
+
+export function SplitFlapPreview({ config, set }: PreviewApi) {
     const c = config as unknown as SplitFlapDemoConfig
-    const [wordIndex, setWordIndex] = useState(0)
+    const [word, setWord] = useState(0)
 
     const deadline = useSyncExternalStore(subscribe, deadlineOnClient, deadlineOnServer)
 
-    const shown = c.mode === "text" ? c.value || WORDS[wordIndex % WORDS.length] : ""
-    const cells = c.mode === "text" ? Math.max(c.length, shown.length) : c.length
+    const numeric = c.mode === "text" && /^\d+$/.test(c.value)
+    const cells = c.mode === "text" ? Math.max(c.length, c.value.length) : c.length
+
+    const advance = () => {
+        if (numeric) {
+            set("value", nextNumber(c.value))
+            return
+        }
+        const index = (word + 1) % WORDS.length
+        setWord(index)
+        set("value", WORDS[index])
+    }
 
     return (
         <div className="pg-flap-stage">
             <SplitFlap
-                value={shown}
+                value={c.mode === "text" ? c.value : ""}
                 mode={c.mode}
                 target={deadline}
                 length={cells}
@@ -53,12 +68,8 @@ export function SplitFlapPreview({ config }: PreviewApi) {
             />
 
             {c.mode === "text" ? (
-                <button
-                    type="button"
-                    className="pg-flap-next"
-                    onClick={() => setWordIndex((index) => index + 1)}
-                >
-                    Flip to the next word
+                <button type="button" className="pg-flap-next" onClick={advance}>
+                    {numeric ? "Count up" : "Flip to the next word"}
                 </button>
             ) : null}
         </div>

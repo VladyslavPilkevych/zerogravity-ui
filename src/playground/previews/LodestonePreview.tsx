@@ -3,8 +3,6 @@
 import { Lodestone } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
-const ACTIONS = ["Get started", "Read the docs", "View source", "Book a demo", "Pricing"]
-
 export function LodestonePreview({ config }: PreviewApi) {
     const c = config as {
         radius: number
@@ -29,7 +27,7 @@ export function LodestonePreview({ config }: PreviewApi) {
                     release={c.release}
                     lift={c.lift}
                 >
-                    {ACTIONS[index % ACTIONS.length]}
+                    {`Button ${index + 1}`}
                 </Lodestone>
             ))}
         </div>

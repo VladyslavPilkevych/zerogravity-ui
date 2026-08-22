@@ -51,10 +51,13 @@ export function RicochetPreview({ config }: PreviewApi) {
                 className="xpg-ricochet-game"
             />
 
-            <div className="xpg-ricochet-actions">
+            <div className="xpg-ricochet-foot">
+                <span className="xpg-ricochet-eyebrow">
+                    {cleared ? "cleared" : "knock the text apart"}
+                </span>
                 <button
                     type="button"
-                    className="xpg-ricochet-preset"
+                    className="xpg-ricochet-restart"
                     onClick={() => {
                         setCleared(false)
                         setRun((count) => count + 1)
@@ -62,9 +65,6 @@ export function RicochetPreview({ config }: PreviewApi) {
                 >
                     Restart
                 </button>
-                <span className="xpg-ricochet-eyebrow">
-                    {cleared ? "cleared" : "knock the text apart"}
-                </span>
             </div>
         </div>
     )

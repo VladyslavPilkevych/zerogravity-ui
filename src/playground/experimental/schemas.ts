@@ -569,29 +569,11 @@ export const MEADOW_CONTROLS: ControlGroup[] = [
     },
 ]
 
-export const MEADOW_ASSETS_DEFAULTS = { backdrop: "day" }
-
-export const MEADOW_ASSETS_CONTROLS: ControlGroup[] = [
-    {
-        id: "gallery",
-        title: "Gallery",
-        hint: "which sky the artwork is judged against",
-        open: true,
-        controls: [
-            {
-                kind: "select",
-                path: "backdrop",
-                label: "Backdrop",
-                options: ["day", "night", "space"],
-            },
-        ],
-    },
-]
-
 export const RASTER_DEFAULTS = {
     mode: "pixel",
+    disabled: false,
     animated: true,
-    interactive: true,
+    interactive: false,
     blurStrength: 22,
     distortion: 18,
     glyphSet: "ascii",
@@ -614,6 +596,7 @@ export const RASTER_CONTROLS: ControlGroup[] = [
                 label: "Mode",
                 options: ["blur", "glass", "glyph", "pixel"],
             },
+            { kind: "boolean", path: "disabled", label: "Show the original" },
             { kind: "boolean", path: "interactive", label: "Reveal on hover" },
             { kind: "boolean", path: "animated", label: "Animated" },
         ],
@@ -651,6 +634,7 @@ export const LOADERS_DEFAULTS = {
     heartVariant: "pulse",
     blocksVariant: "wave",
     size: 96,
+    gap: 0.34,
     color: "#f4a04f",
     speed: 1,
     paused: false,
@@ -668,6 +652,7 @@ export const LOADERS_CONTROLS: ControlGroup[] = [
             { kind: "color", path: "color", label: "Colour" },
             { kind: "number", path: "speed", label: "Speed", min: 0.25, max: 3, step: 0.25 },
             { kind: "number", path: "size", label: "Heart size", min: 32, max: 200, step: 4 },
+            { kind: "number", path: "gap", label: "Pixel gap", min: 0, max: 3, step: 0.02 },
             { kind: "boolean", path: "paused", label: "Paused" },
         ],
     },

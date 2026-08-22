@@ -3,6 +3,8 @@
 import { Vellum } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
+import { Hint } from "./parts"
+
 export function VellumPreview({ config }: PreviewApi) {
     const c = config as {
         tilt: number
@@ -17,6 +19,7 @@ export function VellumPreview({ config }: PreviewApi) {
 
     return (
         <Vellum
+            className="xpg-vellum"
             tilt={c.tilt}
             radius={c.radius}
             ease={c.ease}
@@ -25,8 +28,8 @@ export function VellumPreview({ config }: PreviewApi) {
                 c.highlight ? { dent: c.dent, sheen: c.sheen, sheenColor: c.sheenColor } : false
             }
         >
-            <div className="xpg-tall" style={{ borderRadius: 0 }}>
-                Flexible sheet
+            <div className="xpg-vellum-sheet">
+                <Hint>Hover</Hint>
             </div>
         </Vellum>
     )

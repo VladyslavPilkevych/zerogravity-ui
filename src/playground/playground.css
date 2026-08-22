@@ -45,54 +45,6 @@ kbd {
     color: rgba(255, 255, 255, 0.75);
 }
 
-.pg-intro,
-.pg-outro {
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 14px;
-    min-height: 100vh;
-    padding: 40px;
-    text-align: center;
-    background: var(--pg-backdrop);
-}
-
-.pg-intro h1 {
-    margin: 0;
-    font-size: clamp(34px, 6vw, 68px);
-    font-weight: 600;
-    letter-spacing: -0.035em;
-    background: linear-gradient(120deg, #ffffff, #b9c9ff 60%, #8ab4ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.pg-intro p,
-.pg-outro p {
-    max-width: 46ch;
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.pg-outro h2 {
-    margin: 0;
-    font-size: clamp(24px, 4vw, 40px);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
-
-.pg-scroll-hint {
-    margin-top: 10px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.3);
-}
-
 .pg-card {
     display: grid;
     place-content: center;
@@ -374,107 +326,6 @@ kbd {
     border-color: rgba(255, 255, 255, 0.45);
 }
 
-.pg-trail-stage,
-.pg-cursor-stage {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    gap: 28px;
-    width: 100%;
-    height: 100%;
-    padding: 90px 24px 40px;
-    pointer-events: none;
-}
-
-@media (max-width: 720px) {
-    .pg-trail-stage,
-    .pg-cursor-stage {
-        padding-right: 24px;
-    }
-}
-
-.pg-trail-scope {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: min(560px, 72vw);
-    height: 300px;
-    overflow: hidden;
-    border: 1px dashed rgba(255, 255, 255, 0.18);
-    border-radius: 16px;
-    pointer-events: auto;
-}
-
-.pg-trail-scope span {
-    position: relative;
-    z-index: 1;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.35);
-}
-
-.pg-trail-targets {
-    display: flex;
-    gap: 12px;
-    pointer-events: auto;
-}
-
-.pg-trail-targets button,
-.pg-trail-targets a {
-    padding: 8px 16px;
-    border: 1px solid var(--pg-border);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.04);
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 12px;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.pg-cursor-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 12px;
-    width: min(760px, 84vw);
-    pointer-events: auto;
-}
-
-.pg-cursor-card {
-    display: grid;
-    gap: 6px;
-    padding: 18px;
-    border: 1px solid var(--pg-border);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.035);
-    text-align: left;
-    font: inherit;
-    color: inherit;
-}
-
-.pg-cursor-card strong {
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.88);
-}
-
-.pg-cursor-card span {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.42);
-}
-
-.pg-cursor-card input {
-    margin-top: 4px;
-    padding: 6px 8px;
-    border: 1px solid var(--pg-border);
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.3);
-    color: #fff;
-    font-size: 12px;
-}
-
 .pg-flap-stage {
     display: grid;
     align-content: center;
@@ -525,64 +376,6 @@ kbd {
 }
 
 /* ------------------------------------------------ docs preview scaffolding */
-
-.pg-story {
-    display: block;
-    width: 100%;
-}
-
-.pg-intro,
-.pg-outro {
-    display: grid;
-    place-content: center;
-    gap: 10px;
-    min-height: 46vh;
-    padding: 40px 24px;
-    text-align: center;
-}
-
-.pg-intro h2,
-.pg-outro h2 {
-    margin: 0;
-    font-size: 24px;
-    letter-spacing: -0.02em;
-}
-
-.pg-intro p,
-.pg-outro p {
-    max-width: 46ch;
-    margin: 0 auto;
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-.pg-scroll-hint {
-    color: rgba(255, 255, 255, 0.35);
-    font-size: 12px;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-}
-
-.pg-trail-head {
-    display: grid;
-    gap: 8px;
-    max-width: 44ch;
-    text-align: center;
-}
-
-.pg-trail-head h2 {
-    margin: 0;
-    font-size: 20px;
-    letter-spacing: -0.015em;
-}
-
-.pg-trail-head p {
-    margin: 0;
-    color: rgba(255, 255, 255, 0.52);
-    font-size: 14px;
-    line-height: 1.6;
-}
 
 .pg-overlay {
     position: absolute;
@@ -646,4 +439,37 @@ kbd {
 .pg-text:focus-visible {
     outline: 2px solid var(--pg-accent);
     outline-offset: 1px;
+}
+
+.pg-hint {
+    color: rgba(255, 255, 255, 0.34);
+    font-size: clamp(17px, 2.6vw, 26px);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+    user-select: none;
+    pointer-events: none;
+}
+
+.pg-port {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.pg-surface {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+}
+
+.pg-lead {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    min-height: 220px;
 }

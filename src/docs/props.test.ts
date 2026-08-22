@@ -52,11 +52,9 @@ describe("propsFor", () => {
         expect(row?.description).toContain("Range 4 to 60")
     })
 
-    it("gives every component at least one documented prop, except the gallery", () => {
+    it("gives every component at least one documented prop", () => {
         for (const entry of COMPONENTS) {
-            const rows = propsFor(entry)
-            if (entry.slug === "meadow-assets") expect(rows).toHaveLength(0)
-            else expect(rows.length, entry.slug).toBeGreaterThan(0)
+            expect(propsFor(entry).length, entry.slug).toBeGreaterThan(0)
         }
     })
 

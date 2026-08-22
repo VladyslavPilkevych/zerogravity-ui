@@ -307,3 +307,75 @@ describe("PixelPulse", () => {
         expect(style).toContain("--l-scrim: rgba(0,0,0,0.5)")
     })
 })
+
+describe("a decorative bar", () => {
+    it("hides itself instead of exposing a nameless progressbar", () => {
+        const { container } = render(<PixelBar label="" value={0.6} />)
+        const root = container.querySelector(".xp-bar") as HTMLElement
+
+        expect(root.getAttribute("role")).toBeNull()
+        expect(root.getAttribute("aria-hidden")).toBe("true")
+    })
+
+    it("still reports progress when it has a name", () => {
+        const { container } = render(<PixelBar label="Loading assets" value={0.6} />)
+        const root = container.querySelector(".xp-bar") as HTMLElement
+
+        expect(root.getAttribute("role")).toBe("progressbar")
+        expect(root.getAttribute("aria-valuenow")).toBe("60")
+    })
+})
+
+describe("pixel spacing", () => {
+    const read = (node: Element | null) =>
+        (node as HTMLElement | null)?.style.getPropertyValue("--l-gap")
+
+    it("keeps its natural spacing when gap is left out", () => {
+        const { container } = render(<PixelBlocks label="" />)
+
+        expect(read(container.querySelector(".xp-blocks"))).toBe("0.34")
+    })
+
+    it("lets the pixels touch at zero", () => {
+        const { container } = render(<PixelBlocks label="" gap={0} />)
+
+        expect(read(container.querySelector(".xp-blocks"))).toBe("0")
+    })
+
+    it("takes a custom gap on every pixel loader", () => {
+        const blocks = render(<PixelBlocks label="" gap={1.5} />)
+        const heart = render(<PixelHeart label="" gap={1.5} />)
+        const bar = render(<PixelBar label="" gap={1.5} />)
+
+        expect(read(blocks.container.querySelector(".xp-blocks"))).toBe("1.5")
+        expect(read(heart.container.querySelector(".xp-heart"))).toBe("1.5")
+        expect(read(bar.container.querySelector(".xp-bar"))).toBe("1.5")
+    })
+
+    it("turns a pulse gap into a fill fraction", () => {
+        const natural = render(<PixelPulse label="" />)
+        const wide = render(<PixelPulse label="" gap={3} />)
+
+        const fill = (view: { container: HTMLElement }) =>
+            Number(
+                (view.container.querySelector(".xp-pulse") as HTMLElement).style.getPropertyValue(
+                    "--l-fill",
+                ),
+            )
+
+        expect(fill(natural)).toBeCloseTo(0.34, 2)
+        expect(fill(wide)).toBeCloseTo(0.25, 2)
+    })
+
+    it("clamps a value that would tear the geometry apart", () => {
+        const { container } = render(<PixelBlocks label="" gap={999} />)
+
+        expect(read(container.querySelector(".xp-blocks"))).toBe("4")
+    })
+
+    it("ignores a nonsense value", () => {
+        const { container } = render(<PixelBlocks label="" gap={Number.NaN} />)
+
+        expect(read(container.querySelector(".xp-blocks"))).toBe("0.34")
+    })
+})

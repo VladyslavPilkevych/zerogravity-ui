@@ -1,14 +1,24 @@
 "use client"
 
-import { Children, useCallback, useEffect, useRef, type CSSProperties, type ReactNode } from "react"
+import {
+    Children,
+    useCallback,
+    useEffect,
+    useRef,
+    type CSSProperties,
+    type RefObject,
+    type ReactNode,
+} from "react"
 
-import { cx, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
+import { cx, scrollPort, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
 import "./Aperture.css"
 
 export type ApertureDirection = "close" | "open" | "both"
 
 export interface ApertureProps {
     children: ReactNode
+    /** Drive the frame from a scrollable element instead of the page. */
+    scrollContainer?: RefObject<HTMLElement | null>
     height?: string
     inset?: number
     radius?: number
@@ -31,6 +41,7 @@ function clamp01(value: number): number {
 
 export function Aperture({
     children,
+    scrollContainer,
     height = "160vh",
     inset = 12,
     radius = 28,
@@ -61,12 +72,13 @@ export function Aperture({
             metricsRef.current = null
             return
         }
+        const port = scrollPort(scrollContainer?.current)
         const box = track.getBoundingClientRect()
         metricsRef.current = {
-            top: box.top + window.scrollY,
-            span: Math.max(1, box.height - window.innerHeight),
+            top: port.top(track) + port.scroll(),
+            span: Math.max(1, box.height - port.height()),
         }
-    }, [])
+    }, [scrollContainer])
 
     const paint = useCallback(() => {
         const metrics = metricsRef.current
@@ -78,7 +90,8 @@ export function Aperture({
             typeof window.matchMedia === "function" &&
             window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-        let raw = clamp01((window.scrollY - metrics.top) / metrics.span)
+        const scrolled = scrollPort(scrollContainer?.current).scroll()
+        let raw = clamp01((scrolled - metrics.top) / metrics.span)
 
         if (config.direction === "open") raw = 1 - raw
         else if (config.direction === "both") raw = 1 - Math.abs(raw * 2 - 1)
@@ -99,7 +112,7 @@ export function Aperture({
         if (veil) veil.style.opacity = (config.dim * progress).toFixed(3)
 
         progressRef.current?.(progress)
-    }, [settings, progressRef])
+    }, [settings, progressRef, scrollContainer])
 
     const schedule = useCallback(() => {
         if (rafRef.current !== 0) return
@@ -130,19 +143,20 @@ export function Aperture({
             schedule()
         }
 
-        window.addEventListener("scroll", schedule, { passive: true })
+        const port = scrollPort(scrollContainer?.current)
+        port.target.addEventListener("scroll", schedule, { passive: true })
         window.addEventListener("resize", onResize)
         const observer = typeof ResizeObserver === "function" ? new ResizeObserver(onResize) : null
         observer?.observe(track)
 
         return () => {
-            window.removeEventListener("scroll", schedule)
+            port.target.removeEventListener("scroll", schedule)
             window.removeEventListener("resize", onResize)
             observer?.disconnect()
             if (rafRef.current !== 0) cancelAnimationFrame(rafRef.current)
             rafRef.current = 0
         }
-    }, [measure, schedule])
+    }, [measure, schedule, scrollContainer])
 
     return (
         <div ref={trackRef} className={cx("aperture", className)} style={{ ...style, height }}>

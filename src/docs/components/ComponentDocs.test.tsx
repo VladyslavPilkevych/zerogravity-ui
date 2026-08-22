@@ -169,13 +169,4 @@ describe("ComponentDocs", () => {
 
         expect(screen.queryByText(/not part of the published package/)).toBeNull()
     })
-
-    it("drops the code and props sections when there is nothing to document", () => {
-        render(<ComponentDocs entry={findComponent("meadow-assets")!} />)
-        const headings = screen
-            .getAllByRole("heading", { level: 2 })
-            .map((node) => node.textContent)
-
-        expect(headings).toEqual(["Customize", "Dependencies"])
-    })
 })

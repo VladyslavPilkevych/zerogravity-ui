@@ -2,7 +2,7 @@ import { expect, test } from "./fixtures"
 
 import type { Page } from "@playwright/test"
 
-const HEADING = ".xpg-hero-copy h2"
+const HEADING = ".xpg-tessera-copy h2"
 
 async function watchRouteSwap(page: Page) {
     await page.evaluate((selector) => {
@@ -33,7 +33,7 @@ test("Tessera swaps the route only once its containing block is fully covered", 
     const heading = page.locator(HEADING)
     const overlay = page.locator(".xp-tessera")
 
-    await expect(heading).toHaveText("Studio Tessera")
+    await expect(heading).toHaveText("Home")
     await expect(overlay).toHaveCount(0)
     await watchRouteSwap(page)
 
@@ -41,7 +41,7 @@ test("Tessera swaps the route only once its containing block is fully covered", 
 
     await expect(overlay).toBeVisible()
     await expect(overlay.locator(".xp-tessera-tile")).toHaveCount(24)
-    await expect(heading).toHaveText("Studio Tessera")
+    await expect(heading).toHaveText("Home")
 
     // the docs frame is transformed, so it becomes the containing block for the
     // fixed overlay; in an untransformed app that block is the viewport
@@ -80,7 +80,7 @@ test("Tessera swaps the route only once its containing block is fully covered", 
     expect(coverage.height).toBe(coverage.frameHeight)
     expect(coverage.capturesPointer).toBe(true)
 
-    await expect(heading).toHaveText("The Shop")
+    await expect(heading).toHaveText("Shop")
     await expect(page.locator("body")).toHaveAttribute("data-swap-phase", "covered")
     await expect(page.locator("body")).toHaveAttribute("data-swap-plain", "false")
 
@@ -97,16 +97,16 @@ test("Tessera leaves no overlay behind after repeated navigation", async ({
     const heading = page.locator(HEADING)
     const overlay = page.locator(".xp-tessera")
 
-    await expect(heading).toHaveText("Studio Tessera")
+    await expect(heading).toHaveText("Home")
 
     await page.locator('button[data-route="shop"]').click()
     await page.locator('button[data-route="collection"]').click()
 
-    await expect(heading).toHaveText("The Shop")
+    await expect(heading).toHaveText("Shop")
     await expect(overlay).toHaveCount(0)
 
     await page.locator('button[data-route="collection"]').click()
-    await expect(heading).toHaveText("Spring Collection")
+    await expect(heading).toHaveText("Collection")
     await expect(overlay).toHaveCount(0)
 
     const stuck = await page.evaluate(() => {
@@ -135,12 +135,12 @@ test("Tessera still hides the route swap under reduced motion", async ({
     const heading = page.locator(HEADING)
     const overlay = page.locator(".xp-tessera")
 
-    await expect(heading).toHaveText("Studio Tessera")
+    await expect(heading).toHaveText("Home")
     await watchRouteSwap(page)
 
     await page.locator('button[data-route="shop"]').click()
 
-    await expect(heading).toHaveText("The Shop")
+    await expect(heading).toHaveText("Shop")
     await expect(page.locator("body")).toHaveAttribute("data-swap-phase", "covered")
     await expect(page.locator("body")).toHaveAttribute("data-swap-plain", "true")
     await expect(overlay).toHaveCount(0)

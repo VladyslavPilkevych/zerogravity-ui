@@ -29,6 +29,25 @@ describe("ScrollStack", () => {
         scrollTo(0)
     })
 
+    it("follows a scroll container instead of the page when given one", () => {
+        const host = document.createElement("div")
+        Object.defineProperty(host, "scrollTop", { value: 0, writable: true, configurable: true })
+        Object.defineProperty(host, "clientHeight", { value: 500, configurable: true })
+        const ref = { current: host }
+
+        const add = vi.spyOn(host, "addEventListener")
+        const onWindow = vi.spyOn(window, "addEventListener")
+
+        const { unmount } = render(<ScrollStack scrollContainer={ref}>{cards()}</ScrollStack>)
+
+        expect(add.mock.calls.some(([type]) => type === "scroll")).toBe(true)
+        expect(onWindow.mock.calls.some(([type]) => type === "scroll")).toBe(false)
+
+        const remove = vi.spyOn(host, "removeEventListener")
+        unmount()
+        expect(remove.mock.calls.some(([type]) => type === "scroll")).toBe(true)
+    })
+
     it("wraps every child in its own sticky card", () => {
         const { container, getByText } = render(<ScrollStack>{cards()}</ScrollStack>)
 

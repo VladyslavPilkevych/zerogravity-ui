@@ -1,9 +1,10 @@
 "use client"
 
-import { useRef, useState, type CSSProperties, type ReactNode } from "react"
+import { useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react"
 
 import {
     cx,
+    scrollPort,
     useIsomorphicLayoutEffect,
     useLatestRef,
     usePrefersReducedMotion,
@@ -12,6 +13,8 @@ import "./Louvre.css"
 
 export interface LouvreProps {
     front: ReactNode
+    /** Drive the reveal from a scrollable element instead of the page. */
+    scrollContainer?: RefObject<HTMLElement | null>
     back: ReactNode
     slats?: number
     orientation?: "horizontal" | "vertical"
@@ -27,6 +30,7 @@ export interface LouvreProps {
 
 export function Louvre({
     front,
+    scrollContainer,
     back,
     slats = 10,
     orientation = "horizontal",
@@ -54,10 +58,12 @@ export function Louvre({
 
         let progress = -1
 
+        const port = scrollPort(scrollContainer?.current)
+
         const measure = () => {
             const rect = root.getBoundingClientRect()
-            const travel = rect.height - window.innerHeight
-            const raw = travel > 0 ? -rect.top / travel : 0
+            const travel = rect.height - port.height()
+            const raw = travel > 0 ? -port.top(root) / travel : 0
             const next = raw < 0 ? 0 : raw > 1 ? 1 : raw
 
             if (Math.abs(next - progress) > 0.001) {
@@ -74,16 +80,16 @@ export function Louvre({
         }
 
         measure()
-        window.addEventListener("scroll", schedule, { passive: true })
+        port.target.addEventListener("scroll", schedule, { passive: true })
         window.addEventListener("resize", schedule)
 
         return () => {
-            window.removeEventListener("scroll", schedule)
+            port.target.removeEventListener("scroll", schedule)
             window.removeEventListener("resize", schedule)
             if (frameRef.current !== 0) cancelAnimationFrame(frameRef.current)
             frameRef.current = 0
         }
-    }, [still, settings])
+    }, [still, settings, scrollContainer])
 
     const rootStyle: CSSProperties = {
         ...style,

@@ -1,14 +1,24 @@
 "use client"
 
-import { Children, useCallback, useEffect, useRef, type CSSProperties, type ReactNode } from "react"
+import {
+    Children,
+    useCallback,
+    useEffect,
+    useRef,
+    type CSSProperties,
+    type ReactNode,
+    type RefObject,
+} from "react"
 
-import { cx, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
+import { cx, scrollPort, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
 import "./ScrollStack.css"
 
 export type StackEasing = "linear" | "smooth"
 
 export interface ScrollStackProps {
     children: ReactNode
+    /** Drive the stack from a scrollable element instead of the page. */
+    scrollContainer?: RefObject<HTMLElement | null>
     height?: string
     heights?: (string | undefined)[]
     top?: number
@@ -41,6 +51,7 @@ function clamp01(value: number): number {
 
 export function ScrollStack({
     children,
+    scrollContainer,
     height = "100vh",
     heights,
     top = 0,
@@ -91,7 +102,8 @@ export function ScrollStack({
             return
         }
 
-        let cursor = container.getBoundingClientRect().top + window.scrollY
+        const port = scrollPort(scrollContainer?.current)
+        let cursor = port.top(container) + port.scroll()
         const offsets: number[] = []
 
         for (const card of cards) {
@@ -100,8 +112,8 @@ export function ScrollStack({
         }
         offsets.push(cursor)
 
-        metricsRef.current = { offsets, viewport: window.innerHeight }
-    }, [])
+        metricsRef.current = { offsets, viewport: port.height() }
+    }, [scrollContainer])
 
     const paint = useCallback(() => {
         const metrics = metricsRef.current
@@ -109,7 +121,7 @@ export function ScrollStack({
         if (!metrics || cards.length === 0) return
 
         const settings = settingsRef.current
-        const scrollY = window.scrollY
+        const scrollY = scrollPort(scrollContainer?.current).scroll()
         const viewport = metrics.viewport
         const reduced =
             typeof window.matchMedia === "function" &&
@@ -163,7 +175,7 @@ export function ScrollStack({
             activeRef.current = active
             activeHandlerRef.current?.(active)
         }
-    }, [settingsRef, activeHandlerRef])
+    }, [settingsRef, activeHandlerRef, scrollContainer])
 
     const schedule = useCallback(() => {
         if (frameRef.current !== 0) return
@@ -196,20 +208,21 @@ export function ScrollStack({
             schedule()
         }
 
-        window.addEventListener("scroll", schedule, { passive: true })
+        const port = scrollPort(scrollContainer?.current)
+        port.target.addEventListener("scroll", schedule, { passive: true })
         window.addEventListener("resize", onResize)
 
         const observer = typeof ResizeObserver === "function" ? new ResizeObserver(onResize) : null
         observer?.observe(container)
 
         return () => {
-            window.removeEventListener("scroll", schedule)
+            port.target.removeEventListener("scroll", schedule)
             window.removeEventListener("resize", onResize)
             observer?.disconnect()
             if (frameRef.current !== 0) cancelAnimationFrame(frameRef.current)
             frameRef.current = 0
         }
-    }, [measure, schedule])
+    }, [measure, schedule, scrollContainer])
 
     return (
         <div ref={containerRef} className={cx("scroll-stack", className)} style={style}>

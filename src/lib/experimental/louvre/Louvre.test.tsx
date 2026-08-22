@@ -14,6 +14,27 @@ const sections = {
 }
 
 describe("Louvre", () => {
+    it("follows a scroll container instead of the page when given one", () => {
+        const host = document.createElement("div")
+        Object.defineProperty(host, "scrollTop", { value: 0, writable: true, configurable: true })
+        Object.defineProperty(host, "clientHeight", { value: 500, configurable: true })
+        const ref = { current: host }
+
+        const add = vi.spyOn(host, "addEventListener")
+        const onWindow = vi.spyOn(window, "addEventListener")
+
+        const { unmount } = render(
+            <Louvre scrollContainer={ref} front={<p>A</p>} back={<p>B</p>} />,
+        )
+
+        expect(add.mock.calls.some(([type]) => type === "scroll")).toBe(true)
+        expect(onWindow.mock.calls.some(([type]) => type === "scroll")).toBe(false)
+
+        const remove = vi.spyOn(host, "removeEventListener")
+        unmount()
+        expect(remove.mock.calls.some(([type]) => type === "scroll")).toBe(true)
+    })
+
     it("renders one slat per configured blind", () => {
         const { container } = render(<Louvre {...sections} slats={6} />)
         expect(container.querySelectorAll(".xp-louvre-slat")).toHaveLength(6)

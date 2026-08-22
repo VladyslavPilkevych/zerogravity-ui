@@ -36,9 +36,6 @@ export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
     meadow: dynamic(() =>
         import("@/playground/previews/MeadowPreview").then((m) => m.MeadowPreview),
     ),
-    "meadow-assets": dynamic(() =>
-        import("@/playground/previews/MeadowAssetsPreview").then((m) => m.MeadowAssetsPreview),
-    ),
     overprint: dynamic(() =>
         import("@/playground/previews/OverprintPreview").then((m) => m.OverprintPreview),
     ),

@@ -15,28 +15,44 @@ export function Chrome() {
 
 Mount it once, near the root of the app.
 
+## Scope
+
+Without `container` the cursor owns the page: it listens on the window and hides
+the native cursor on `<body>`. Pass a `container` ref and everything narrows to
+that element — the listeners, the coordinates the dot and ring use, and the
+`cursor: none` rule. The native cursor returns the moment the pointer leaves.
+
+```tsx
+const box = useRef<HTMLDivElement>(null)
+
+<div ref={box}>
+    <TrailingCursor container={box} />
+</div>
+```
+
 ## Props
 
-| Prop                   | Type                                                 | Default      |                                                 |
-| ---------------------- | ---------------------------------------------------- | ------------ | ----------------------------------------------- |
-| `preset`               | `amber \| cyan \| violet \| emerald \| rose \| mono` | `amber`      | Fills the three colours from the shared palette |
-| `variant`              | `dot-ring \| ring-only \| dot-only`                  | `dot-ring`   |                                                 |
-| `dotColor`             | string                                               | from preset  | Any CSS colour, `var(--token)` included         |
-| `ringColor`            | string                                               | from preset  | Ring fill                                       |
-| `ringBorderColor`      | string                                               | from preset  | Ring border and label colour                    |
-| `dotSize`              | number                                               | `6`          | px                                              |
-| `ringSize`             | number                                               | `34`         | px at rest                                      |
-| `ringHoverSize`        | number                                               | `52`         | px over an interactive element                  |
-| `ringPressSize`        | number                                               | `26`         | px while the pointer is down                    |
-| `ease`                 | number                                               | `0.16`       | Lerp factor, 0..1. Higher snaps harder          |
-| `hideNativeCursor`     | boolean                                              | `true`       |                                                 |
-| `interactiveSelector`  | string                                               | see below    | What counts as interactive                      |
-| `mixBlendMode`         | CSS value                                            |              | `difference` inverts against any background     |
-| `zIndex`               | number                                               | `2147483000` |                                                 |
-| `className`            | string                                               |              |                                                 |
-| `disabled`             | boolean                                              | `false`      |                                                 |
-| `enableOnTouch`        | boolean                                              | `false`      |                                                 |
-| `respectReducedMotion` | boolean                                              | `true`       |                                                 |
+| Prop                   | Type                                                 | Default      |                                                     |
+| ---------------------- | ---------------------------------------------------- | ------------ | --------------------------------------------------- |
+| `preset`               | `amber \| cyan \| violet \| emerald \| rose \| mono` | `amber`      | Fills the three colours from the shared palette     |
+| `container`            | RefObject<HTMLElement>                               | —            | Scope the effect to one element instead of the page |
+| `variant`              | `dot-ring \| ring-only \| dot-only`                  | `dot-ring`   |                                                     |
+| `dotColor`             | string                                               | from preset  | Any CSS colour, `var(--token)` included             |
+| `ringColor`            | string                                               | from preset  | Ring fill                                           |
+| `ringBorderColor`      | string                                               | from preset  | Ring border and label colour                        |
+| `dotSize`              | number                                               | `6`          | px                                                  |
+| `ringSize`             | number                                               | `34`         | px at rest                                          |
+| `ringHoverSize`        | number                                               | `52`         | px over an interactive element                      |
+| `ringPressSize`        | number                                               | `26`         | px while the pointer is down                        |
+| `ease`                 | number                                               | `0.16`       | Lerp factor, 0..1. Higher snaps harder              |
+| `hideNativeCursor`     | boolean                                              | `true`       |                                                     |
+| `interactiveSelector`  | string                                               | see below    | What counts as interactive                          |
+| `mixBlendMode`         | CSS value                                            |              | `difference` inverts against any background         |
+| `zIndex`               | number                                               | `2147483000` |                                                     |
+| `className`            | string                                               |              |                                                     |
+| `disabled`             | boolean                                              | `false`      |                                                     |
+| `enableOnTouch`        | boolean                                              | `false`      |                                                     |
+| `respectReducedMotion` | boolean                                              | `true`       |                                                     |
 
 The default `interactiveSelector` is
 `a, button, input, select, textarea, [role='button'], [data-cursor]`.

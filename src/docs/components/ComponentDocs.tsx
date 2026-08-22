@@ -22,8 +22,7 @@ type Tab = "preview" | "code"
 /** A nested scroll port needs a fixed height; page scroll needs none at all. */
 function frameSize(preview: DocEntry["preview"]) {
     if (!preview) return { minHeight: 380 }
-    if (preview.pageScroll) return undefined
-    if (preview.scroll) return { height: preview.minHeight ?? 480 }
+    if (preview.port || preview.scroll) return { height: preview.minHeight ?? 480 }
     return { minHeight: preview.minHeight ?? 380 }
 }
 
@@ -75,13 +74,13 @@ export function ComponentDocs({ entry }: { entry: DocEntry }) {
                         className="dz-preview"
                         data-bleed={preview.bleed ? "true" : undefined}
                         data-scroll={preview.scroll ? "true" : undefined}
-                        data-page-scroll={preview.pageScroll ? "true" : undefined}
+                        data-port={preview.port ? "true" : undefined}
                         data-contain={preview.containFixed ? "true" : undefined}
                     >
                         <div className="dz-preview-body" style={frameSize(preview)}>
                             {Preview ? <Preview {...state} /> : null}
                         </div>
-                        {preview.scroll ? (
+                        {preview.scroll || preview.port ? (
                             <span className="dz-preview-tag">scrolls inside this frame</span>
                         ) : null}
                     </div>

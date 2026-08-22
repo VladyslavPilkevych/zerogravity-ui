@@ -16,7 +16,7 @@ Meadow no longer has at all.
 
 ## Where to review them
 
-- **Docs:** `/docs/meadow-assets`. Every group is shown as a labelled grid,
+- **Storybook:** the variant stories. Every group is shown as a labelled grid,
   with a Day / Night / Space switch so you can see each asset on the backdrop it
   would actually sit on.
 - **Storybook:** `Experimental/Meadow Assets` — one story per group, plus
@@ -32,7 +32,7 @@ Meadow no longer has at all.
 | `moons.tsx`    | `MEADOW_MOON_VARIANTS`                                |
 | `suns.tsx`     | `MEADOW_SUN_VARIANTS`                                 |
 | `ghostBody.ts` | Parametric ghost silhouette builder                   |
-| `gallery.css`  | Grid and tile styles, shared by both previews         |
+| `gallery.css`  | Grid and tile styles used by the variant stories      |
 | `index.ts`     | `MEADOW_VARIANT_SETS`, the registry the previews read |
 
 Every variant is `{ id, label, note, Art }`. Ids are `<group>-<n>` and match the
@@ -70,4 +70,4 @@ seed, salt)`, so changing `seed` changes which approved sun or moon hangs in
    height follow, so a much taller or wider box changes how an anchor reads.
 
 Removing one means deleting the component and its registry entry, then updating
-the approved lists in `variants.test.tsx` and `e2e/meadow-assets.spec.ts`.
+the approved lists in `variants.test.tsx`.

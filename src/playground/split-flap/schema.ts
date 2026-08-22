@@ -39,6 +39,7 @@ export const SPLIT_FLAP_CONTROLS: ControlGroup[] = [
         hint: "what the board shows",
         open: true,
         controls: [
+            { kind: "text", path: "value", label: "Value", maxLength: 18 },
             { kind: "select", path: "mode", label: "Mode", options: MODES },
             { kind: "number", path: "length", label: "Cells", min: 1, max: 16, step: 1 },
         ],
@@ -123,12 +124,23 @@ export const SPLIT_FLAP_PRESETS: PanelPreset[] = [
     { id: "clock", label: "Clock", hint: "Live wall clock" },
     { id: "countdown", label: "Countdown", hint: "Ticks down to a moment" },
     { id: "ticker", label: "Ticker", hint: "Small dense cells" },
+    { id: "countup", label: "CountUp", hint: "Zero-padded numeric counter" },
 ]
 
 export const SPLIT_FLAP_PRESET_VALUES: Record<string, Partial<SplitFlapDemoConfig>> = {
     board: {},
     clock: { mode: "clock", length: 8, charWidth: 52, fontSize: 40, color: "#ffd166" },
     countdown: { mode: "countdown", length: 8, charWidth: 52, fontSize: 40, color: "#7ee8fa" },
+    countup: {
+        value: "0000",
+        length: 4,
+        charWidth: 56,
+        charHeight: 78,
+        fontSize: 44,
+        stepDuration: 40,
+        stagger: 28,
+        color: "#8ef2a4",
+    },
     ticker: {
         charWidth: 26,
         charHeight: 38,

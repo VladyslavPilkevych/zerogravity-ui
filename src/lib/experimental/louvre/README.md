@@ -7,17 +7,18 @@ slats that rotate away as you scroll, revealing Section B behind them.
 <Louvre front={<SectionA />} back={<SectionB />} />
 ```
 
-| Prop           | Default        | Notes                                     |
-| -------------- | -------------- | ----------------------------------------- |
-| `front`        | —              | Content shown before the transition       |
-| `back`         | —              | Content revealed behind the blinds        |
-| `slats`        | `10`           | Number of blinds                          |
-| `orientation`  | `"horizontal"` | Rotate on X or Y                          |
-| `scrollLength` | `"260vh"`      | Scroll distance the sticky phase occupies |
-| `phase`        | `0.55`         | Wave offset so slats open in sequence     |
-| `perspective`  | `1400`         | 3D depth, px                              |
-| `gap`          | `0`            | Space between slats, px                   |
-| `shade`        | `0.55`         | Shadow applied to a slat as it rotates    |
+| Prop              | Default        | Notes                                      |
+| ----------------- | -------------- | ------------------------------------------ |
+| `front`           | —              | Content shown before the transition        |
+| `back`            | —              | Content revealed behind the blinds         |
+| `scrollContainer` | —              | Drive the reveal from a scrollable element |
+| `slats`           | `10`           | Number of blinds                           |
+| `orientation`     | `"horizontal"` | Rotate on X or Y                           |
+| `scrollLength`    | `"260vh"`      | Scroll distance the sticky phase occupies  |
+| `phase`           | `0.55`         | Wave offset so slats open in sequence      |
+| `perspective`     | `1400`         | 3D depth, px                               |
+| `gap`             | `0`            | Space between slats, px                    |
+| `shade`           | `0.55`         | Shadow applied to a slat as it rotates     |
 
 **How it works.** The root reserves `scrollLength` of scroll; inside it a sticky
 viewport pins the scene. Scroll progress writes one `--louvre-progress` custom

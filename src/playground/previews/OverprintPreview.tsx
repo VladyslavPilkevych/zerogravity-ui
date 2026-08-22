@@ -3,6 +3,8 @@
 import { Overprint } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
+import { Hint } from "./parts"
+
 export function OverprintPreview({ config }: PreviewApi) {
     const c = config as {
         text: string
@@ -13,17 +15,15 @@ export function OverprintPreview({ config }: PreviewApi) {
     }
 
     return (
-        <div className="pg-story">
-            <div className="xpg-tall" style={{ minHeight: 460 }}>
-                <Overprint
-                    text={c.text}
-                    size={c.size}
-                    spread={c.spread}
-                    converge={c.converge}
-                    weight={c.weight}
-                />
-            </div>
-            <div className="xpg-spacer" />
+        <div className="xpg-overprint">
+            <Overprint
+                text={c.text}
+                size={c.size}
+                spread={c.spread}
+                converge={c.converge}
+                weight={c.weight}
+            />
+            <Hint>Scroll</Hint>
         </div>
     )
 }

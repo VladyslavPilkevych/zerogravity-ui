@@ -29,8 +29,8 @@ export interface PreviewOptions {
     minHeight?: number
     /** the demo tells a tall scroll story, so it gets its own scroll port */
     scroll?: boolean
-    /** the component reads window scroll, so the page has to be the scroller */
-    pageScroll?: boolean
+    /** the preview renders its own bounded scroller and drives the component from it */
+    port?: boolean
     /** drop the frame padding for canvases that should reach the edges */
     bleed?: boolean
     /** keep `position: fixed` children inside the frame instead of the viewport */

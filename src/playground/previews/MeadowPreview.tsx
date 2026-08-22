@@ -36,22 +36,7 @@ export function MeadowPreview({ config }: PreviewApi) {
             }}
             className="xpg-meadow-scene"
         >
-            <div className="xpg-meadow-copy">
-                <span className="xpg-meadow-badge">Ages 4–10</span>
-                <h2>A little world that grows with them</h2>
-                <p>
-                    Ten warm minutes a day of stories, sounds and small puzzles — made with
-                    teachers, loved by families.
-                </p>
-                <div className="xpg-meadow-actions">
-                    <button type="button" className="xpg-meadow-primary">
-                        Start the journey
-                    </button>
-                    <button type="button" className="xpg-meadow-secondary">
-                        Watch a lesson
-                    </button>
-                </div>
-            </div>
+            <span className="xpg-meadow-word">Meadow</span>
         </Meadow>
     )
 }

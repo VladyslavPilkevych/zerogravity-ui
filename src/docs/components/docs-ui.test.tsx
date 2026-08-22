@@ -106,7 +106,7 @@ describe("DocsShell", () => {
 
         await user.type(screen.getByLabelText("Search components"), "reel")
 
-        expect(screen.getByText("1 of 22 match")).toBeInTheDocument()
+        expect(screen.getByText(`1 of ${COMPONENTS.length} match`)).toBeInTheDocument()
     })
 
     it("shows a friendly empty state", async () => {

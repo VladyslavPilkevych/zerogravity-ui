@@ -12,11 +12,12 @@ export function LoadersPreview({ config }: PreviewApi) {
         color: string
         speed: number
         paused: boolean
+        gap: number
         value: number
         determinate: boolean
     }
 
-    const shared = { color: c.color, speed: c.speed, paused: c.paused }
+    const shared = { color: c.color, speed: c.speed, paused: c.paused, gap: c.gap }
 
     return (
         <div className="xpg-loaders">

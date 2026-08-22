@@ -992,12 +992,9 @@
     outline-offset: 2px;
 }
 
-/* window-scroll components need the page itself to be the scroller */
-.dz-preview[data-page-scroll="true"] {
-    overflow: visible;
-}
-
-.dz-preview[data-page-scroll="true"] .dz-preview-body {
+/* the preview owns the scroller, so the frame just bounds it */
+.dz-preview[data-port="true"] .dz-preview-body {
     display: block;
+    overflow: hidden;
     padding: 0;
 }

@@ -7,25 +7,12 @@ import type { TesseraSequence } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 const PAGES = [
-    {
-        id: "home",
-        label: "Home",
-        title: "Studio Tessera",
-        blurb: "A route transition that tiles the viewport before the next page arrives.",
-        tint: "linear-gradient(150deg, #131521, #2a1f38)",
-    },
-    {
-        id: "shop",
-        label: "Shop",
-        title: "The Shop",
-        blurb: "Every navigation waits for full coverage, so the swap is never visible.",
-        tint: "linear-gradient(150deg, #10201f, #1d3a32)",
-    },
+    { id: "home", label: "Home", title: "Home", tint: "linear-gradient(150deg, #131521, #2a1f38)" },
+    { id: "shop", label: "Shop", title: "Shop", tint: "linear-gradient(150deg, #10201f, #1d3a32)" },
     {
         id: "collection",
         label: "Collection",
-        title: "Spring Collection",
-        blurb: "Tiles retreat in the same direction they arrived, uncovering this page.",
+        title: "Collection",
         tint: "linear-gradient(150deg, #201524, #3a2030)",
     },
 ] as const
@@ -44,27 +31,25 @@ function MockRouter() {
 
     return (
         <div className="xpg-tessera-page" style={{ ["--xpg-tessera-tint" as string]: page.tint }}>
-            <div className="xpg-hero-copy">
+            <div className="xpg-tessera-copy">
                 <h2>{page.title}</h2>
-                <p>{page.blurb}</p>
-                <div className="xpg-buttons">
+                <div className="xpg-tessera-routes">
                     {PAGES.map((entry) => (
                         <button
                             key={entry.id}
                             type="button"
                             data-route={entry.id}
-                            className={entry.id === route ? "xpg-cta" : "xpg-cta xpg-cta-ghost"}
+                            aria-current={entry.id === route ? "page" : undefined}
+                            className="xpg-tessera-route"
                             onClick={() => go(entry.id)}
                         >
                             {entry.label}
                         </button>
                     ))}
                 </div>
-                <div className="xpg-tessera-status">
-                    <span className="xpg-chip" data-phase={phase}>
-                        phase: {phase}
-                    </span>
-                </div>
+                <span className="xpg-chip" data-phase={phase}>
+                    phase: {phase}
+                </span>
             </div>
         </div>
     )

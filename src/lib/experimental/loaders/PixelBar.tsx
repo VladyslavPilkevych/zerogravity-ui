@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react"
 
 import { cx } from "../../internal"
-import { beatOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
+import { beatOf, gapOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
 import "./loaders.css"
 
 export interface PixelBarProps extends LoaderCommon {
@@ -21,6 +21,7 @@ export function PixelBar({
     color = "#f4a04f",
     speed = 1,
     paused = false,
+    gap,
     respectReducedMotion = true,
     className,
     style,
@@ -31,15 +32,17 @@ export function PixelBar({
     const share = known ? Math.min(1, Math.max(0, value)) : 0
     const lit = known ? Math.round(share * count) : 0
 
-    const semantics = known
-        ? {
-              role: "progressbar" as const,
-              "aria-valuemin": 0,
-              "aria-valuemax": 100,
-              "aria-valuenow": Math.round(share * 100),
-              "aria-label": label ?? "Loading",
-          }
-        : loaderAria(label)
+    // an empty label means decorative, so it must not leave a nameless progressbar
+    const semantics =
+        known && label !== ""
+            ? {
+                  role: "progressbar" as const,
+                  "aria-valuemin": 0,
+                  "aria-valuemax": 100,
+                  "aria-valuenow": Math.round(share * 100),
+                  "aria-label": label ?? "Loading",
+              }
+            : loaderAria(label)
 
     return (
         <div
@@ -49,6 +52,7 @@ export function PixelBar({
                 {
                     ...style,
                     "--l-size": size,
+                    "--l-gap": gapOf(gap, 0.183),
                     "--l-color": color,
                     "--l-count": count,
                     "--l-beat": beatOf(1.6, speed),

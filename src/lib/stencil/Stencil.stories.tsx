@@ -75,3 +75,59 @@ export const Animated: Story = {
     args: { animate: 6 },
     parameters: { chromatic: { disableSnapshot: true } },
 }
+
+/** The Dock preset used to wrap onto a second line inside a narrow column. */
+export const DockNarrow: Story = {
+    args: {
+        text: "DOCK",
+        fill: "stripes",
+        colors: ["#8ab4ff", "#0b1020"],
+        scale: 40,
+        hover: "expand",
+        strength: 1.4,
+        size: 170,
+    },
+    decorators: [
+        (Story) => (
+            <div style={{ width: 320 }}>
+                <Story />
+            </div>
+        ),
+    ],
+    play: async ({ canvasElement }) => {
+        const root = canvasElement.querySelector(".stencil") as HTMLElement
+        const letters = [...root.querySelectorAll(".stencil-letter")]
+
+        await waitFor(() =>
+            expect(Number(getComputedStyle(root).getPropertyValue("--stencil-fit"))).toBeLessThan(
+                1,
+            ),
+        )
+
+        const rows = new Set(letters.map((node) => Math.round(node.getBoundingClientRect().top)))
+        await expect(rows.size).toBe(1)
+        await expect(root.scrollWidth).toBeLessThanOrEqual(root.clientWidth + 1)
+    },
+}
+
+export const DockWide: Story = {
+    args: {
+        text: "DOCK",
+        fill: "stripes",
+        colors: ["#8ab4ff", "#0b1020"],
+        scale: 40,
+        hover: "expand",
+        strength: 1.4,
+        size: 170,
+    },
+    play: async ({ canvasElement }) => {
+        const root = canvasElement.querySelector(".stencil") as HTMLElement
+        const rows = new Set(
+            [...root.querySelectorAll(".stencil-letter")].map((node) =>
+                Math.round(node.getBoundingClientRect().top),
+            ),
+        )
+
+        await expect(rows.size).toBe(1)
+    },
+}
