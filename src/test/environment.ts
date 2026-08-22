@@ -1,13 +1,15 @@
 export interface MediaState {
     fine: boolean
     reducedMotion: boolean
+    narrow: boolean
 }
 
-export const mediaState: MediaState = { fine: true, reducedMotion: false }
+export const mediaState: MediaState = { fine: true, reducedMotion: false, narrow: false }
 
 export function resetMediaState(): void {
     mediaState.fine = true
     mediaState.reducedMotion = false
+    mediaState.narrow = false
 }
 
 class ResizeObserverStub implements ResizeObserver {
@@ -31,6 +33,7 @@ class IntersectionObserverStub {
 function matchesQuery(query: string): boolean {
     if (query.includes("pointer: fine")) return mediaState.fine
     if (query.includes("prefers-reduced-motion")) return mediaState.reducedMotion
+    if (query.includes("max-width")) return mediaState.narrow
     return false
 }
 

@@ -1,0 +1,802 @@
+.xp-meadow {
+    --meadow-sky-top: #fdf9f2;
+    --meadow-sky-mid: #fdf3e6;
+    --meadow-sky-low: #fbe8d8;
+    --meadow-wash: rgba(247, 178, 103, 0.26);
+    --meadow-glow: rgba(250, 205, 148, 0.34);
+    --meadow-glow-soft: rgba(250, 205, 148, 0.12);
+    --meadow-cloud: #ffffff;
+    --meadow-cloud-tone: 1;
+    --meadow-hill-far: #e9f2df;
+    --meadow-hill-mid: #d6e8c8;
+    --meadow-hill-near: #c3dcb1;
+    --meadow-stem: #a3c48d;
+    --meadow-pollen: #f7b267;
+    --meadow-bud: #f4bfc9;
+    --meadow-spark: #f9c47e;
+    --meadow-petal-pink: #f2b9c5;
+    --meadow-petal-coral: #f4b39a;
+    --meadow-petal-cream: #fbeacf;
+    --meadow-leaf: #a3c48d;
+    --meadow-leaf-deep: #8fb87a;
+    --meadow-body: #fffaf1;
+    --meadow-outline: #dfcdb4;
+    --meadow-face: #6f625a;
+    --meadow-blush: #f7cdd5;
+    --meadow-trail-core: rgba(244, 191, 201, 0.85);
+    --meadow-trail-edge: rgba(246, 207, 182, 0.35);
+    --meadow-ink: #3f362e;
+    --meadow-ink-soft: #6d5f52;
+    --meadow-edge: rgba(63, 54, 46, 0.2);
+    --meadow-veil: rgba(255, 255, 255, 0.6);
+
+    position: relative;
+    display: grid;
+    align-content: center;
+    isolation: isolate;
+    min-height: 34rem;
+    background:
+        radial-gradient(58% 46% at 78% 12%, var(--meadow-wash) 0%, transparent 68%),
+        linear-gradient(
+            176deg,
+            var(--meadow-sky-top) 0%,
+            var(--meadow-sky-mid) 46%,
+            var(--meadow-sky-low) 100%
+        );
+    color: var(--meadow-ink);
+}
+
+.xp-meadow-night {
+    --meadow-sky-top: #191a2e;
+    --meadow-sky-mid: #1f1f3a;
+    --meadow-sky-low: #2a2445;
+    --meadow-wash: rgba(150, 165, 235, 0.16);
+    --meadow-glow: rgba(178, 192, 255, 0.22);
+    --meadow-glow-soft: rgba(178, 192, 255, 0.08);
+    --meadow-cloud: #333c63;
+    --meadow-cloud-tone: 0.58;
+    --meadow-hill-far: #2b3850;
+    --meadow-hill-mid: #232e44;
+    --meadow-hill-near: #1c2536;
+    --meadow-stem: #4f6b62;
+    --meadow-pollen: #c9a86a;
+    --meadow-bud: #8e7ba8;
+    --meadow-spark: #ddd4ff;
+    --meadow-petal-pink: #8d7796;
+    --meadow-petal-coral: #946f77;
+    --meadow-petal-cream: #9b93bd;
+    --meadow-leaf: #4e6b62;
+    --meadow-leaf-deep: #3f5a55;
+    --meadow-body: #f2f1ff;
+    --meadow-outline: #8b85bd;
+    --meadow-face: #3a3457;
+    --meadow-blush: #c6a4c6;
+    --meadow-trail-core: rgba(190, 202, 255, 0.8);
+    --meadow-trail-edge: rgba(150, 165, 235, 0.28);
+    --meadow-ink: #eceaf7;
+    --meadow-ink-soft: #b3aed0;
+    --meadow-edge: rgba(236, 234, 247, 0.24);
+    --meadow-veil: rgba(255, 255, 255, 0.08);
+}
+
+.xp-meadow-warm {
+    --meadow-sky-top: #fdeadd;
+    --meadow-sky-mid: #fbd7c2;
+    --meadow-sky-low: #f6bda8;
+    --meadow-wash: rgba(244, 146, 96, 0.3);
+    --meadow-glow: rgba(248, 168, 112, 0.42);
+    --meadow-glow-soft: rgba(248, 168, 112, 0.16);
+    --meadow-cloud: #fff2e6;
+    --meadow-cloud-tone: 0.92;
+    --meadow-hill-far: #dfe5c8;
+    --meadow-hill-mid: #c8d4b2;
+    --meadow-hill-near: #b0c39c;
+    --meadow-stem: #93b083;
+    --meadow-pollen: #ef9d5c;
+    --meadow-bud: #eeaebc;
+    --meadow-spark: #ffd79a;
+    --meadow-petal-pink: #eeaebc;
+    --meadow-petal-coral: #ef9f86;
+    --meadow-petal-cream: #fbe0c4;
+    --meadow-leaf: #93b083;
+    --meadow-leaf-deep: #7f9d72;
+    --meadow-body: #fff8ef;
+    --meadow-outline: #d9b79c;
+    --meadow-face: #6b5044;
+    --meadow-blush: #f4b3ad;
+    --meadow-trail-core: rgba(248, 186, 160, 0.85);
+    --meadow-trail-edge: rgba(244, 170, 150, 0.35);
+    --meadow-ink: #4a352c;
+    --meadow-ink-soft: #7d5c4c;
+    --meadow-edge: rgba(74, 53, 44, 0.22);
+    --meadow-veil: rgba(255, 255, 255, 0.5);
+}
+
+/* sunrise leans pink and cool, sunset leans deeper amber */
+.xp-meadow-dawn {
+    --meadow-sky-top: #fdeef0;
+    --meadow-sky-mid: #fcdcd6;
+    --meadow-sky-low: #f7c3b4;
+    --meadow-wash: rgba(240, 150, 140, 0.28);
+    --meadow-glow: rgba(252, 190, 160, 0.4);
+}
+
+.xp-meadow-dusk {
+    --meadow-sky-top: #fce4cf;
+    --meadow-sky-mid: #f8c3a0;
+    --meadow-sky-low: #eda07f;
+    --meadow-wash: rgba(230, 110, 70, 0.32);
+    --meadow-glow: rgba(246, 152, 92, 0.44);
+    --meadow-hill-far: #d3d9ba;
+    --meadow-hill-mid: #b9c6a4;
+    --meadow-hill-near: #9fb28c;
+}
+
+.xp-meadow-space {
+    --meadow-sky-top: #090a1a;
+    --meadow-sky-mid: #101128;
+    --meadow-sky-low: #191436;
+    --meadow-wash: rgba(140, 120, 220, 0.16);
+    --meadow-glow: rgba(170, 150, 255, 0.2);
+    --meadow-glow-soft: rgba(170, 150, 255, 0.07);
+    --meadow-cloud: #2b2b52;
+    --meadow-cloud-tone: 0.4;
+    --meadow-hill-far: #1d2140;
+    --meadow-hill-mid: #171a33;
+    --meadow-hill-near: #121428;
+    --meadow-stem: #4a5580;
+    --meadow-pollen: #b39ae0;
+    --meadow-bud: #9a86d6;
+    --meadow-spark: #dbe3ff;
+    --meadow-petal-pink: #7f6fae;
+    --meadow-petal-coral: #8a6f9e;
+    --meadow-petal-cream: #9b9ad2;
+    --meadow-leaf: #48557e;
+    --meadow-leaf-deep: #3a456a;
+    --meadow-body: #eef0ff;
+    --meadow-outline: #7d78c9;
+    --meadow-face: #2c2850;
+    --meadow-blush: #a98fd0;
+    --meadow-trail-core: rgba(178, 168, 255, 0.8);
+    --meadow-trail-edge: rgba(132, 126, 226, 0.28);
+    --meadow-ink: #eef0ff;
+    --meadow-ink-soft: #a9a6cf;
+    --meadow-edge: rgba(238, 240, 255, 0.24);
+    --meadow-veil: rgba(255, 255, 255, 0.07);
+
+    background:
+        radial-gradient(42% 34% at 16% 22%, rgba(126, 96, 190, 0.3) 0%, transparent 72%),
+        radial-gradient(38% 30% at 82% 68%, rgba(74, 122, 190, 0.26) 0%, transparent 74%),
+        radial-gradient(52% 40% at 62% 6%, rgba(170, 120, 200, 0.16) 0%, transparent 76%),
+        linear-gradient(
+            172deg,
+            var(--meadow-sky-top) 0%,
+            var(--meadow-sky-mid) 52%,
+            var(--meadow-sky-low) 100%
+        );
+}
+
+.xp-meadow-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.xp-meadow-drift {
+    position: absolute;
+    inset: 0;
+}
+
+.xp-meadow-far {
+    z-index: 0;
+}
+
+.xp-meadow-far .xp-meadow-drift {
+    animation: xp-meadow-sway-far 38s ease-in-out infinite alternate;
+}
+
+.xp-meadow-land {
+    z-index: 1;
+}
+
+.xp-meadow-land .xp-meadow-drift {
+    animation: xp-meadow-sway-land 26s ease-in-out infinite alternate;
+}
+
+.xp-meadow-air {
+    z-index: 2;
+}
+
+.xp-meadow-content {
+    position: relative;
+    z-index: 3;
+    padding: clamp(3.5rem, 9vh, 6.5rem) clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.xp-meadow-fore {
+    z-index: 4;
+}
+
+.xp-meadow-fore .xp-meadow-drift {
+    animation: xp-meadow-sway-fore 19s ease-in-out infinite alternate;
+}
+
+@keyframes xp-meadow-sway-far {
+    from {
+        transform: translate3d(-13px, 5px, 0);
+    }
+    to {
+        transform: translate3d(13px, -5px, 0);
+    }
+}
+
+@keyframes xp-meadow-sway-land {
+    from {
+        transform: translate3d(0, 5px, 0);
+    }
+    to {
+        transform: translate3d(0, -5px, 0);
+    }
+}
+
+@keyframes xp-meadow-sway-fore {
+    from {
+        transform: translate3d(-6px, 8px, 0);
+    }
+    to {
+        transform: translate3d(6px, -8px, 0);
+    }
+}
+
+.xp-meadow-orb {
+    position: absolute;
+    top: -6%;
+    right: 4%;
+    width: clamp(128px, 17vw, 208px);
+}
+
+.xp-meadow-arc .xp-meadow-orb {
+    top: calc(var(--orb-y) * 1%);
+    right: auto;
+    left: calc(var(--orb-x) * 1%);
+    translate: -50% -50%;
+    transition:
+        top 900ms ease-out,
+        left 900ms ease-out;
+}
+
+.xp-meadow-arc .xp-meadow-glow {
+    top: calc(var(--orb-y) * 1% - 22%);
+    right: auto;
+    left: calc(var(--orb-x) * 1% - 22%);
+    transition:
+        top 900ms ease-out,
+        left 900ms ease-out;
+}
+
+.xp-meadow-still .xp-meadow-arc .xp-meadow-orb,
+.xp-meadow-arc.xp-meadow-still .xp-meadow-orb,
+.xp-meadow-arc.xp-meadow-still .xp-meadow-glow {
+    transition: none;
+}
+
+.xp-meadow-orb svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.xp-meadow-glow {
+    position: absolute;
+    top: -18%;
+    right: -6%;
+    width: clamp(280px, 44vw, 520px);
+    aspect-ratio: 1;
+    background: radial-gradient(
+        circle,
+        var(--meadow-glow) 0%,
+        var(--meadow-glow-soft) 40%,
+        transparent 70%
+    );
+    animation: xp-meadow-breathe 12s ease-in-out infinite alternate;
+}
+
+@keyframes xp-meadow-breathe {
+    from {
+        transform: scale(0.94);
+        opacity: 0.72;
+    }
+    to {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+}
+
+.xp-meadow-rays {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: xp-meadow-spin 90s linear infinite;
+}
+
+@keyframes xp-meadow-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.xp-meadow-cloud {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    color: var(--meadow-cloud);
+    opacity: calc(var(--m-tone) * var(--meadow-cloud-tone));
+    animation: xp-meadow-cloud-drift calc(var(--m-beat) * 1s) ease-in-out infinite alternate;
+}
+
+.xp-meadow-cloud-far {
+    filter: blur(1px);
+}
+
+.xp-meadow-cloud svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+@keyframes xp-meadow-cloud-drift {
+    from {
+        transform: translate3d(-14px, 3px, 0);
+    }
+    to {
+        transform: translate3d(18px, -3px, 0);
+    }
+}
+
+.xp-meadow-hills {
+    position: absolute;
+    left: -4%;
+    bottom: -1px;
+    width: 108%;
+}
+
+.xp-meadow-hills svg {
+    display: block;
+    width: 100%;
+    height: clamp(150px, 26vw, 260px);
+}
+
+.xp-meadow-plant {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    bottom: calc(var(--m-bottom) * 1%);
+    width: calc(var(--m-size) * 1px);
+    transform-origin: 50% 100%;
+    animation: xp-meadow-sway calc(var(--m-beat) * 1s) ease-in-out infinite alternate;
+}
+
+.xp-meadow-plant svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.xp-meadow-tint-pink {
+    color: var(--meadow-petal-pink);
+}
+
+.xp-meadow-tint-coral {
+    color: var(--meadow-petal-coral);
+}
+
+.xp-meadow-tint-cream {
+    color: var(--meadow-petal-cream);
+}
+
+.xp-meadow-tint-green {
+    color: var(--meadow-leaf);
+}
+
+.xp-meadow-tint-deep {
+    color: var(--meadow-leaf-deep);
+}
+
+@keyframes xp-meadow-sway {
+    from {
+        transform: rotate(-2.6deg);
+    }
+    to {
+        transform: rotate(2.6deg);
+    }
+}
+
+.xp-meadow-object {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    margin-left: calc(var(--m-size) * -0.5px);
+    margin-top: calc(var(--m-size) * -0.5px);
+    opacity: var(--m-alpha);
+}
+
+.xp-meadow-object[data-motion="glide"] {
+    left: 0;
+    right: 0;
+    width: auto;
+    margin-left: 0;
+}
+
+.xp-meadow-object[data-motion="glide"] .xp-meadow-body {
+    width: calc(var(--m-size) * 1px);
+}
+
+.xp-meadow-object[data-flip="true"]:not([data-motion="glide"]) .xp-meadow-body {
+    scale: -1 1;
+}
+
+/* a gliding character mirrors its whole lane, so it faces the way it travels */
+.xp-meadow-object[data-motion="glide"][data-flip="true"] {
+    scale: -1 1;
+}
+
+.xp-meadow-track {
+    display: block;
+    animation-duration: calc(var(--m-beat) * 1s);
+    animation-delay: calc(var(--m-delay) * 1s);
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+}
+
+.xp-meadow-body {
+    display: block;
+    animation-duration: calc(var(--m-beat) * 0.61s);
+    animation-delay: calc(var(--m-delay) * 0.43s);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: ease-in-out;
+}
+
+.xp-meadow-body svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.xp-meadow-echo {
+    position: absolute;
+    top: calc(var(--m-size) * 0.18px);
+    left: calc(var(--m-size) * 0.19px);
+    width: calc(var(--m-size) * 0.62px);
+    height: calc(var(--m-size) * 0.86px);
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        var(--meadow-trail-core) 0%,
+        var(--meadow-trail-edge) 44%,
+        transparent 72%
+    );
+    opacity: var(--m-fade);
+    scale: var(--m-shrink);
+    animation-duration: calc(var(--m-beat) * 1s);
+    animation-delay: calc((var(--m-delay) + var(--m-beat) * (var(--m-lag) - 1)) * 1s);
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+}
+
+.xp-meadow-track[data-motion="float"],
+.xp-meadow-track[data-motion="bob"],
+.xp-meadow-track[data-motion="hover"],
+.xp-meadow-track[data-motion="twinkle"],
+.xp-meadow-echo[data-motion="float"],
+.xp-meadow-echo[data-motion="bob"],
+.xp-meadow-echo[data-motion="hover"],
+.xp-meadow-echo[data-motion="twinkle"] {
+    animation-name: xp-meadow-lift;
+    animation-direction: alternate;
+    animation-timing-function: ease-in-out;
+}
+
+.xp-meadow-track[data-motion="flit"],
+.xp-meadow-echo[data-motion="flit"] {
+    animation-name: xp-meadow-flit;
+    animation-timing-function: ease-in-out;
+}
+
+.xp-meadow-track[data-motion="glide"],
+.xp-meadow-echo[data-motion="glide"] {
+    animation-name: xp-meadow-glide;
+    animation-timing-function: cubic-bezier(0.4, 0.02, 0.6, 0.98);
+}
+
+@keyframes xp-meadow-lift {
+    from {
+        transform: translate3d(0, calc(var(--m-reach) * 0.5px), 0);
+    }
+    to {
+        transform: translate3d(
+            calc(var(--m-sway) * var(--m-swing) * 1px),
+            calc(var(--m-reach) * -0.5px),
+            0
+        );
+    }
+}
+
+@keyframes xp-meadow-flit {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    25% {
+        transform: translate3d(
+            calc(var(--m-reach) * var(--m-swing) * 0.7px),
+            calc(var(--m-reach) * -0.5px),
+            0
+        );
+    }
+    50% {
+        transform: translate3d(
+            calc(var(--m-reach) * var(--m-swing) * 1.2px),
+            calc(var(--m-reach) * 0.2px),
+            0
+        );
+    }
+    75% {
+        transform: translate3d(
+            calc(var(--m-reach) * var(--m-swing) * 0.4px),
+            calc(var(--m-reach) * 0.6px),
+            0
+        );
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes xp-meadow-glide {
+    0% {
+        transform: translate3d(calc(-1 * var(--m-size) * 1px - 40px), 0, 0);
+    }
+    64% {
+        transform: translate3d(calc(100% + 40px), calc(var(--m-reach) * -0.7px), 0);
+    }
+    100% {
+        transform: translate3d(calc(100% + 40px), calc(var(--m-reach) * -0.7px), 0);
+    }
+}
+
+.xp-meadow-body[data-motion="bob"],
+.xp-meadow-body[data-motion="glide"],
+.xp-meadow-body[data-motion="hover"],
+.xp-meadow-body[data-motion="float"] {
+    animation-name: xp-meadow-tilt;
+}
+
+.xp-meadow-body[data-motion="twinkle"] {
+    animation-name: xp-meadow-twinkle;
+}
+
+@keyframes xp-meadow-tilt {
+    from {
+        rotate: calc(var(--m-spin) * -1deg);
+    }
+    to {
+        rotate: calc(var(--m-spin) * 1deg);
+    }
+}
+
+@keyframes xp-meadow-twinkle {
+    from {
+        opacity: 0.45;
+        scale: 0.82;
+    }
+    to {
+        opacity: 1;
+        scale: 1.06;
+    }
+}
+
+.xp-meadow-wing-left,
+.xp-meadow-wing-right {
+    transform-box: fill-box;
+    animation: xp-meadow-flutter 0.52s ease-in-out infinite alternate;
+}
+
+.xp-meadow-wing-left {
+    transform-origin: right center;
+}
+
+.xp-meadow-wing-right {
+    transform-origin: left center;
+}
+
+@keyframes xp-meadow-flutter {
+    from {
+        transform: scaleX(1) rotate(-3deg);
+    }
+    to {
+        transform: scaleX(0.68) rotate(4deg);
+    }
+}
+
+.xp-meadow-still .xp-meadow-drift,
+.xp-meadow-still .xp-meadow-glow,
+.xp-meadow-still .xp-meadow-rays,
+.xp-meadow-still .xp-meadow-cloud,
+.xp-meadow-still .xp-meadow-plant,
+.xp-meadow-still .xp-meadow-track,
+.xp-meadow-still .xp-meadow-body,
+.xp-meadow-still .xp-meadow-wing-left,
+.xp-meadow-still .xp-meadow-wing-right {
+    animation: none;
+}
+
+.xp-meadow-still .xp-meadow-track[data-motion="glide"] {
+    transform: translate3d(calc(var(--m-rest) * 1%), 0, 0);
+}
+
+.xp-meadow-planet {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    animation: xp-meadow-planet-drift calc(var(--m-beat) * 1s) ease-in-out infinite alternate;
+}
+
+.xp-meadow-planet[data-faint="true"] {
+    opacity: 0.55;
+}
+
+.xp-meadow-planet svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+@keyframes xp-meadow-planet-drift {
+    from {
+        transform: translate3d(-7px, 5px, 0);
+    }
+    to {
+        transform: translate3d(7px, -5px, 0);
+    }
+}
+
+.xp-meadow-orbit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--m-size) * var(--m-ring) * 1px);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+}
+
+.xp-meadow-orbit-ring {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(198, 190, 255, 0.28);
+    border-radius: 50%;
+}
+
+.xp-meadow-orbit-spin {
+    position: absolute;
+    inset: 0;
+    animation: xp-meadow-spin calc(var(--m-beat) * 1.6s) linear infinite;
+}
+
+.xp-meadow-orbit-dot {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #dde2ff;
+    translate: -50% -50%;
+}
+
+.xp-meadow-star {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #e8ecff;
+    opacity: var(--m-tone);
+    animation: xp-meadow-twinkle calc(var(--m-beat) * 1s) ease-in-out infinite alternate;
+    animation-delay: calc(var(--m-beat) * -0.5s);
+}
+
+.xp-meadow-comet {
+    position: absolute;
+    left: calc(var(--m-x) * 1%);
+    top: calc(var(--m-y) * 1%);
+    width: calc(var(--m-size) * 1px);
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+        90deg,
+        rgba(214, 224, 255, 0) 0%,
+        rgba(214, 224, 255, 0.2) 40%,
+        rgba(232, 238, 255, 0.95) 100%
+    );
+    opacity: 0;
+    animation: xp-meadow-comet calc(var(--m-beat) * 1s) linear infinite;
+    animation-delay: calc(var(--m-delay) * 1s);
+}
+
+@keyframes xp-meadow-comet {
+    0%,
+    86% {
+        transform: translate3d(0, 0, 0) rotate(calc(var(--m-tilt) * 1deg));
+        opacity: 0;
+    }
+    88% {
+        opacity: 0;
+    }
+    91% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate3d(200px, calc(var(--m-tilt) * 3.7px), 0)
+            rotate(calc(var(--m-tilt) * 1deg));
+        opacity: 0;
+    }
+}
+
+.xp-meadow-halo {
+    position: absolute;
+    top: calc(var(--m-size) * -0.15px);
+    left: calc(var(--m-size) * -0.14px);
+    width: calc(var(--m-size) * 1.28px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(198, 210, 255, 0.32) 0%,
+        rgba(198, 210, 255, 0.1) 44%,
+        transparent 68%
+    );
+}
+
+.xp-meadow-still .xp-meadow-echo {
+    display: none;
+}
+
+.xp-meadow-still .xp-meadow-star,
+.xp-meadow-still .xp-meadow-comet,
+.xp-meadow-still .xp-meadow-planet,
+.xp-meadow-still .xp-meadow-orbit-spin {
+    animation: none;
+}
+
+@media (max-width: 1080px) {
+    .xp-meadow-fore .xp-meadow-plant {
+        width: calc(var(--m-size) * 0.6px);
+    }
+
+    .xp-meadow-orb {
+        width: clamp(112px, 19vw, 168px);
+    }
+}
+
+@media (max-width: 700px) {
+    .xp-meadow {
+        min-height: 30rem;
+    }
+
+    .xp-meadow-fore .xp-meadow-plant {
+        bottom: calc(var(--m-bottom) * 1% - 16px);
+        width: calc(var(--m-size) * 0.5px);
+    }
+
+    .xp-meadow-hills svg {
+        height: clamp(120px, 34vw, 190px);
+    }
+
+    .xp-meadow-orb {
+        width: clamp(104px, 30vw, 140px);
+    }
+}

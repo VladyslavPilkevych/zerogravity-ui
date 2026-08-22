@@ -1,0 +1,50 @@
+.xp-wash {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--wash-base);
+}
+
+.xp-wash-pour {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        circle at var(--wash-x) var(--wash-y),
+        var(--wash-color) calc(100% - var(--wash-soft)),
+        transparent 100%
+    );
+    transform-origin: var(--wash-x) var(--wash-y);
+    animation: xp-wash-pour var(--wash-duration) var(--wash-easing) forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes xp-wash-pour {
+    from {
+        transform: scale(0.04);
+        opacity: 0.55;
+    }
+    35% {
+        opacity: 1;
+    }
+    to {
+        transform: scale(3.2);
+        opacity: 1;
+    }
+}
+
+.xp-wash-content {
+    position: relative;
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-wash {
+        transition: background 220ms ease;
+    }
+
+    .xp-wash-pour {
+        animation: none;
+        display: none;
+    }
+}

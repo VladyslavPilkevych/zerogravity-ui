@@ -1,0 +1,68 @@
+.xp-vellum {
+    --vellum-x: 0.5;
+    --vellum-y: 0.5;
+    --vellum-press: 0;
+    perspective: var(--vellum-perspective);
+}
+
+.xp-vellum-sheet {
+    position: relative;
+    border-radius: var(--vellum-radius);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transform: rotateX(calc((0.5 - var(--vellum-y)) * var(--vellum-tilt) * 2))
+        rotateY(calc((var(--vellum-x) - 0.5) * var(--vellum-tilt) * 2));
+    will-change: transform;
+}
+
+.xp-vellum-content {
+    position: relative;
+    z-index: 1;
+}
+
+.xp-vellum-dent,
+.xp-vellum-sheen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.xp-vellum-dent {
+    background: radial-gradient(
+        circle at calc(var(--vellum-x) * 100%) calc(var(--vellum-y) * 100%),
+        color-mix(
+                in srgb,
+                var(--vellum-dent-color) calc(var(--vellum-dent) * var(--vellum-press) * 100%),
+                transparent
+            )
+            0%,
+        transparent 42%
+    );
+}
+
+.xp-vellum-sheen {
+    background: radial-gradient(
+        circle at calc((1 - var(--vellum-x)) * 100%) calc((1 - var(--vellum-y)) * 100%),
+        color-mix(
+                in srgb,
+                var(--vellum-sheen-color) calc(var(--vellum-sheen) * var(--vellum-press) * 35%),
+                transparent
+            )
+            0%,
+        transparent 55%
+    );
+    mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-vellum-sheet {
+        transform: none;
+        will-change: auto;
+    }
+
+    .xp-vellum-dent,
+    .xp-vellum-sheen {
+        display: none;
+    }
+}

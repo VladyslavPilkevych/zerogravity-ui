@@ -7,6 +7,7 @@ export default defineConfig({
         "src/lib/**/*.css",
         "!src/lib/**/*.test.*",
         "!src/lib/**/*.stories.*",
+        "!src/lib/experimental/**",
     ],
     outDir: "dist",
     format: ["esm"],

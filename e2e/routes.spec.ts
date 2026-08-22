@@ -1,4 +1,4 @@
-import { ROUTES, expect, test } from "./fixtures"
+import { EXPERIMENTAL_ROUTES, ROUTES, expect, test } from "./fixtures"
 
 for (const route of ROUTES) {
     test(`${route.name} route loads without browser errors`, async ({
@@ -38,3 +38,15 @@ test("navigating between routes keeps the app mounted", async ({ page, browserLo
 
     guard.assertClean()
 })
+
+for (const route of EXPERIMENTAL_ROUTES) {
+    test(`experimental ${route.name} route loads without browser errors`, async ({
+        page,
+        browserLog: guard,
+    }) => {
+        await page.goto(route.path)
+        await expect(page.locator("nav.pg-nav")).toBeVisible()
+        await page.waitForLoadState("networkidle")
+        guard.assertClean()
+    })
+}

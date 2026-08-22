@@ -1,0 +1,99 @@
+.xp-tessera {
+    position: fixed;
+    inset: 0;
+    z-index: var(--tessera-layer);
+    overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: contain;
+}
+
+.xp-tessera-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--tessera-columns), 1fr);
+    grid-template-rows: repeat(var(--tessera-rows), 1fr);
+    width: 100%;
+    height: 100%;
+}
+
+.xp-tessera-tile {
+    margin: -1px;
+    background: var(--tessera-color);
+    backface-visibility: hidden;
+}
+
+.xp-tessera[data-phase="covering"] .xp-tessera-tile {
+    animation: xp-tessera-cover var(--tessera-duration) var(--tessera-ease) both;
+    animation-delay: calc(var(--tessera-stagger) * var(--tessera-in));
+    will-change: transform, opacity;
+}
+
+.xp-tessera[data-phase="covered"] .xp-tessera-grid {
+    background: var(--tessera-color);
+}
+
+.xp-tessera[data-phase="covered"] .xp-tessera-tile {
+    transform: none;
+    opacity: 1;
+}
+
+.xp-tessera[data-phase="revealing"] .xp-tessera-tile {
+    animation: xp-tessera-reveal var(--tessera-duration) var(--tessera-ease) both;
+    animation-delay: calc(var(--tessera-stagger) * var(--tessera-out));
+    will-change: transform, opacity;
+}
+
+@keyframes xp-tessera-cover {
+    from {
+        transform: scale(0.55);
+        opacity: 0;
+    }
+    55% {
+        opacity: 1;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes xp-tessera-reveal {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    45% {
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.55);
+        opacity: 0;
+    }
+}
+
+.xp-tessera.xp-tessera-plain[data-phase="covering"] .xp-tessera-tile {
+    animation-name: xp-tessera-appear;
+    animation-delay: 0s;
+}
+
+.xp-tessera.xp-tessera-plain[data-phase="revealing"] .xp-tessera-tile {
+    animation-name: xp-tessera-vanish;
+    animation-delay: 0s;
+}
+
+@keyframes xp-tessera-appear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes xp-tessera-vanish {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}

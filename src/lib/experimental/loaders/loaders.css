@@ -1,0 +1,285 @@
+.xp-loader {
+    --l-color: #f4a04f;
+    --l-beat: 1.4;
+    --l-size: 96;
+
+    display: inline-block;
+    line-height: 0;
+}
+
+/* ── pixel heart ─────────────────────────────────────────────── */
+
+.xp-heart {
+    display: grid;
+    grid-template-columns: repeat(var(--l-cols), 1fr);
+    gap: calc(var(--l-size) * 0.006px);
+    width: calc(var(--l-size) * 1px);
+}
+
+.xp-heart-pixel {
+    aspect-ratio: 1;
+    background: var(--l-color);
+    animation-duration: calc(var(--l-beat) * 1s);
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+}
+
+.xp-heart[data-variant="pulse"] .xp-heart-pixel {
+    animation-name: xp-heart-ripple;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+    animation-delay: calc(var(--l-reach) * var(--l-beat) * -0.55s);
+}
+
+.xp-heart[data-variant="blink"] .xp-heart-pixel {
+    animation-name: xp-heart-blink;
+    animation-timing-function: steps(1, end);
+}
+
+.xp-heart[data-variant="pulse"] {
+    animation: xp-heart-breathe calc(var(--l-beat) * 2s) ease-in-out infinite alternate;
+}
+
+@keyframes xp-heart-ripple {
+    from {
+        opacity: 0.34;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes xp-heart-blink {
+    0% {
+        opacity: 1;
+    }
+    55% {
+        opacity: 0.22;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes xp-heart-breathe {
+    from {
+        transform: scale(0.94);
+    }
+    to {
+        transform: scale(1.04);
+    }
+}
+
+/* ── pixel blocks ────────────────────────────────────────────── */
+
+.xp-blocks {
+    display: flex;
+    align-items: flex-end;
+    gap: calc(var(--l-size) * 0.34px);
+    height: calc(var(--l-size) * 2.4px);
+}
+
+.xp-blocks-pixel {
+    width: calc(var(--l-size) * 1px);
+    height: calc(var(--l-size) * 1px);
+    background: var(--l-color);
+    animation-duration: calc(var(--l-beat) * 1s);
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in-out;
+    animation-delay: calc(var(--l-step) * var(--l-beat) * -1s);
+}
+
+.xp-blocks[data-variant="wave"] .xp-blocks-pixel {
+    animation-name: xp-blocks-wave;
+}
+
+.xp-blocks[data-variant="center"] .xp-blocks-pixel {
+    animation-name: xp-blocks-center;
+    animation-direction: alternate;
+}
+
+.xp-blocks[data-variant="steps"] .xp-blocks-pixel {
+    animation-name: xp-blocks-steps;
+    animation-timing-function: steps(1, end);
+}
+
+@keyframes xp-blocks-wave {
+    0%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    35% {
+        transform: translateY(calc(var(--l-size) * -1.2px));
+        opacity: 1;
+    }
+}
+
+@keyframes xp-blocks-center {
+    from {
+        transform: scale(0.55);
+        opacity: 0.35;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes xp-blocks-steps {
+    0%,
+    100% {
+        opacity: 0.22;
+    }
+    25% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.55;
+    }
+}
+
+/* ── pixel bar ───────────────────────────────────────────────── */
+
+.xp-bar {
+    display: grid;
+    grid-template-columns: repeat(var(--l-count), 1fr);
+    gap: calc(var(--l-size) * 0.22px);
+    width: 100%;
+    min-width: calc(var(--l-count) * var(--l-size) * 1.2px);
+}
+
+.xp-bar-cell {
+    height: calc(var(--l-size) * 1px);
+    background: var(--l-color);
+    opacity: 0.16;
+}
+
+.xp-bar[data-mode="flow"] .xp-bar-cell {
+    animation: xp-bar-march calc(var(--l-beat) * 1s) linear infinite;
+    animation-delay: calc(var(--l-step) * var(--l-beat) * -1s);
+}
+
+.xp-bar-cell[data-lit="true"] {
+    opacity: 1;
+}
+
+.xp-bar[data-mode="value"] .xp-bar-cell[data-edge="true"] {
+    animation: xp-bar-tip calc(var(--l-beat) * 0.7s) steps(1, end) infinite;
+}
+
+@keyframes xp-bar-march {
+    0% {
+        opacity: 1;
+    }
+    16% {
+        opacity: 0.42;
+    }
+    34%,
+    100% {
+        opacity: 0.16;
+    }
+}
+
+@keyframes xp-bar-tip {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* ── pixel pulse ─────────────────────────────────────────────── */
+
+.xp-pulse {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 100%;
+    isolation: isolate;
+}
+
+.xp-pulse-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: var(--l-scrim);
+}
+
+/*
+ * A sparse field of pixel squares rather than a checkerboard: crossed stripe
+ * masks intersect into blocks, and two interleaved layers breathe in antiphase.
+ */
+.xp-pulse-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--l-color);
+    mask-image:
+        repeating-linear-gradient(
+            90deg,
+            #000 0 calc(var(--l-cell) * 0.34px),
+            transparent calc(var(--l-cell) * 0.34px) calc(var(--l-cell) * 1px)
+        ),
+        repeating-linear-gradient(
+            0deg,
+            #000 0 calc(var(--l-cell) * 0.34px),
+            transparent calc(var(--l-cell) * 0.34px) calc(var(--l-cell) * 1px)
+        );
+    mask-composite: intersect;
+    animation: xp-pulse-breathe calc(var(--l-beat) * 2s) ease-in-out infinite alternate;
+}
+
+.xp-pulse-grid[data-phase="b"] {
+    mask-position: calc(var(--l-cell) * 0.5px) calc(var(--l-cell) * 0.5px);
+    animation-direction: alternate-reverse;
+}
+
+.xp-pulse-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 18px;
+    padding: 24px;
+}
+
+@keyframes xp-pulse-breathe {
+    from {
+        opacity: 0.05;
+    }
+    to {
+        opacity: 0.14;
+    }
+}
+
+/* ── resting state ───────────────────────────────────────────── */
+
+.xp-loader-still .xp-heart-pixel,
+.xp-loader-still.xp-heart,
+.xp-loader-still .xp-blocks-pixel,
+.xp-loader-still .xp-bar-cell,
+.xp-loader-still .xp-pulse-grid {
+    animation: none;
+}
+
+.xp-loader-still .xp-heart-pixel {
+    opacity: 1;
+}
+
+.xp-loader-still .xp-blocks-pixel {
+    opacity: 0.75;
+    transform: none;
+}
+
+.xp-loader-still .xp-pulse-grid {
+    opacity: 0.09;
+}
+
+.xp-loader-still.xp-bar[data-mode="flow"] .xp-bar-cell[data-rest="true"] {
+    opacity: 1;
+}

@@ -1,0 +1,46 @@
+.xp-diorama {
+    --diorama-x: 0;
+    --diorama-y: 0;
+    position: relative;
+    overflow: hidden;
+    perspective: var(--diorama-perspective);
+    isolation: isolate;
+}
+
+.xp-diorama-far {
+    position: relative;
+    z-index: 0;
+    transform: translate3d(
+        calc(var(--diorama-x) * var(--diorama-parallax) * -0.12px),
+        calc(var(--diorama-y) * var(--diorama-parallax) * -0.12px),
+        0
+    );
+    will-change: transform;
+}
+
+.xp-diorama-near {
+    position: absolute;
+    inset: -8%;
+    pointer-events: none;
+    transform: translate3d(
+        calc(var(--diorama-x) * var(--diorama-parallax) * var(--depth) * 1px),
+        calc(var(--diorama-y) * var(--diorama-parallax) * var(--depth) * 1px),
+        0
+    );
+    filter: blur(calc(var(--depth) * var(--depth) * var(--diorama-blur) * 1px));
+    will-change: transform;
+}
+
+.xp-diorama-still .xp-diorama-far,
+.xp-diorama-still .xp-diorama-near {
+    transform: none;
+    will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-diorama-far,
+    .xp-diorama-near {
+        transform: none;
+        will-change: auto;
+    }
+}
