@@ -69,7 +69,7 @@ jobs:
             - run: pnpm test:consumer
 
     playground:
-        name: Next.js playground build
+        name: Next.js docs site build
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4

@@ -9,6 +9,7 @@ import {
     TrailingCursor,
     resolveAntigravityConfig,
 } from "zerogravity-ui"
+import { Aperture } from "zerogravity-ui/aperture"
 
 export default function Page() {
     const config = resolveAntigravityConfig(ANTIGRAVITY_PRESETS[0].options)
@@ -31,6 +32,9 @@ export default function Page() {
             </Reel>
             <SplitFlap value="NEXT" />
             <Stencil text="RSC" fill="stripes" />
+            <Aperture>
+                <p>Framed by a subpath import</p>
+            </Aperture>
         </main>
     )
 }

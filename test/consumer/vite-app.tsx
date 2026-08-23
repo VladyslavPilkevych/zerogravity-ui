@@ -1,6 +1,8 @@
 import { createRoot } from "react-dom/client"
 
 import { Antigravity, Reel, SplitFlap, Stencil, TrailingCursor } from "zerogravity-ui"
+import { Aperture } from "zerogravity-ui/aperture"
+import { GridTrail } from "zerogravity-ui/grid-trail"
 
 export function App() {
     return (
@@ -15,6 +17,10 @@ export function App() {
             </Reel>
             <SplitFlap value="VITE" />
             <Stencil text="OK" fill="zebra" />
+            <GridTrail />
+            <Aperture>
+                <p>Framed</p>
+            </Aperture>
         </main>
     )
 }

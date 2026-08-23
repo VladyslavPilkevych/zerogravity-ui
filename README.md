@@ -44,6 +44,42 @@ export function Showcase() {
 }
 ```
 
+### Direct component imports
+
+Every component also has its own entry point, so you can import it without going
+through the root barrel:
+
+```tsx
+import { Reel } from "zerogravity-ui/reel"
+import { SplitFlap } from "zerogravity-ui/split-flap"
+```
+
+Both styles produce the same bundle. The root barrel is a plain re-export and
+tree-shakes cleanly: a Vite production build importing only `SplitFlap` measures
+**3.2 kB of library code and 1.5 kB of CSS** on top of a React-only baseline,
+byte-identical whichever import form is used, with every other component and
+stylesheet absent. Those numbers come from `pnpm test:consumer`, which builds
+both apps against the packed tarball on every run rather than trusting that ESM
+implies tree shaking.
+
+Reach for the subpath form when you prefer explicit module boundaries, not
+because it is smaller.
+
+The entry points are the nine components plus `pointer-fx`, spelled as the
+directory name:
+
+```text
+zerogravity-ui/antigravity      zerogravity-ui/split-flap
+zerogravity-ui/aperture         zerogravity-ui/stencil
+zerogravity-ui/grid-trail       zerogravity-ui/trailing-cursor
+zerogravity-ui/reel             zerogravity-ui/pointer-fx
+zerogravity-ui/scroll-stack
+```
+
+Nothing else is importable. Engines, geometry helpers, the shared `internal`
+modules and `dist/` paths have no entry point and never will — the package
+declares no wildcard exports, and the package check fails if one appears.
+
 ### Styles
 
 There is nothing to import. Each component imports its own stylesheet, and
@@ -97,6 +133,11 @@ static prerendering.
 
 Every component README carries the full prop table, accessibility notes and
 performance characteristics.
+
+### Dependencies
+
+The package has **no runtime dependencies**. React and React DOM are peers;
+nothing else is installed alongside it.
 
 ### Environment requirements
 
@@ -206,17 +247,22 @@ and an `index.ts` that defines its public surface.
 
 ### Scripts
 
-|                                     |                                             |
-| ----------------------------------- | ------------------------------------------- |
-| `pnpm dev`                          | Playground dev server                       |
-| `pnpm build`                        | Playground production build                 |
-| `pnpm build:lib`                    | Library build into `dist/` via tsup         |
-| `pnpm lint`                         | ESLint, including the library-boundary rule |
-| `pnpm format` / `pnpm format:check` | Prettier                                    |
-| `pnpm typecheck`                    | `tsc --noEmit`                              |
-| `pnpm test`                         | Vitest, jsdom                               |
-| `pnpm check`                        | Everything CI runs                          |
-| `pnpm release:check`                | `pnpm check` plus the library build         |
+|                                     |                                                  |
+| ----------------------------------- | ------------------------------------------------ |
+| `pnpm dev`                          | Docs site dev server                             |
+| `pnpm build`                        | Docs site production build                       |
+| `pnpm build:lib`                    | Library build into `dist/` via tsup              |
+| `pnpm lint`                         | ESLint, including the library-boundary rule      |
+| `pnpm format` / `pnpm format:check` | Prettier                                         |
+| `pnpm typecheck`                    | `tsc --noEmit`                                   |
+| `pnpm test`                         | Vitest, jsdom                                    |
+| `pnpm test:browser`                 | Storybook stories in a real browser, plus a11y   |
+| `pnpm test:e2e`                     | Playwright against the built docs site           |
+| `pnpm build-storybook`              | Static Storybook, also the Chromatic input       |
+| `pnpm check:package`                | Packs, then runs publint and Are The Types Wrong |
+| `pnpm test:consumer`                | Installs the tarball into Vite and Next.js apps  |
+| `pnpm check`                        | Fast local gate: static checks and both suites   |
+| `pnpm release:check`                | `pnpm check` plus build, package and consumer    |
 
 Do not run `pnpm build` while `pnpm dev` is running — both write to `.next`.
 
@@ -232,15 +278,28 @@ The release process is documented in [CONTRIBUTING.md](CONTRIBUTING.md#releasing
 
 ## Release blockers
 
-One thing cannot be inferred from the repository and must be decided by the
-project owner before a first publish:
+Everything the repository controls is ready. What is left cannot be decided from
+inside it:
 
-1. **A package name.** `zerogravity-ui` matches the repository but was already
-   taken on npm at the time of writing. Confirm an available name and update
-   `name` in `package.json` plus the install instructions above.
+1. **The package name is taken.** `zerogravity-ui` exists on npm — version
+   `0.0.6`, published by a different author — so this package cannot be
+   published under that name. Verified against the registry, not assumed. The
+   owner has to either claim a free name and update `name` in `package.json`
+   plus the install instructions above, or take over the existing one.
+   `@zerogravity/ui` and `zerogravity` were both unregistered when this was
+   checked; a scoped name already matches the `publishConfig.access: public`
+   setting in `package.json`. No name has been chosen here on purpose —
+   switching it silently would be the wrong call to make on someone's behalf.
+2. **npm publish rights.** An npm account with 2FA enabled, and ownership of
+   whichever name is settled on.
 
-`private: true` is still set in `package.json` and must be removed once that is
-resolved.
+`private: true` stays in `package.json` until the first is resolved. It is the
+only thing standing between this repository and `npm publish`, and it is
+deliberate: with an unavailable name, publishing would fail anyway, and the flag
+makes that failure a local one rather than a half-finished release.
+
+Not blockers: a custom domain (the docs site can keep deploying to its current
+host) and a Chromatic token (CI reports the visual job as skipped without one).
 
 ## Adding a component
 

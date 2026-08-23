@@ -134,8 +134,18 @@ maintenance.
 
 `prepack` runs `pnpm build:lib`, so the build cannot be skipped by accident.
 
-1. Confirm the [release blockers](README.md#release-blockers) are resolved: an
-   available package name, and `private` removed from `package.json`.
+1. Confirm the [release blockers](README.md#release-blockers) are resolved:
+
+    - an npm account with 2FA enabled,
+    - ownership of the package name, checked against the registry rather than
+      assumed — `npm view <name>` returning `404` means it is free,
+    - `name` in `package.json` matching it, and the README install snippet
+      updated to match,
+    - `private` removed from `package.json`.
+
+    None of this can be done from the repository, and none of it should be
+    guessed at.
+
 2. `pnpm release:check` — lint, format, typecheck, unit and browser tests, then
    the library build, package validation and the packed-consumer tests.
 3. `pnpm audit` — no known vulnerabilities.
@@ -152,8 +162,12 @@ maintenance.
 8. `npm publish` (the package is public: `publishConfig.access` is already set).
 9. `git push && git push --tags`.
 10. Create the GitHub release from the tag, pasting the changelog section.
+11. Install the published package into a throwaway app — `npm i <name>` from the
+    registry, not the local tarball — and check that a root import, a subpath
+    import and the types all resolve. The registry can serve a different set of
+    files than `pnpm pack` produced if `files` and `.npmignore` disagree.
 
-Steps 6 and 7 are not optional. A `tsup` build that succeeds is not evidence that
+Steps 6, 7 and 11 are not optional. A `tsup` build that succeeds is not evidence that
 the published package works — the JSX runtime and `"use client"` bugs found
 before `0.1.0` were both invisible until the packed tarball was installed by a
 real consumer.
