@@ -184,3 +184,98 @@ test("no preview leaves fake buttons behind", async ({ page }) => {
         expect(buttons.map((text) => text.trim()).slice(0, 3), slug).toEqual(expected)
     }
 })
+
+test("Elemental keeps its edge attached at every radius", async ({ page, browserLog: guard }) => {
+    await page.goto("/docs/elemental")
+    const card = page.locator(".xpg-el-main")
+    await expect(card).toBeVisible()
+
+    for (const radius of [0, 24, 999]) {
+        await page.getByLabel("Radius").last().fill(String(radius))
+        await page.waitForTimeout(300)
+
+        const shape = await card.evaluate((node) => {
+            const edges = [...node.querySelectorAll(".xp-el-edge")] as SVGRectElement[]
+            const halo = node.querySelector(".xp-el-halo") as SVGRectElement
+            const art = node.querySelector(".xp-el-art") as SVGSVGElement
+            const box = node.getBoundingClientRect()
+            return {
+                content: parseFloat(getComputedStyle(node).borderTopLeftRadius),
+                corners: edges.map((edge) => Number(edge.getAttribute("rx"))),
+                limit: Math.min(box.width, box.height) / 2,
+                stroke: parseFloat(getComputedStyle(halo).strokeWidth),
+                spills: getComputedStyle(art).overflow,
+            }
+        })
+
+        // every stroke corners on the same clamped radius as the content
+        const expected = Math.min(radius, shape.limit)
+        expect(shape.corners.length, `radius ${radius}`).toBeGreaterThanOrEqual(4)
+        for (const corner of shape.corners)
+            expect(corner, `radius ${radius}`).toBeCloseTo(expected, 0)
+        expect(shape.content, `radius ${radius}`).toBeCloseTo(expected, 0)
+
+        // the strokes straddle that path, so the glow spills outside the box
+        expect(shape.stroke, `radius ${radius}`).toBeGreaterThan(0)
+        expect(shape.spills, `radius ${radius}`).toBe("visible")
+    }
+
+    guard.assertClean()
+})
+
+test("Elemental scopes its cursor to the wrapper", async ({ page }) => {
+    await page.goto("/docs/elemental")
+    await page.getByLabel("Cursor effect").check()
+
+    const card = page.locator(".xpg-el-main")
+    await card.scrollIntoViewIfNeeded()
+    await page.waitForTimeout(400)
+
+    const box = (await card.boundingBox())!
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.waitForTimeout(350)
+
+    await expect(card).toHaveCSS("cursor", "none")
+    await expect(page.locator(".xp-el-cursor").first()).toHaveAttribute("data-on", "true")
+
+    await page.mouse.move(60, 300)
+    await page.waitForTimeout(350)
+
+    await expect(page.locator(".dz-side")).not.toHaveCSS("cursor", "none")
+    await expect(page.locator("body")).toHaveCSS("cursor", "auto")
+    await expect(page.locator(".xp-el-cursor").first()).toHaveAttribute("data-on", "false")
+})
+
+test("Elemental decoration never blocks the content", async ({ page }) => {
+    await page.goto("/docs/elemental")
+    const card = page.locator(".xpg-el-main")
+    const box = (await card.boundingBox())!
+
+    const hit = await page.evaluate(
+        ([x, y]) => {
+            const node = document.elementFromPoint(x, y)
+            return {
+                inContent: Boolean(node?.closest(".xp-el-content")),
+                inDecoration: Boolean(node?.closest(".xp-el-fx, .xp-el-rim, .xp-el-bits")),
+            }
+        },
+        [Math.round(box.x + box.width / 2), Math.round(box.y + box.height / 2)],
+    )
+
+    expect(hit.inContent).toBe(true)
+    expect(hit.inDecoration).toBe(false)
+})
+
+test("Elemental switches variant from the comparison row", async ({ page }) => {
+    await page.goto("/docs/elemental")
+    const card = page.locator(".xpg-el-main")
+
+    await page.getByRole("button", { name: "fire" }).click()
+    await expect(card).toHaveAttribute("data-variant", "fire")
+    await expect(page.locator(".dz-code code")).toContainText('variant="fire"')
+
+    // electric is the default, so picking it drops the prop again
+    await page.getByRole("button", { name: "electric" }).click()
+    await expect(card).toHaveAttribute("data-variant", "electric")
+    await expect(page.locator(".dz-code code")).not.toContainText("variant=")
+})

@@ -3,6 +3,7 @@ export const COMPONENT_SLUGS = [
     "antigravity",
     "scroll-stack",
     "aperture",
+    "elemental",
     "louvre",
     "reel",
     "raster",

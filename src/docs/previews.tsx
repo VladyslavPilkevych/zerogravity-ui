@@ -19,6 +19,9 @@ export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
     diorama: dynamic(() =>
         import("@/playground/previews/DioramaPreview").then((m) => m.DioramaPreview),
     ),
+    elemental: dynamic(() =>
+        import("@/playground/previews/ElementalPreview").then((m) => m.ElementalPreview),
+    ),
     facet: dynamic(() => import("@/playground/previews/FacetPreview").then((m) => m.FacetPreview)),
     "grid-trail": dynamic(() =>
         import("@/playground/previews/GridTrailPreview").then((m) => m.GridTrailPreview),

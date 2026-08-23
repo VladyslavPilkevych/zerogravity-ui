@@ -754,3 +754,52 @@ export const RICOCHET_CONTROLS: ControlGroup[] = [
         ],
     },
 ]
+
+export const ELEMENTAL_DEFAULTS = {
+    variant: "electric",
+    color: "",
+    intensity: 1,
+    speed: 1,
+    radius: 16,
+    particles: true,
+    cursorEffect: false,
+}
+
+export const ELEMENTAL_CONTROLS: ControlGroup[] = [
+    {
+        id: "element",
+        title: "Element",
+        hint: "which edge the wrapper draws",
+        open: true,
+        controls: [
+            {
+                kind: "select",
+                path: "variant",
+                label: "Variant",
+                options: ["electric", "fire"], // "frost", "water" are parked
+            },
+            { kind: "colorNullable", path: "color", label: "Custom colour" },
+            {
+                kind: "number",
+                path: "radius",
+                label: "Radius",
+                min: 0,
+                max: 60,
+                step: 2,
+                unit: "px",
+            },
+        ],
+    },
+    {
+        id: "energy",
+        title: "Energy",
+        hint: "how hard the edge works",
+        open: true,
+        controls: [
+            { kind: "number", path: "intensity", label: "Intensity", min: 0, max: 2, step: 0.1 },
+            { kind: "number", path: "speed", label: "Speed", min: 0.25, max: 3, step: 0.25 },
+            { kind: "boolean", path: "particles", label: "Particles" },
+            { kind: "boolean", path: "cursorEffect", label: "Cursor effect" },
+        ],
+    },
+]

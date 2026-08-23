@@ -1,6 +1,9 @@
 export { Diorama } from "./diorama"
 export type { DioramaPlane, DioramaProps } from "./diorama"
 
+export { Elemental, ELEMENTAL_VARIANTS } from "./elemental"
+export type { ElementalProps, ElementalVariant } from "./elemental"
+
 export { Facet } from "./facet"
 export type { FacetProps } from "./facet"
 

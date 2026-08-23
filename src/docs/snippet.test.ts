@@ -49,7 +49,10 @@ describe("snippetFor", () => {
         expect(code).toContain('glyphSet="dots"')
         expect(code).toContain("cellSize={14}")
         expect(code).toContain("animated={false}")
-        expect(code).not.toContain("interactive")
+        // true against a false default shortens to the bare prop
+        expect(code).toContain("\n    interactive\n")
+        // untouched props stay out entirely
+        expect(code).not.toContain("pixelSize")
     })
 
     it("shortens a true boolean to the bare prop", () => {

@@ -374,3 +374,81 @@
     width: 100%;
     padding: 24px;
 }
+
+.xpg-el {
+    display: grid;
+    gap: 52px;
+    justify-items: center;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.xpg-el-main {
+    width: min(460px, 100%);
+}
+
+.xpg-el-face {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 62px 34px;
+    border-radius: inherit;
+    background: linear-gradient(168deg, #0e1017, #08090d);
+}
+
+.xpg-el-face strong {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-transform: capitalize;
+}
+
+.xpg-el-face span {
+    color: rgba(255, 255, 255, 0.44);
+    font-size: 13.5px;
+}
+
+.xpg-el-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
+
+.xpg-el-pick {
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 220ms ease;
+}
+
+.xpg-el-pick:hover,
+.xpg-el-pick[aria-pressed="true"] {
+    opacity: 1;
+}
+
+.xpg-el-pick:focus-visible {
+    outline: 2px solid rgba(138, 180, 255, 0.8);
+    outline-offset: 6px;
+}
+
+.xpg-el-label {
+    display: grid;
+    place-items: center;
+    width: 116px;
+    padding: 17px 6px;
+    border-radius: inherit;
+    background: #0b0c12;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color 220ms ease;
+}
+
+.xpg-el-pick[aria-pressed="true"] .xpg-el-label {
+    color: #fff;
+}

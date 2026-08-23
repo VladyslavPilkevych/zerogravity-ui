@@ -10,6 +10,8 @@ import {
 import {
     DIORAMA_CONTROLS,
     DIORAMA_DEFAULTS,
+    ELEMENTAL_CONTROLS,
+    ELEMENTAL_DEFAULTS,
     FACET_CONTROLS,
     FACET_DEFAULTS,
     KERN_CONTROLS,
@@ -201,6 +203,39 @@ export const COMPONENTS: DocEntry[] = [
             wide: true,
             note: "The demo drives the component from this frame. In an app it reads page scroll instead.",
         },
+    },
+    {
+        slug: "elemental",
+        name: "Elemental",
+        description: "An animated edge that wraps any content in electricity or fire.",
+        category: "Motion",
+        status: "experimental",
+        dependencies: [],
+        tags: ["border", "glow", "card", "effect", "decorative", "wrapper"],
+        defaults: ELEMENTAL_DEFAULTS,
+        controls: ELEMENTAL_CONTROLS,
+        extraProps: [
+            {
+                name: "children",
+                type: "ReactNode",
+                default: "—",
+                description: "Whatever the edge wraps. It stays fully interactive.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Freeze the edge in its static state.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Fall back to the static edge when the user asks for less motion.",
+            },
+        ],
+        children: "<Card />",
+        preview: { minHeight: 520 },
     },
     {
         slug: "louvre",
