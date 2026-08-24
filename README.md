@@ -1,96 +1,76 @@
-# zerogravity-ui
+# ZeroGravity UI
 
-Motion-first React components — particle fields, animated borders, illustrated
-scenes, scroll framing, carousels and display type. Every component ships its
-own styles, stops animating when idle, and honours `prefers-reduced-motion`.
+Motion-first React components for expressive interfaces.
 
-> **Not published yet.** The package name is still unresolved — see
-> [Release blockers](#release-blockers). Everything below describes the package
-> as it is built and verified today.
+ZeroGravity UI is a set of animated, interactive React components: pointer
+effects, scroll-driven layout, display typography, animated borders, illustrated
+scenes and route transitions. Every component ships its own styles, stops
+animating when it is idle, and honours `prefers-reduced-motion`.
+
+Published on npm as **`zerogravity`**.
+
+[![npm](https://img.shields.io/npm/v/zerogravity.svg)](https://www.npmjs.com/package/zerogravity)
+[![license](https://img.shields.io/npm/l/zerogravity.svg)](LICENSE)
+[![CI](https://github.com/VladyslavPilkevych/zerogravity-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/VladyslavPilkevych/zerogravity-ui/actions/workflows/ci.yml)
+
+[npm](https://www.npmjs.com/package/zerogravity) ·
+[GitHub](https://github.com/VladyslavPilkevych/zerogravity-ui) ·
+[Issues](https://github.com/VladyslavPilkevych/zerogravity-ui/issues)
 
 ## Installation
 
 ```bash
-pnpm add zerogravity-ui
+pnpm add zerogravity
 ```
 
-React and React DOM are peer dependencies:
-
-```json
-"react": "^18.2.0 || ^19.0.0",
-"react-dom": "^18.2.0 || ^19.0.0"
+```bash
+npm install zerogravity
 ```
-
-The package is **ESM only**. It needs a bundler that understands CSS imports —
-Vite, Next.js, Rspack, webpack 5 and Parcel all qualify. Importing it from plain
-Node without a bundler will fail on the CSS imports.
 
 ## Usage
 
 ```tsx
-import { Reel, SplitFlap } from "zerogravity-ui"
+import { Reel } from "zerogravity"
 
-export function Showcase() {
+export function Carousel() {
     return (
-        <>
-            <SplitFlap value="ARRIVALS" />
-            <Reel radius={20}>
-                <article>One</article>
-                <article>Two</article>
-                <article>Three</article>
-            </Reel>
-        </>
+        <Reel radius={20}>
+            <article>One</article>
+            <article>Two</article>
+            <article>Three</article>
+        </Reel>
     )
 }
 ```
 
 ### Direct component imports
 
-Every component also has its own entry point, so you can import it without going
-through the root barrel:
+Components can be imported from the root package or through an explicit
+per-component subpath:
 
 ```tsx
-import { Reel } from "zerogravity-ui/reel"
-import { SplitFlap } from "zerogravity-ui/split-flap"
+import { Reel } from "zerogravity"
+import { Reel } from "zerogravity/reel"
 ```
 
-Both styles produce the same bundle. The root barrel is a plain re-export and
-tree-shakes cleanly: a Vite production build importing only `SplitFlap` measures
-**3.2 kB of library code and 1.5 kB of CSS** on top of a React-only baseline,
-byte-identical whichever import form is used, with every other component and
-stylesheet absent. Those numbers come from `pnpm test:consumer`, which builds
-both apps against the packed tarball on every run rather than trusting that ESM
-implies tree shaking.
+Both resolve to the same module. The package preserves one file per module and
+marks its stylesheets as side effects, so bundlers can drop the components you
+do not use — the repository verifies this on every run by building a consumer
+app that imports a single component and asserting the others are absent.
 
-Reach for the subpath form when you prefer explicit module boundaries, not
-because it is smaller.
-
-The entry points are the seventeen components plus `pointer-fx`, spelled as
-the directory name:
-
-```text
-zerogravity-ui/antigravity      zerogravity-ui/meadow        zerogravity-ui/split-flap
-zerogravity-ui/aperture         zerogravity-ui/overprint     zerogravity-ui/stencil
-zerogravity-ui/diorama          zerogravity-ui/pointer-fx    zerogravity-ui/tessera
-zerogravity-ui/elemental        zerogravity-ui/reel          zerogravity-ui/trailing-cursor
-zerogravity-ui/grid-trail       zerogravity-ui/ricochet      zerogravity-ui/vellum
-zerogravity-ui/kern             zerogravity-ui/scroll-stack
-zerogravity-ui/lodestone
-```
-
-Nothing else is importable. Engines, geometry helpers, the shared `internal`
-modules and `dist/` paths have no entry point and never will — the package
-declares no wildcard exports, and the package check fails if one appears.
+The subpath is the directory name of the component, lowercased and hyphenated:
+`zerogravity/grid-trail`, `zerogravity/split-flap`, `zerogravity/trailing-cursor`.
+Nothing else is importable — engines, geometry helpers and internal modules have
+no entry point.
 
 ### Styles
 
-There is nothing to import. Each component imports its own stylesheet, and
-`sideEffects` in `package.json` marks those CSS files so bundlers keep them while
-still tree-shaking unused components — import two components and only their two
-stylesheets end up in your bundle.
+There is no global stylesheet to import. Each component imports its own CSS, and
+`sideEffects` in `package.json` marks those files so bundlers keep them while
+still tree-shaking unused components.
 
-Colours that are meant to be themed are exposed as CSS custom properties on the
-component root, so you override them with ordinary CSS:
+Colours meant to be themed are exposed as CSS custom properties on the component
+root, so you override them with ordinary CSS:
 
 ```css
 .my-carousel {
@@ -100,12 +80,13 @@ component root, so you override them with ordinary CSS:
 
 ### Next.js App Router
 
-Interactive components are compiled with their `"use client"` directive intact,
-so you can import and render them directly from a Server Component without
-marking your own page as a client component:
+Interactive components keep their `"use client"` boundaries in the published
+build, so you can render them directly from a Server Component without marking
+your own page as a client component. This is verified against a real Next.js 15
+App Router production build, including static prerendering.
 
 ```tsx
-import { Reel } from "zerogravity-ui"
+import { Reel } from "zerogravity"
 
 export default function Page() {
     return (
@@ -116,46 +97,72 @@ export default function Page() {
 }
 ```
 
-This is verified against a real Next.js 15 App Router production build, including
-static prerendering.
-
 ## Components
 
-| Component                                           |                                                                                                                                                                                |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Antigravity](src/lib/antigravity/README.md)        | Canvas particle cloud that follows the cursor, or stays put and scatters away from it. Eighteen formations including a 3-D planet, a DNA helix and a black hole accretion disc |
-| [Aperture](src/lib/aperture/README.md)              | Full-bleed panel that closes into a framed card as you scroll, driven by `clip-path`                                                                                           |
-| [Diorama](src/lib/diorama/README.md)                | Layered planes that part around the pointer for a parallax depth effect                                                                                                        |
-| [Elemental](src/lib/elemental/README.md)            | Animated border that wraps any content: a crackling electric edge or a burning one                                                                                             |
-| [GridTrail](src/lib/grid-trail/README.md)           | Grid cells light up under the pointer and fade out. Viewport-wide or scoped to a container                                                                                     |
-| [Kern](src/lib/kern/README.md)                      | Glyphs that open up, lift and gain weight as the pointer passes them                                                                                                           |
-| [Lodestone](src/lib/lodestone/README.md)            | Magnetic buttons that lean toward the cursor without ever overlapping each other                                                                                               |
-| [Meadow](src/lib/meadow/README.md)                  | Illustrated scene that shifts with the time of day, plus an explicit space theme                                                                                               |
-| [Overprint](src/lib/overprint/README.md)            | Misregistered colour separations that converge as the section scrolls into place                                                                                               |
-| [Reel](src/lib/reel/README.md)                      | Roulette-style carousel with drag, flick, wheel, keyboard and a highlighted centre slide                                                                                       |
-| [ScrollStack](src/lib/scroll-stack/README.md)       | Sections that slide over each other on scroll and unstack on the way back                                                                                                      |
-| [Ricochet](src/lib/ricochet/README.md)              | Playable Breakout and shooter modes that demolish pixel text, with power-ups                                                                                                   |
-| [SplitFlap](src/lib/split-flap/README.md)           | Airport board that flips one character at a time. Text, clock or countdown                                                                                                     |
-| [Stencil](src/lib/stencil/README.md)                | Display type with a pattern showing through the letters, and per-letter hover effects                                                                                          |
-| [Tessera](src/lib/tessera/README.md)                | Router-agnostic page-transition overlay that covers, swaps the route, then reveals                                                                                             |
-| [TrailingCursor](src/lib/trailing-cursor/README.md) | Dot pinned to the pointer plus a lagging ring, with per-element `data-cursor-*` overrides                                                                                      |
-| [Vellum](src/lib/vellum/README.md)                  | Paper-like surface that lifts and catches light under the pointer                                                                                                              |
-| [pointer-fx](src/lib/pointer-fx/README.md)          | Shared colour resolution and the reduced-motion / pointer-type gate. No component of its own                                                                                   |
+| Component                                           | Description                                                                    |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [Antigravity](src/lib/antigravity/README.md)        | A particle field that flows around the cursor and settles into formations      |
+| [Aperture](src/lib/aperture/README.md)              | A full-bleed panel that closes into a framed card as you scroll, or opens      |
+| [Diorama](src/lib/diorama/README.md)                | Depth layers that part as the pointer moves, letting you see past the front    |
+| [Elemental](src/lib/elemental/README.md)            | An animated edge that wraps any content in electricity or fire                 |
+| [GridTrail](src/lib/grid-trail/README.md)           | A pointer trail that lights cells on an invisible grid, then stops the loop    |
+| [Kern](src/lib/kern/README.md)                      | Glyphs that open up, lift and gain weight as the pointer passes them           |
+| [Lodestone](src/lib/lodestone/README.md)            | Magnetic buttons that lean toward the pointer but never overlap each other     |
+| [Meadow](src/lib/meadow/README.md)                  | A living pastel hero scene that drifts and flutters around your content        |
+| [Overprint](src/lib/overprint/README.md)            | Colour separations that misregister on scroll and converge back into register  |
+| [Reel](src/lib/reel/README.md)                      | A roulette-style carousel you can drag, flick, scroll sideways or step         |
+| [Ricochet](src/lib/ricochet/README.md)              | Destructible pixel text with breakout or shooter play                          |
+| [ScrollStack](src/lib/scroll-stack/README.md)       | Sections that slide over each other on scroll, and unstack back                |
+| [SplitFlap](src/lib/split-flap/README.md)           | An airport board that flips one character at a time: text, clock or countdown  |
+| [Stencil](src/lib/stencil/README.md)                | Display type filled with stripes, checks, gradients, an image or video         |
+| [Tessera](src/lib/tessera/README.md)                | A tiled route transition: tiles cover the viewport, the route swaps, they lift |
+| [TrailingCursor](src/lib/trailing-cursor/README.md) | A dot pinned to the pointer and a ring that lags, grows and recolours          |
+| [Vellum](src/lib/vellum/README.md)                  | A sheet that leans toward the pointer, with an optional dent and sheen         |
+| [pointer-fx](src/lib/pointer-fx/README.md)          | Shared colour resolution and the reduced-motion / pointer-type gate            |
 
-Every component README carries the full prop table, accessibility notes and
+Each component README carries the full prop table, accessibility notes and
 performance characteristics.
 
-### Dependencies
+A few prototypes — Facet, Louvre, Raster, Wash and the pixel loaders — live in
+`src/lib/experimental` and have documentation pages, but they are **not part of
+the published package** and cannot be imported from `zerogravity`.
 
-The package has **no runtime dependencies**. React and React DOM are peers;
-nothing else is installed alongside it.
+## Requirements
 
-### Environment requirements
+React and React DOM are peer dependencies:
+
+```json
+"react": "^18.2.0 || ^19.0.0",
+"react-dom": "^18.2.0 || ^19.0.0"
+```
+
+The package has no runtime dependencies of its own.
+
+It is **ESM only** and needs a bundler that understands CSS imports — Vite,
+Next.js, Rspack, webpack 5 and Parcel all qualify. Importing it from plain Node
+without a bundler will fail on the stylesheet imports.
+
+The `engines` field in `package.json` (Node 22, pnpm 10) applies to developing
+this repository. It is not a requirement for applications that install the
+package.
 
 Components degrade instead of throwing when a browser API is missing:
 `ResizeObserver` and `IntersectionObserver` are feature-detected, and Antigravity
 skips its engine when a 2D canvas context is unavailable. Server rendering and
 jsdom-based test suites therefore need no polyfills.
+
+## Naming
+
+**ZeroGravity UI** is the project. The npm package is published as
+[`zerogravity`](https://www.npmjs.com/package/zerogravity), and the repository
+is [`zerogravity-ui`](https://github.com/VladyslavPilkevych/zerogravity-ui).
+
+## Links
+
+- [npm package](https://www.npmjs.com/package/zerogravity)
+- [Source repository](https://github.com/VladyslavPilkevych/zerogravity-ui)
+- [Issues](https://github.com/VladyslavPilkevych/zerogravity-ui/issues)
+- [Changelog](CHANGELOG.md)
 
 ## Versioning
 
@@ -302,30 +309,15 @@ cannot silently regress.
 
 The release process is documented in [CONTRIBUTING.md](CONTRIBUTING.md#releasing).
 
-## Release blockers
+## Release status
 
-Everything the repository controls is ready. What is left cannot be decided from
-inside it:
+`0.1.0` is published as [`zerogravity`](https://www.npmjs.com/package/zerogravity).
+The name `zerogravity-ui` was already taken on npm by an unrelated package, so
+the shorter name was claimed instead; the repository keeps its original slug.
 
-1. **The package name is taken.** `zerogravity-ui` exists on npm — version
-   `0.0.6`, published by a different author — so this package cannot be
-   published under that name. Verified against the registry, not assumed. The
-   owner has to either claim a free name and update `name` in `package.json`
-   plus the install instructions above, or take over the existing one.
-   `@zerogravity/ui` and `zerogravity` were both unregistered when this was
-   checked; a scoped name already matches the `publishConfig.access: public`
-   setting in `package.json`. No name has been chosen here on purpose —
-   switching it silently would be the wrong call to make on someone's behalf.
-2. **npm publish rights.** An npm account with 2FA enabled, and ownership of
-   whichever name is settled on.
-
-`private: true` stays in `package.json` until the first is resolved. It is the
-only thing standing between this repository and `npm publish`, and it is
-deliberate: with an unavailable name, publishing would fail anyway, and the flag
-makes that failure a local one rather than a half-finished release.
-
-Not blockers: a custom domain (the docs site can keep deploying to its current
-host) and a Chromatic token (CI reports the visual job as skipped without one).
+The release process is in [CONTRIBUTING.md](CONTRIBUTING.md#releasing). A custom
+docs domain is still unconfigured, and CI reports the Chromatic visual job as
+skipped until `CHROMATIC_PROJECT_TOKEN` is set — neither blocks a release.
 
 ## Adding a component
 

@@ -1,9 +1,9 @@
 import { createRoot } from "react-dom/client"
 
-import { Antigravity, Reel, SplitFlap, Stencil, TrailingCursor } from "zerogravity-ui"
-import { Aperture } from "zerogravity-ui/aperture"
-import { GridTrail } from "zerogravity-ui/grid-trail"
-import { Elemental } from "zerogravity-ui/elemental"
+import { Antigravity, Reel, SplitFlap, Stencil, TrailingCursor } from "zerogravity"
+import { Aperture } from "zerogravity/aperture"
+import { GridTrail } from "zerogravity/grid-trail"
+import { Elemental } from "zerogravity/elemental"
 
 export function App() {
     return (

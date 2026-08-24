@@ -5,7 +5,7 @@ import { COMPONENTS, REPOSITORY_URL } from "@/docs/registry"
 
 const FEATURED = ["antigravity", "scroll-stack", "reel", "meadow", "raster", "ricochet"]
 
-const EXAMPLE = `import { ScrollStack } from "zerogravity-ui"
+const EXAMPLE = `import { ScrollStack } from "zerogravity"
 
 <ScrollStack top={72} peek={18}>
     <article>Sticky, not scripted</article>

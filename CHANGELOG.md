@@ -7,12 +7,29 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
 
-## [0.1.0] - Unreleased
+- The README shipped with `0.1.0` still called the package `zerogravity-ui` and
+  told readers to run `pnpm add zerogravity-ui`, which installs an unrelated
+  package by another author. Every install command, import example and generated
+  usage snippet now uses `zerogravity`. Worth a patch release on its own: the
+  npm page is the first thing a reader sees, and it currently points at the
+  wrong package.
 
-First public release. Not yet published to npm — see the release blockers in the
-README before tagging.
+### Changed
+
+- README rewritten for someone arriving from npm: what the project is, the
+  package name, install, a working example, subpath imports, and the component
+  table, before any repository detail.
+- `description` and `keywords` in `package.json` reworded for the npm listing.
+
+## [0.1.0]
+
+First public release, published to npm as
+[`zerogravity`](https://www.npmjs.com/package/zerogravity). The project is
+ZeroGravity UI and the repository is `zerogravity-ui`; the shorter package name
+was claimed because `zerogravity-ui` was already taken on npm by an unrelated
+package.
 
 ### Added
 
@@ -24,7 +41,7 @@ README before tagging.
 - `Diorama`, `Elemental`, `Kern`, `Lodestone`, `Meadow`, `Overprint`,
   `Ricochet`, `Tessera` and `Vellum` graduated out of the experimental folder
   into the published surface, each with its own entry point.
-- Per-component entry points, so `import { Reel } from "zerogravity-ui/reel"`
+- Per-component entry points, so `import { Reel } from "zerogravity/reel"`
   works alongside the root barrel. The export map is derived from the library
   directories and verified on every package check, so an entry point cannot go
   missing and an internal path cannot appear.

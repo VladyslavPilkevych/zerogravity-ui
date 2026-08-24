@@ -9,9 +9,9 @@ import {
     Stencil,
     TrailingCursor,
     resolveAntigravityConfig,
-} from "zerogravity-ui"
-import { Aperture } from "zerogravity-ui/aperture"
-import { Elemental } from "zerogravity-ui/elemental"
+} from "zerogravity"
+import { Aperture } from "zerogravity/aperture"
+import { Elemental } from "zerogravity/elemental"
 
 export default function Page() {
     const config = resolveAntigravityConfig(ANTIGRAVITY_PRESETS[0].options)

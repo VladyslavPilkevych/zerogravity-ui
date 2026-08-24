@@ -123,7 +123,7 @@ function viteConsumer(tarball) {
             .join("")
         const missing = [".aperture", ".grid-trail"].filter((rule) => !css.includes(rule))
         if (missing.length) throw new Error(`subpath styles missing: ${missing.join(", ")}`)
-        return "zerogravity-ui/aperture and /grid-trail"
+        return "zerogravity/aperture and /grid-trail"
     })
 
     step("vite: styles reach the consumer bundle", () => {

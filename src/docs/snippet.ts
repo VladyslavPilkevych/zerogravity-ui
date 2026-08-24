@@ -2,7 +2,7 @@ import { propLines } from "@/playground/panel/codegen"
 
 import type { DocEntry } from "./types"
 
-const PACKAGE = "zerogravity-ui"
+const PACKAGE = "zerogravity"
 
 /**
  * The single generated example. It reads the same defaults and the same live

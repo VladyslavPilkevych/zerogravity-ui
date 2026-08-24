@@ -23,7 +23,7 @@ describe("snippetFor", () => {
     it("adds an import line for published components", () => {
         const code = snippetFor(reel, { ...reel.defaults, radius: 40 })
 
-        expect(code.startsWith('import { Reel } from "zerogravity-ui"')).toBe(true)
+        expect(code.startsWith('import { Reel } from "zerogravity"')).toBe(true)
     })
 
     it("leaves the import out of experimental components", () => {
@@ -73,7 +73,7 @@ describe("snippetFor", () => {
 
     it("keeps the children even with no changed props", () => {
         expect(snippetFor(meadow, meadow.defaults)).toBe(
-            'import { Meadow } from "zerogravity-ui"\n\n<Meadow>\n    <div>Hero copy</div>\n</Meadow>',
+            'import { Meadow } from "zerogravity"\n\n<Meadow>\n    <div>Hero copy</div>\n</Meadow>',
         )
     })
 
@@ -83,7 +83,7 @@ describe("snippetFor", () => {
         // experimental components have no entry point to import them from
         expect(snippetFor(raster, raster.defaults)).not.toContain("import")
         expect(snippetFor(meadow, meadow.defaults)).toContain(
-            'import { Meadow } from "zerogravity-ui"',
+            'import { Meadow } from "zerogravity"',
         )
     })
 

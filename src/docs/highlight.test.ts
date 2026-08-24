@@ -8,7 +8,7 @@ function types(code: string) {
 
 describe("tokenize", () => {
     it("keeps the source intact", () => {
-        const code = 'import { Reel } from "zerogravity-ui"\n\n<Reel radius={20} loop />'
+        const code = 'import { Reel } from "zerogravity"\n\n<Reel radius={20} loop />'
 
         expect(
             tokenize(code)
@@ -22,8 +22,8 @@ describe("tokenize", () => {
         expect(types('import { Reel } from "x"')).toContain("keyword:from")
     })
 
-    it("keeps a hyphenated package name in one string token", () => {
-        expect(types('from "zerogravity-ui"')).toContain('string:"zerogravity-ui"')
+    it("keeps a hyphenated subpath specifier in one string token", () => {
+        expect(types('from "zerogravity/grid-trail"')).toContain('string:"zerogravity/grid-trail"')
     })
 
     it("marks tags and attributes", () => {
