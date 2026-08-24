@@ -1,7 +1,7 @@
 {
-    "name": "zerogravity-ui",
+    "name": "zerogravity",
     "version": "0.1.0",
-    "private": true,
+    "private": false,
     "description": "Motion-first React components: particle fields, animated borders, illustrated scenes, scroll framing, carousels and display type.",
     "keywords": [
         "react",
