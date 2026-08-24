@@ -279,11 +279,26 @@ Do not run `pnpm build` while `pnpm dev` is running — both write to `.next`.
 
 ### Library build
 
-`pnpm build:lib` runs [tsup](https://tsup.egoist.dev/) in preserved-module mode:
-every source file becomes one ESM file in `dist/`, with declarations and source
-maps. Nothing is bundled, which is what keeps `"use client"` attached to the
-individual client modules instead of collapsing the whole library into one client
-boundary. CSS files are copied next to the modules that import them.
+`pnpm build:lib` is three steps:
+
+1. [tsup](https://tsup.egoist.dev/) in preserved-module mode — every source file
+   becomes one ESM file in `dist/`, with source maps. Nothing is bundled, which
+   is what keeps `"use client"` attached to the individual client modules
+   instead of collapsing the whole library into one client boundary. CSS files
+   are copied next to the modules that import them.
+2. `tsc -p tsconfig.build.json` for the declarations, one per module.
+3. `scripts/declaration-extensions.mjs`, which gives the relative specifiers in
+   those declarations explicit `.js` paths and drops the stylesheet imports TypeScript
+   copies into them. Node16 resolution has no directory lookup, so without this
+   step every entry point is a dead end for a consumer.
+
+tsup can emit the declarations itself, and used to. Its dts pass flattens the
+whole type graph in a worker thread: it peaked at 2.1 GB and failed outright on
+smaller machines, with an error that named no file. `tsc` produces the same
+public surface from the same config in a fifth of the memory and a quarter of
+the time, and points at a line when something is wrong. Are The Types Wrong runs
+against the packed tarball on every `pnpm check:package`, so the rewrite step
+cannot silently regress.
 
 The release process is documented in [CONTRIBUTING.md](CONTRIBUTING.md#releasing).
 

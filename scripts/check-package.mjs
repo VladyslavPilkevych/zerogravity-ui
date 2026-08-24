@@ -74,6 +74,40 @@ step("tarball ships declarations and stylesheets", () => {
     return `${declarations} declarations, ${styles} stylesheets`
 })
 
+step("every module ships its declaration", () => {
+    // modules are preserved one-to-one, so a half-finished type build shows up
+    // here as a count mismatch rather than as a consumer's missing import
+    const strip = (suffix) =>
+        new Set(
+            entries
+                .filter((entry) => entry.endsWith(suffix))
+                .map((entry) => entry.slice(0, -suffix.length)),
+        )
+    const js = strip(".js")
+    const types = strip(".d.ts")
+    const untyped = [...js].filter((name) => !types.has(name))
+    if (untyped.length) throw new Error(`modules with no .d.ts: ${untyped.slice(0, 5).join(", ")}`)
+    return `${js.size} modules, all typed`
+})
+
+step("every shipped stylesheet belongs to a shipped module", () => {
+    // a stylesheet only a story imported used to ride along unnoticed
+    const styles = entries.filter((entry) => entry.endsWith(".css"))
+    const code = entries
+        .filter((entry) => entry.endsWith(".js"))
+        .map((entry) =>
+            readFileSync(
+                path.join(REPO_ROOT, "dist", entry.replace(/^package\/dist\//, "")),
+                "utf8",
+            ),
+        )
+        .join("\n")
+
+    const orphans = styles.filter((entry) => !code.includes(`/${path.basename(entry)}"`))
+    if (orphans.length) throw new Error(`unimported stylesheets: ${orphans.join(", ")}`)
+    return `${styles.length} stylesheets, all imported`
+})
+
 step("publint reports no packaging problems", () => {
     execFileSync("npx", ["publint", "--strict", tarball], {
         cwd: REPO_ROOT,

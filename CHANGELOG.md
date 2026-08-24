@@ -45,6 +45,12 @@ README before tagging.
 
 ### Changed
 
+- Declarations are emitted by `tsc` instead of tsup's dts pass, then given
+  explicit `.js` specifiers by a build step. tsup's worker flattened the whole
+  type graph, needed over 2 GB and failed on smaller machines with an error that
+  named no file; the build now peaks around 400 MB and runs in a quarter of the
+  time. The published type surface is unchanged, and Are The Types Wrong checks
+  it against the packed tarball on every package check.
 - `Aperture` and `Louvre` size their sticky pane from `--aperture-viewport` /
   `--louvre-viewport`, defaulting to `100vh`. Without this a component driven
   through `scrollContainer` rendered a viewport-tall pane inside a short box, so
@@ -55,6 +61,11 @@ README before tagging.
   pulls a framework in behind it.
 
 ### Fixed
+
+- The published package no longer carries a stylesheet that only a Storybook
+  story imported, and declarations no longer contain `import "./Component.css"`
+  lines, which resolved to nothing and broke type resolution for every entry
+  point under Node16.
 
 - `Reel`: the hover highlight on the centre slide painted a square hairline ring
   around rounded cards, because the shadow was drawn on a wrapper with no border

@@ -128,7 +128,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "build:lib": "tsup",
+        "build:lib": "tsup && tsc -p tsconfig.build.json && node scripts/declaration-extensions.mjs",
         "start": "next start",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
