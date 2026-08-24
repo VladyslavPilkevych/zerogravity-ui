@@ -1,7 +1,7 @@
 "use client"
 
-import { Elemental, ELEMENTAL_VARIANTS } from "@/lib/experimental"
-import type { ElementalVariant } from "@/lib/experimental"
+import { Elemental, ELEMENTAL_VARIANTS } from "@/lib"
+import type { ElementalVariant } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 const BLURB: Record<ElementalVariant, string> = {

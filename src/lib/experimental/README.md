@@ -10,8 +10,12 @@ Import them through the experimental barrel only:
 import { Facet, Lodestone } from "@/lib/experimental"
 ```
 
-The batch is Lodestone, Facet, Vellum, Kern, Overprint, Louvre, Diorama, Wash,
-Tessera, Meadow, Raster, Ricochet, Elemental and the pixel loaders.
+What is left is Facet, Louvre, Raster, Wash and the pixel loaders, plus `Kbd`,
+which exists for the documentation site's search hint and is not a component in
+its own right.
+
+Lodestone, Vellum, Diorama, Elemental, Kern, Overprint, Meadow, Tessera and
+Ricochet graduated in `0.1.0` and now live directly under `src/lib`.
 
 Each has a documentation page under `/docs/<name>` and stories under
 `Experimental/*`. Deleting a rejected prototype means deleting its folder and its

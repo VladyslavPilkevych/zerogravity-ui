@@ -1,6 +1,6 @@
 "use client"
 
-import { Diorama } from "@/lib/experimental"
+import { Diorama } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function DioramaPreview({ config }: PreviewApi) {

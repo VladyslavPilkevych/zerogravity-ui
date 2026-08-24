@@ -2,7 +2,7 @@
     "name": "zerogravity-ui",
     "version": "0.1.0",
     "private": true,
-    "description": "Motion-first React components: particle fields, scroll framing, carousels and display type.",
+    "description": "Motion-first React components: particle fields, animated borders, illustrated scenes, scroll framing, carousels and display type.",
     "keywords": [
         "react",
         "nextjs",
@@ -12,7 +12,11 @@
         "cursor",
         "scroll",
         "carousel",
-        "particles"
+        "particles",
+        "border",
+        "svg",
+        "pointer",
+        "transition"
     ],
     "license": "MIT",
     "repository": {
@@ -38,9 +42,33 @@
             "types": "./dist/aperture/index.d.ts",
             "import": "./dist/aperture/index.js"
         },
+        "./diorama": {
+            "types": "./dist/diorama/index.d.ts",
+            "import": "./dist/diorama/index.js"
+        },
+        "./elemental": {
+            "types": "./dist/elemental/index.d.ts",
+            "import": "./dist/elemental/index.js"
+        },
         "./grid-trail": {
             "types": "./dist/grid-trail/index.d.ts",
             "import": "./dist/grid-trail/index.js"
+        },
+        "./kern": {
+            "types": "./dist/kern/index.d.ts",
+            "import": "./dist/kern/index.js"
+        },
+        "./lodestone": {
+            "types": "./dist/lodestone/index.d.ts",
+            "import": "./dist/lodestone/index.js"
+        },
+        "./meadow": {
+            "types": "./dist/meadow/index.d.ts",
+            "import": "./dist/meadow/index.js"
+        },
+        "./overprint": {
+            "types": "./dist/overprint/index.d.ts",
+            "import": "./dist/overprint/index.js"
         },
         "./pointer-fx": {
             "types": "./dist/pointer-fx/index.d.ts",
@@ -49,6 +77,10 @@
         "./reel": {
             "types": "./dist/reel/index.d.ts",
             "import": "./dist/reel/index.js"
+        },
+        "./ricochet": {
+            "types": "./dist/ricochet/index.d.ts",
+            "import": "./dist/ricochet/index.js"
         },
         "./scroll-stack": {
             "types": "./dist/scroll-stack/index.d.ts",
@@ -62,9 +94,17 @@
             "types": "./dist/stencil/index.d.ts",
             "import": "./dist/stencil/index.js"
         },
+        "./tessera": {
+            "types": "./dist/tessera/index.d.ts",
+            "import": "./dist/tessera/index.js"
+        },
         "./trailing-cursor": {
             "types": "./dist/trailing-cursor/index.d.ts",
             "import": "./dist/trailing-cursor/index.js"
+        },
+        "./vellum": {
+            "types": "./dist/vellum/index.d.ts",
+            "import": "./dist/vellum/index.js"
         },
         "./package.json": "./package.json"
     },

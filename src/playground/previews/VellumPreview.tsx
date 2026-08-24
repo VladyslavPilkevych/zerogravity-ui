@@ -1,6 +1,6 @@
 "use client"
 
-import { Vellum } from "@/lib/experimental"
+import { Vellum } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"

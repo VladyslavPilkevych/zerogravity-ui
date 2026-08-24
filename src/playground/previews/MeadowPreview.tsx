@@ -1,7 +1,7 @@
 "use client"
 
-import { Meadow } from "@/lib/experimental"
-import type { MeadowDensity, MeadowTheme } from "@/lib/experimental"
+import { Meadow } from "@/lib"
+import type { MeadowDensity, MeadowTheme } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function MeadowPreview({ config }: PreviewApi) {

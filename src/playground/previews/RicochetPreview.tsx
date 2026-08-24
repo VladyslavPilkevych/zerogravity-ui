@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 
-import { Ricochet } from "@/lib/experimental"
-import type { RicochetMode, RicochetVariant } from "@/lib/experimental"
+import { Ricochet } from "@/lib"
+import type { RicochetMode, RicochetVariant } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function RicochetPreview({ config }: PreviewApi) {

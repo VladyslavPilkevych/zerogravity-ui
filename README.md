@@ -1,8 +1,8 @@
 # zerogravity-ui
 
-Motion-first React components — particle fields, scroll framing, carousels and
-display type. Every component ships its own styles, stops animating when idle,
-and honours `prefers-reduced-motion`.
+Motion-first React components — particle fields, animated borders, illustrated
+scenes, scroll framing, carousels and display type. Every component ships its
+own styles, stops animating when idle, and honours `prefers-reduced-motion`.
 
 > **Not published yet.** The package name is still unresolved — see
 > [Release blockers](#release-blockers). Everything below describes the package
@@ -65,15 +65,17 @@ implies tree shaking.
 Reach for the subpath form when you prefer explicit module boundaries, not
 because it is smaller.
 
-The entry points are the nine components plus `pointer-fx`, spelled as the
-directory name:
+The entry points are the seventeen components plus `pointer-fx`, spelled as
+the directory name:
 
 ```text
-zerogravity-ui/antigravity      zerogravity-ui/split-flap
-zerogravity-ui/aperture         zerogravity-ui/stencil
-zerogravity-ui/grid-trail       zerogravity-ui/trailing-cursor
-zerogravity-ui/reel             zerogravity-ui/pointer-fx
-zerogravity-ui/scroll-stack
+zerogravity-ui/antigravity      zerogravity-ui/meadow        zerogravity-ui/split-flap
+zerogravity-ui/aperture         zerogravity-ui/overprint     zerogravity-ui/stencil
+zerogravity-ui/diorama          zerogravity-ui/pointer-fx    zerogravity-ui/tessera
+zerogravity-ui/elemental        zerogravity-ui/reel          zerogravity-ui/trailing-cursor
+zerogravity-ui/grid-trail       zerogravity-ui/ricochet      zerogravity-ui/vellum
+zerogravity-ui/kern             zerogravity-ui/scroll-stack
+zerogravity-ui/lodestone
 ```
 
 Nothing else is importable. Engines, geometry helpers, the shared `internal`
@@ -123,12 +125,21 @@ static prerendering.
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [Antigravity](src/lib/antigravity/README.md)        | Canvas particle cloud that follows the cursor, or stays put and scatters away from it. Eighteen formations including a 3-D planet, a DNA helix and a black hole accretion disc |
 | [Aperture](src/lib/aperture/README.md)              | Full-bleed panel that closes into a framed card as you scroll, driven by `clip-path`                                                                                           |
+| [Diorama](src/lib/diorama/README.md)                | Layered planes that part around the pointer for a parallax depth effect                                                                                                        |
+| [Elemental](src/lib/elemental/README.md)            | Animated border that wraps any content: a crackling electric edge or a burning one                                                                                             |
 | [GridTrail](src/lib/grid-trail/README.md)           | Grid cells light up under the pointer and fade out. Viewport-wide or scoped to a container                                                                                     |
+| [Kern](src/lib/kern/README.md)                      | Glyphs that open up, lift and gain weight as the pointer passes them                                                                                                           |
+| [Lodestone](src/lib/lodestone/README.md)            | Magnetic buttons that lean toward the cursor without ever overlapping each other                                                                                               |
+| [Meadow](src/lib/meadow/README.md)                  | Illustrated scene that shifts with the time of day, plus an explicit space theme                                                                                               |
+| [Overprint](src/lib/overprint/README.md)            | Misregistered colour separations that converge as the section scrolls into place                                                                                               |
 | [Reel](src/lib/reel/README.md)                      | Roulette-style carousel with drag, flick, wheel, keyboard and a highlighted centre slide                                                                                       |
 | [ScrollStack](src/lib/scroll-stack/README.md)       | Sections that slide over each other on scroll and unstack on the way back                                                                                                      |
+| [Ricochet](src/lib/ricochet/README.md)              | Playable Breakout and shooter modes that demolish pixel text, with power-ups                                                                                                   |
 | [SplitFlap](src/lib/split-flap/README.md)           | Airport board that flips one character at a time. Text, clock or countdown                                                                                                     |
 | [Stencil](src/lib/stencil/README.md)                | Display type with a pattern showing through the letters, and per-letter hover effects                                                                                          |
+| [Tessera](src/lib/tessera/README.md)                | Router-agnostic page-transition overlay that covers, swaps the route, then reveals                                                                                             |
 | [TrailingCursor](src/lib/trailing-cursor/README.md) | Dot pinned to the pointer plus a lagging ring, with per-element `data-cursor-*` overrides                                                                                      |
+| [Vellum](src/lib/vellum/README.md)                  | Paper-like surface that lifts and catches light under the pointer                                                                                                              |
 | [pointer-fx](src/lib/pointer-fx/README.md)          | Shared colour resolution and the reduced-motion / pointer-type gate. No component of its own                                                                                   |
 
 Every component README carries the full prop table, accessibility notes and

@@ -153,7 +153,18 @@ function viteConsumer(tarball) {
     rmSync(dir, { recursive: true, force: true })
 }
 
-const HEAVY = ["Antigravity", "GridTrail", "ScrollStack", "TrailingCursor", "Aperture", "Reel"]
+const HEAVY = [
+    "Antigravity",
+    "GridTrail",
+    "ScrollStack",
+    "TrailingCursor",
+    "Aperture",
+    "Reel",
+    "Meadow",
+    "Ricochet",
+    "Elemental",
+    "Diorama",
+]
 
 /**
  * `entry` picks the import style, so the same assertions cover the root barrel
@@ -210,7 +221,7 @@ function treeShakingConsumer(tarball, label, entry) {
             .filter((file) => file.endsWith(".css"))
             .map((file) => readFileSync(path.join(dir, "dist", "assets", file), "utf8"))
             .join("")
-        if (css.includes("antigravity") || css.includes("reel-item")) {
+        if (css.includes("antigravity") || css.includes("reel-item") || css.includes("meadow")) {
             throw new Error("unused component CSS pulled in")
         }
 
@@ -302,7 +313,7 @@ function nextConsumer(tarball) {
         const manifest = JSON.parse(
             readFileSync(path.join(dir, "node_modules", PKG, "package.json"), "utf8"),
         )
-        for (const blocked of ["./internal", "./reel/engine", "./dist/index.js", "./meadow"]) {
+        for (const blocked of ["./internal", "./reel/engine", "./dist/index.js", "./raster"]) {
             if (manifest.exports[blocked]) throw new Error(`${blocked} is exported`)
         }
         return "internal, engine and prototype paths blocked"

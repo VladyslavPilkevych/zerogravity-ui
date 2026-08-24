@@ -102,7 +102,9 @@ step("the package declares no runtime dependencies", () => {
 step("package size stays within the tracked baseline", () => {
     const bytes = statSync(tarball).size
     const kb = bytes / 1024
-    if (kb > 250) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 250 kB)`)
+    // Raised from 250 kB when nine prototypes were promoted, roughly doubling
+    // the component count. Headroom for polish, not for a second doubling.
+    if (kb > 320) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 320 kB)`)
     return `${kb.toFixed(0)} kB tarball`
 })
 

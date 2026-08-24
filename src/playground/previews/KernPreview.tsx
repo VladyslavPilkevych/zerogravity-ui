@@ -1,6 +1,6 @@
 "use client"
 
-import { Kern } from "@/lib/experimental"
+import { Kern } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function KernPreview({ config }: PreviewApi) {

@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 
-import { TesseraProvider, useTessera, useTesseraPhase } from "@/lib/experimental"
-import type { TesseraSequence } from "@/lib/experimental"
+import { TesseraProvider, useTessera, useTesseraPhase } from "@/lib"
+import type { TesseraSequence } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 const PAGES = [

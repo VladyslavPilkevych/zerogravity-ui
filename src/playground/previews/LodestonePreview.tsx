@@ -1,6 +1,6 @@
 "use client"
 
-import { Lodestone } from "@/lib/experimental"
+import { Lodestone } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function LodestonePreview({ config }: PreviewApi) {

@@ -73,7 +73,17 @@ describe("snippetFor", () => {
 
     it("keeps the children even with no changed props", () => {
         expect(snippetFor(meadow, meadow.defaults)).toBe(
-            "<Meadow>\n    <div>Hero copy</div>\n</Meadow>",
+            'import { Meadow } from "zerogravity-ui"\n\n<Meadow>\n    <div>Hero copy</div>\n</Meadow>',
+        )
+    })
+
+    it("omits the import for a component that is not published yet", () => {
+        const raster = findComponent("raster")!
+
+        // experimental components have no entry point to import them from
+        expect(snippetFor(raster, raster.defaults)).not.toContain("import")
+        expect(snippetFor(meadow, meadow.defaults)).toContain(
+            'import { Meadow } from "zerogravity-ui"',
         )
     })
 

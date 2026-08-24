@@ -17,9 +17,13 @@ README before tagging.
 ### Added
 
 - MIT licence and a root `LICENSE` file, shipped with the package.
-- Nine components: `Antigravity`, `Aperture`, `GridTrail`, `Reel`,
-  `ScrollStack`, `SplitFlap`, `Stencil`, `TrailingCursor`, and the shared
-  `pointer-fx` utilities.
+- Seventeen components: `Antigravity`, `Aperture`, `Diorama`, `Elemental`,
+  `GridTrail`, `Kern`, `Lodestone`, `Meadow`, `Overprint`, `Reel`, `Ricochet`,
+  `ScrollStack`, `SplitFlap`, `Stencil`, `Tessera`, `TrailingCursor`, `Vellum`,
+  and the shared `pointer-fx` utilities.
+- `Diorama`, `Elemental`, `Kern`, `Lodestone`, `Meadow`, `Overprint`,
+  `Ricochet`, `Tessera` and `Vellum` graduated out of the experimental folder
+  into the published surface, each with its own entry point.
 - Per-component entry points, so `import { Reel } from "zerogravity-ui/reel"`
   works alongside the root barrel. The export map is derived from the library
   directories and verified on every package check, so an entry point cannot go

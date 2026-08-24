@@ -1,6 +1,6 @@
 "use client"
 
-import { Overprint } from "@/lib/experimental"
+import { Overprint } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"
