@@ -1,6 +1,6 @@
 {
     "name": "zerogravity",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "private": false,
     "description": "Motion-first React components: pointer effects, scroll interactions, animated borders, display typography and illustrated scenes.",
     "keywords": [
