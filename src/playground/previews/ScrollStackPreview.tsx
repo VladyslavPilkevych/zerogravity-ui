@@ -32,11 +32,12 @@ export function ScrollStackPreview({ config }: PreviewApi) {
         <ScrollPort>
             {(port) => (
                 <>
-                    <div className="pg-lead">
+                    <div className="pg-lead pg-lead-short">
                         <Hint>Scroll</Hint>
                     </div>
 
                     <ScrollStack
+                        className="pg-deck"
                         scrollContainer={port}
                         height={c.height}
                         heights={heights}
@@ -69,7 +70,7 @@ export function ScrollStackPreview({ config }: PreviewApi) {
                         ))}
                     </ScrollStack>
 
-                    <div className="pg-lead" />
+                    <div className="pg-lead pg-lead-short" />
                 </>
             )}
         </ScrollPort>

@@ -56,3 +56,20 @@ The dimming overlay is decorative and marked `aria-hidden`. Under
 `prefers-reduced-motion: reduce` progress is pinned to 0, so the panel renders
 full-bleed and static, and `onProgress` reports 0. Content inside the panel is
 untouched and stays fully focusable.
+
+## Driving it from a bounded scroller
+
+`scrollContainer` points the component at a scrollable element instead of the
+page. One thing has to move with it: the sticky pane is `100vh` by default,
+which is taller than the box you are looking through, so you would only ever see
+a crop. Override `--aperture-viewport` with the height of that element:
+
+```css
+.my-scroller {
+    container-type: size;
+    --aperture-viewport: 100cqh;
+}
+```
+
+`cqh` is the tidiest way to say it — the pane then tracks the scroller at any
+size. A fixed `px` height works just as well.

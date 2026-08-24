@@ -4,10 +4,11 @@
     width: 100%;
 }
 
+/* Override when the blinds are driven from a bounded scroller. */
 .xp-louvre-viewport {
     position: sticky;
     top: 0;
-    height: 100vh;
+    height: var(--louvre-viewport, 100vh);
     overflow: hidden;
 }
 

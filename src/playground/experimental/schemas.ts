@@ -14,13 +14,13 @@ export const PALETTES = {
 }
 
 export const LOUVRE_DEFAULTS = {
-    slats: 10,
+    slats: 8,
     orientation: "horizontal",
-    phase: 0.55,
-    perspective: 1400,
-    gap: 0,
-    shade: 0.55,
-    scrollLength: 260,
+    phase: 0.7,
+    perspective: 900,
+    gap: 2,
+    shade: 0.6,
+    scrollLength: 340,
 }
 
 export const LOUVRE_CONTROLS: ControlGroup[] = [
@@ -56,7 +56,7 @@ export const LOUVRE_CONTROLS: ControlGroup[] = [
                 min: 150,
                 max: 500,
                 step: 10,
-                unit: "vh",
+                unit: "cqh",
             },
         ],
     },

@@ -20,7 +20,7 @@ export function LouvrePreview({ config }: PreviewApi) {
         <ScrollPort>
             {(port) => (
                 <>
-                    <div className="pg-lead">
+                    <div className="pg-lead pg-lead-short">
                         <Hint>Scroll</Hint>
                     </div>
 
@@ -32,20 +32,20 @@ export function LouvrePreview({ config }: PreviewApi) {
                         perspective={c.perspective}
                         gap={c.gap}
                         shade={c.shade}
-                        scrollLength={`${c.scrollLength}%`}
+                        scrollLength={`${c.scrollLength}cqh`}
                         front={
-                            <div className="xpg-section xpg-section-a">
-                                <h2>Section A</h2>
+                            <div className="xpg-blind xpg-blind-a">
+                                <span>Section A</span>
                             </div>
                         }
                         back={
-                            <div className="xpg-section xpg-section-b">
-                                <h2>Section B</h2>
+                            <div className="xpg-blind xpg-blind-b">
+                                <span>Section B</span>
                             </div>
                         }
                     />
 
-                    <div className="pg-lead" />
+                    <div className="pg-lead pg-lead-short" />
                 </>
             )}
         </ScrollPort>

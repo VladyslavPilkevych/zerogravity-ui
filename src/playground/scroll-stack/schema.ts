@@ -17,24 +17,31 @@ export interface ScrollStackDemoConfig {
     sizeMix: "uniform" | "alternating" | "shrinking" | "growing"
 }
 
+/** Heights are a share of the preview frame, not of the browser viewport. */
 export const SIZE_MIXES: Record<string, (index: number, count: number) => string | undefined> = {
     uniform: () => undefined,
-    alternating: (index) => (index % 2 === 1 ? "62vh" : undefined),
-    shrinking: (index, count) => `${Math.round(100 - (index / Math.max(1, count - 1)) * 45)}vh`,
-    growing: (index, count) => `${Math.round(55 + (index / Math.max(1, count - 1)) * 45)}vh`,
+    alternating: (index) => (index % 2 === 1 ? "36cqh" : undefined),
+    shrinking: (index, count) => `${Math.round(52 - (index / Math.max(1, count - 1)) * 16)}cqh`,
+    growing: (index, count) => `${Math.round(36 + (index / Math.max(1, count - 1)) * 16)}cqh`,
 }
 
+/*
+ * Deck proportions rather than the component's own full-page defaults: cards
+ * are a little under half the frame so two are in view at once, and each one
+ * parks a notch lower than the last so the tops of the cards below stay
+ * visible. On a real page you would use full-height sections and no peek.
+ */
 export const SCROLL_STACK_DEFAULTS: ScrollStackDemoConfig = {
-    height: "100vh",
-    top: 0,
-    peek: 0,
-    scaleTo: 0.92,
-    dim: 0.5,
+    height: "44cqh",
+    top: 30,
+    peek: 16,
+    scaleTo: 0.9,
+    dim: 0.45,
     dimColor: "#05050a",
     opacityTo: 1,
     liftTo: 0,
     blurTo: 0,
-    rounded: 0,
+    rounded: 20,
     easing: "smooth",
     disabled: false,
     cards: 5,
@@ -51,11 +58,11 @@ export const SCROLL_STACK_CONTROLS: ControlGroup[] = [
             {
                 kind: "cssLength",
                 path: "height",
-                label: "Section height",
-                min: 40,
-                max: 120,
-                step: 5,
-                unit: "vh",
+                label: "Card height",
+                min: 20,
+                max: 90,
+                step: 2,
+                unit: "cqh",
             },
             {
                 kind: "select",

@@ -13,7 +13,7 @@ export function AperturePreview({ config }: PreviewApi) {
         <ScrollPort>
             {(port) => (
                 <>
-                    <div className="pg-lead">
+                    <div className="pg-lead pg-lead-short">
                         <Hint>Scroll</Hint>
                     </div>
 
@@ -31,11 +31,11 @@ export function AperturePreview({ config }: PreviewApi) {
                     >
                         <div className="pg-aperture-panel">
                             <span className="pg-card-index">clip-path, not width</span>
-                            <h2>The frame closes</h2>
+                            <h2>The frame opens</h2>
                         </div>
                     </Aperture>
 
-                    <div className="pg-lead" />
+                    <div className="pg-lead pg-lead-short" />
                 </>
             )}
         </ScrollPort>

@@ -111,6 +111,62 @@ for (const slug of ["scroll-stack", "aperture", "louvre"]) {
     })
 }
 
+test("ScrollStack reads as a deck rather than one full-bleed panel", async ({ page }) => {
+    await page.goto("/docs/scroll-stack")
+    const port = page.locator(".pg-port")
+    await expect(port).toBeVisible()
+
+    await port.evaluate((node) => {
+        node.scrollTop = (node.scrollHeight - node.clientHeight) * 0.7
+    })
+    await page.waitForTimeout(600)
+
+    const deck = await port.evaluate((node) => {
+        const frame = node.getBoundingClientRect()
+        const cards = [...node.querySelectorAll(".scroll-stack-card")].map((card) => {
+            const box = card.getBoundingClientRect()
+            return { top: Math.round(box.top - frame.top), height: Math.round(box.height) }
+        })
+        const showing = cards.filter((c) => c.top < frame.height && c.top + c.height > 0)
+        return { frame: Math.round(frame.height), cards, showing }
+    })
+
+    // a card has to be well under the frame, or nothing else can be seen behind it
+    for (const card of deck.cards) {
+        expect(card.height, "cards are scaled down for the frame").toBeLessThan(deck.frame * 0.6)
+    }
+
+    // several at once, each parked a notch lower, is what makes it read as a deck
+    expect(deck.showing.length, "more than one card in view").toBeGreaterThanOrEqual(3)
+    const stuck = deck.showing.map((c) => c.top).slice(0, 3)
+    expect(new Set(stuck).size, "stacked cards sit at different offsets").toBe(3)
+})
+
+for (const [slug, pane] of [
+    ["aperture", ".aperture-sticky"],
+    ["louvre", ".xp-louvre-viewport"],
+] as const) {
+    test(`${slug} sizes its sticky pane to the preview frame, not the viewport`, async ({
+        page,
+    }) => {
+        await page.goto(`/docs/${slug}`)
+        const port = page.locator(".pg-port")
+        await expect(port).toBeVisible()
+
+        const sizes = await port.evaluate((node, selector) => {
+            const sticky = node.querySelector(selector) as HTMLElement
+            return {
+                frame: node.clientHeight,
+                pane: Math.round(sticky.getBoundingClientRect().height),
+            }
+        }, pane)
+
+        // a 100vh pane inside a short frame is the whole reason these demos read
+        // as a crop of something bigger
+        expect(sizes.pane).toBe(sizes.frame)
+    })
+}
+
 test("Raster thumbnails drive the main view and the generated code", async ({ page }) => {
     await page.goto("/docs/raster")
     const code = page.locator(".dz-code code")

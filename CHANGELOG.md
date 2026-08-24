@@ -45,6 +45,11 @@ README before tagging.
 
 ### Changed
 
+- `Aperture` and `Louvre` size their sticky pane from `--aperture-viewport` /
+  `--louvre-viewport`, defaulting to `100vh`. Without this a component driven
+  through `scrollContainer` rendered a viewport-tall pane inside a short box, so
+  only a crop of the effect was ever visible.
+- `Elemental` moved from the Motion category to Media.
 - The package declares no runtime dependencies. `next` drives the documentation
   site only and moved to `devDependencies`; installing the library no longer
   pulls a framework in behind it.
