@@ -17,6 +17,65 @@ function movePointer(x: number, y: number) {
     })
 }
 
+function stubRect(rect: Partial<DOMRect>) {
+    const original = Element.prototype.getBoundingClientRect
+    let current = rect
+    let reads = 0
+
+    Element.prototype.getBoundingClientRect = function patched(this: Element) {
+        reads += 1
+        const left = current.left ?? 0
+        const top = current.top ?? 0
+        const width = current.width ?? 0
+        const height = current.height ?? 0
+        return {
+            x: left,
+            y: top,
+            left,
+            top,
+            width,
+            height,
+            right: left + width,
+            bottom: top + height,
+            toJSON: () => ({}),
+        } as DOMRect
+    }
+
+    return {
+        get reads() {
+            return reads
+        },
+        reset() {
+            reads = 0
+        },
+        set(next: Partial<DOMRect>) {
+            current = next
+        },
+        restore() {
+            Element.prototype.getBoundingClientRect = original
+        },
+    }
+}
+
+/** Captures where the engine actually paints, which is what alignment means. */
+function paintedRects() {
+    const context = document
+        .createElement("canvas")
+        .getContext("2d") as unknown as CanvasRenderingContext2D
+    const calls: [number, number][] = []
+    const original = context.fillRect
+    context.fillRect = ((x: number, y: number) => {
+        calls.push([Math.round(x), Math.round(y)])
+    }) as typeof context.fillRect
+
+    return {
+        rects: () => calls,
+        restore() {
+            context.fillRect = original
+        },
+    }
+}
+
 describe("GridTrail", () => {
     let frames: FrameHarness
     let canvas: ReturnType<typeof installCanvasHarness>
@@ -111,27 +170,11 @@ describe("GridTrail", () => {
     it("measures the host once instead of on every pointer move", () => {
         const host = document.createElement("div")
         document.body.appendChild(host)
-        const canvas = document.createElement("canvas")
-        host.appendChild(canvas)
+        const node = document.createElement("canvas")
+        host.appendChild(node)
 
-        const original = Element.prototype.getBoundingClientRect
-        let reads = 0
-        Element.prototype.getBoundingClientRect = function patched(this: Element) {
-            reads += 1
-            return {
-                x: 0,
-                y: 0,
-                left: 0,
-                top: 0,
-                right: 800,
-                bottom: 600,
-                width: 800,
-                height: 600,
-                toJSON: () => ({}),
-            } as DOMRect
-        }
-
-        const engine = new GridTrailEngine(canvas, host, { ...GRID_TRAIL_DEFAULTS })
+        const stop = stubRect({ left: 0, top: 0, width: 800, height: 600 })
+        const engine = new GridTrailEngine(node, host, { ...GRID_TRAIL_DEFAULTS })
 
         const move = () => {
             for (let i = 0; i < 50; i += 1) {
@@ -141,18 +184,98 @@ describe("GridTrail", () => {
             }
         }
 
-        reads = 0
+        stop.reset()
         move()
-        expect(reads).toBe(1)
+        expect(stop.reads).toBeLessThanOrEqual(1)
 
         window.dispatchEvent(new Event("scroll"))
-        reads = 0
+        stop.reset()
         move()
-        expect(reads).toBe(1)
+        expect(stop.reads).toBe(1)
 
-        Element.prototype.getBoundingClientRect = original
+        stop.restore()
         engine.destroy()
         host.remove()
+    })
+
+    describe("pointer mapping", () => {
+        const CONFIG = {
+            ...GRID_TRAIL_DEFAULTS,
+            cellSize: 20,
+            gap: 0,
+            cornerRadius: 0,
+            shape: "square" as const,
+            neighborFalloff: 0,
+            showGrid: false,
+        }
+
+        function litCells(rect: Partial<DOMRect>, points: [number, number][]) {
+            const node = document.createElement("canvas")
+            document.body.appendChild(node)
+            const stop = stubRect(rect)
+            const engine = new GridTrailEngine(node, null, CONFIG)
+            const painted = paintedRects()
+
+            for (const [x, y] of points) {
+                window.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y }))
+            }
+            frames.advance()
+
+            const cells = painted.rects()
+            painted.restore()
+            stop.restore()
+            engine.destroy()
+            node.remove()
+            return cells
+        }
+
+        it("lights the cell directly under the pointer", () => {
+            const cells = litCells({ left: 300, top: 120, width: 400, height: 200 }, [[310, 130]])
+
+            expect(cells).toContainEqual([0, 0])
+        })
+
+        it("maps the centre and the far corner of its own box", () => {
+            const cells = litCells({ left: 300, top: 120, width: 400, height: 200 }, [
+                [505, 225],
+                [699, 319],
+            ])
+
+            expect(cells).toContainEqual([200, 100])
+            expect(cells).toContainEqual([380, 180])
+        })
+
+        it("ignores a pointer outside its own box", () => {
+            const cells = litCells({ left: 300, top: 120, width: 400, height: 200 }, [
+                [299, 130],
+                [310, 119],
+                [710, 130],
+                [310, 330],
+            ])
+
+            expect(cells).toHaveLength(0)
+        })
+
+        it("follows the box after the page scrolls", () => {
+            const node = document.createElement("canvas")
+            document.body.appendChild(node)
+            const stop = stubRect({ left: 300, top: 120, width: 400, height: 200 })
+            const engine = new GridTrailEngine(node, null, CONFIG)
+
+            stop.set({ left: 300, top: 20, width: 400, height: 200 })
+            window.dispatchEvent(new Event("scroll"))
+
+            const painted = paintedRects()
+            window.dispatchEvent(new PointerEvent("pointermove", { clientX: 310, clientY: 30 }))
+            frames.advance()
+
+            expect(painted.rects()).toContainEqual([0, 0])
+
+            painted.restore()
+            stop.restore()
+            engine.destroy()
+            node.remove()
+        })
     })
 
     it("releases every window listener it registers", () => {

@@ -10,12 +10,16 @@ function equal(a: unknown, b: unknown): boolean {
     return a === b || JSON.stringify(a) === JSON.stringify(b)
 }
 
-export function toJsx(
-    component: string,
+/**
+ * One prop per line, and only the ones the reader actually changed. Nested
+ * objects keep just their changed fields so the snippet stays copy-ready.
+ */
+export function propLines(
     defaults: Record<string, unknown>,
     config: Record<string, unknown>,
     omit: string[] = [],
-): string {
+    indent = "    ",
+): string[] {
     const lines: string[] = []
 
     for (const key of Object.keys(defaults)) {
@@ -33,13 +37,15 @@ export function toJsx(
                 }
             }
             if (entries.length > 0) {
-                lines.push(`    ${key}={{ ${entries.join(", ")} }}`)
+                lines.push(`${indent}${key}={{ ${entries.join(", ")} }}`)
             }
         } else if (!equal(value, base)) {
-            lines.push(`    ${key}={${literal(value)}}`)
+            if (value === true) lines.push(`${indent}${key}`)
+            else if (typeof value === "string" && !value.includes('"'))
+                lines.push(`${indent}${key}="${value}"`)
+            else lines.push(`${indent}${key}={${literal(value)}}`)
         }
     }
 
-    if (lines.length === 0) return `<${component} />`
-    return `<${component}\n${lines.join("\n")}\n/>`
+    return lines
 }

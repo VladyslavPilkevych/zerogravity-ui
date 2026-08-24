@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react"
 
 import { cx } from "../../internal"
-import { beatOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
+import { beatOf, gapOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
 import "./loaders.css"
 
 export type PixelBlocksVariant = "wave" | "center" | "steps"
@@ -31,6 +31,7 @@ export function PixelBlocks({
     color = "#f4a04f",
     speed = 1,
     paused = false,
+    gap,
     respectReducedMotion = true,
     className,
     style,
@@ -46,6 +47,7 @@ export function PixelBlocks({
                 {
                     ...style,
                     "--l-size": size,
+                    "--l-gap": gapOf(gap, 0.34),
                     "--l-color": color,
                     "--l-beat": beatOf(variant === "steps" ? 1.2 : 1.05, speed),
                 } as CSSProperties

@@ -2,7 +2,7 @@
     "name": "zerogravity-ui",
     "version": "0.1.0",
     "private": true,
-    "description": "Motion-first React components: particle fields, scroll framing, carousels and display type.",
+    "description": "Motion-first React components: particle fields, animated borders, illustrated scenes, scroll framing, carousels and display type.",
     "keywords": [
         "react",
         "nextjs",
@@ -12,7 +12,11 @@
         "cursor",
         "scroll",
         "carousel",
-        "particles"
+        "particles",
+        "border",
+        "svg",
+        "pointer",
+        "transition"
     ],
     "license": "MIT",
     "repository": {
@@ -29,6 +33,78 @@
         ".": {
             "types": "./dist/index.d.ts",
             "import": "./dist/index.js"
+        },
+        "./antigravity": {
+            "types": "./dist/antigravity/index.d.ts",
+            "import": "./dist/antigravity/index.js"
+        },
+        "./aperture": {
+            "types": "./dist/aperture/index.d.ts",
+            "import": "./dist/aperture/index.js"
+        },
+        "./diorama": {
+            "types": "./dist/diorama/index.d.ts",
+            "import": "./dist/diorama/index.js"
+        },
+        "./elemental": {
+            "types": "./dist/elemental/index.d.ts",
+            "import": "./dist/elemental/index.js"
+        },
+        "./grid-trail": {
+            "types": "./dist/grid-trail/index.d.ts",
+            "import": "./dist/grid-trail/index.js"
+        },
+        "./kern": {
+            "types": "./dist/kern/index.d.ts",
+            "import": "./dist/kern/index.js"
+        },
+        "./lodestone": {
+            "types": "./dist/lodestone/index.d.ts",
+            "import": "./dist/lodestone/index.js"
+        },
+        "./meadow": {
+            "types": "./dist/meadow/index.d.ts",
+            "import": "./dist/meadow/index.js"
+        },
+        "./overprint": {
+            "types": "./dist/overprint/index.d.ts",
+            "import": "./dist/overprint/index.js"
+        },
+        "./pointer-fx": {
+            "types": "./dist/pointer-fx/index.d.ts",
+            "import": "./dist/pointer-fx/index.js"
+        },
+        "./reel": {
+            "types": "./dist/reel/index.d.ts",
+            "import": "./dist/reel/index.js"
+        },
+        "./ricochet": {
+            "types": "./dist/ricochet/index.d.ts",
+            "import": "./dist/ricochet/index.js"
+        },
+        "./scroll-stack": {
+            "types": "./dist/scroll-stack/index.d.ts",
+            "import": "./dist/scroll-stack/index.js"
+        },
+        "./split-flap": {
+            "types": "./dist/split-flap/index.d.ts",
+            "import": "./dist/split-flap/index.js"
+        },
+        "./stencil": {
+            "types": "./dist/stencil/index.d.ts",
+            "import": "./dist/stencil/index.js"
+        },
+        "./tessera": {
+            "types": "./dist/tessera/index.d.ts",
+            "import": "./dist/tessera/index.js"
+        },
+        "./trailing-cursor": {
+            "types": "./dist/trailing-cursor/index.d.ts",
+            "import": "./dist/trailing-cursor/index.js"
+        },
+        "./vellum": {
+            "types": "./dist/vellum/index.d.ts",
+            "import": "./dist/vellum/index.js"
         },
         "./package.json": "./package.json"
     },
@@ -65,7 +141,6 @@
         "test:watch": "vitest --project=unit",
         "test:browser": "vitest run --project=storybook",
         "test:e2e": "playwright test",
-        "test:types": "tsc --project tsconfig.types.json",
         "test:consumer": "node scripts/consumer-test.mjs",
         "check:package": "node scripts/check-package.mjs",
         "chromatic": "chromatic",
@@ -76,9 +151,6 @@
     "peerDependencies": {
         "react": "^18.2.0 || ^19.0.0",
         "react-dom": "^18.2.0 || ^19.0.0"
-    },
-    "dependencies": {
-        "next": "^15.5.23"
     },
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.18.5",
@@ -102,6 +174,7 @@
         "eslint-plugin-react-hooks": "^6.1.1",
         "jsdom": "^30.0.1",
         "lefthook": "^2.1.10",
+        "next": "^15.5.23",
         "playwright": "^1.62.1",
         "prettier": "^3.9.6",
         "publint": "^0.3.23",

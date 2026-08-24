@@ -17,9 +17,17 @@ README before tagging.
 ### Added
 
 - MIT licence and a root `LICENSE` file, shipped with the package.
-- Nine components: `Antigravity`, `Aperture`, `GridTrail`, `Reel`,
-  `ScrollStack`, `SplitFlap`, `Stencil`, `TrailingCursor`, and the shared
-  `pointer-fx` utilities.
+- Seventeen components: `Antigravity`, `Aperture`, `Diorama`, `Elemental`,
+  `GridTrail`, `Kern`, `Lodestone`, `Meadow`, `Overprint`, `Reel`, `Ricochet`,
+  `ScrollStack`, `SplitFlap`, `Stencil`, `Tessera`, `TrailingCursor`, `Vellum`,
+  and the shared `pointer-fx` utilities.
+- `Diorama`, `Elemental`, `Kern`, `Lodestone`, `Meadow`, `Overprint`,
+  `Ricochet`, `Tessera` and `Vellum` graduated out of the experimental folder
+  into the published surface, each with its own entry point.
+- Per-component entry points, so `import { Reel } from "zerogravity-ui/reel"`
+  works alongside the root barrel. The export map is derived from the library
+  directories and verified on every package check, so an entry point cannot go
+  missing and an internal path cannot appear.
 - `Reel` gained a `radius` prop that drives the item geometry through the
   `--reel-radius` custom property.
 - ESM package build with `tsup`, per-file TypeScript declarations, source maps
@@ -34,6 +42,17 @@ README before tagging.
   reduced-motion behaviour and animation-loop idling.
 - ESLint 9, Prettier and a GitHub Actions workflow running the full validation
   suite.
+
+### Changed
+
+- `Aperture` and `Louvre` size their sticky pane from `--aperture-viewport` /
+  `--louvre-viewport`, defaulting to `100vh`. Without this a component driven
+  through `scrollContainer` rendered a viewport-tall pane inside a short box, so
+  only a crop of the effect was ever visible.
+- `Elemental` moved from the Motion category to Media.
+- The package declares no runtime dependencies. `next` drives the documentation
+  site only and moved to `devDependencies`; installing the library no longer
+  pulls a framework in behind it.
 
 ### Fixed
 
@@ -61,6 +80,9 @@ README before tagging.
 
 ### Security
 
+- No wildcard subpath exports, so `dist/internal`, component engines and the
+  unpublished prototypes cannot be reached from an installed package. A packaged
+  consumer test asserts each blocked path stays blocked.
 - CSS `url()` values built from consumer-supplied strings are percent-encoded,
   closing a style-injection vector in `Stencil` and the pattern builder.
 - Transitive advisories in `postcss`, `nanoid` and `sharp` resolved through

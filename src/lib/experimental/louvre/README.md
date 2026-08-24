@@ -7,17 +7,18 @@ slats that rotate away as you scroll, revealing Section B behind them.
 <Louvre front={<SectionA />} back={<SectionB />} />
 ```
 
-| Prop           | Default        | Notes                                     |
-| -------------- | -------------- | ----------------------------------------- |
-| `front`        | —              | Content shown before the transition       |
-| `back`         | —              | Content revealed behind the blinds        |
-| `slats`        | `10`           | Number of blinds                          |
-| `orientation`  | `"horizontal"` | Rotate on X or Y                          |
-| `scrollLength` | `"260vh"`      | Scroll distance the sticky phase occupies |
-| `phase`        | `0.55`         | Wave offset so slats open in sequence     |
-| `perspective`  | `1400`         | 3D depth, px                              |
-| `gap`          | `0`            | Space between slats, px                   |
-| `shade`        | `0.55`         | Shadow applied to a slat as it rotates    |
+| Prop              | Default        | Notes                                      |
+| ----------------- | -------------- | ------------------------------------------ |
+| `front`           | —              | Content shown before the transition        |
+| `back`            | —              | Content revealed behind the blinds         |
+| `scrollContainer` | —              | Drive the reveal from a scrollable element |
+| `slats`           | `10`           | Number of blinds                           |
+| `orientation`     | `"horizontal"` | Rotate on X or Y                           |
+| `scrollLength`    | `"260vh"`      | Scroll distance the sticky phase occupies  |
+| `phase`           | `0.55`         | Wave offset so slats open in sequence      |
+| `perspective`     | `1400`         | 3D depth, px                               |
+| `gap`             | `0`            | Space between slats, px                    |
+| `shade`           | `0.55`         | Shadow applied to a slat as it rotates     |
 
 **How it works.** The root reserves `scrollLength` of scroll; inside it a sticky
 viewport pins the scene. Scroll progress writes one `--louvre-progress` custom
@@ -42,3 +43,20 @@ two sections is reachable at a time. Reading order follows `back` then `front`.
 **Limitations.** `front` is duplicated once per slat, so keep it reasonably light
 and avoid many slats with heavy media. The sticky viewport is `100vh`, so `front`
 and `back` should be designed for a full screen.
+
+## Driving it from a bounded scroller
+
+`scrollContainer` points the component at a scrollable element instead of the
+page. One thing has to move with it: the sticky pane is `100vh` by default,
+which is taller than the box you are looking through, so you would only ever see
+a crop. Override `--louvre-viewport` with the height of that element:
+
+```css
+.my-scroller {
+    container-type: size;
+    --louvre-viewport: 100cqh;
+}
+```
+
+`cqh` is the tidiest way to say it — the pane then tracks the scroller at any
+size. A fixed `px` height works just as well.

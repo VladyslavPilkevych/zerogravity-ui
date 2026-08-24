@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, type CSSProperties } from "react"
+import { useEffect, useRef, type CSSProperties, type RefObject } from "react"
 
 import { cx, useLatestRef } from "../internal"
 import { resolveColor, usePointerFxEnabled, type PointerFxPreset } from "../pointer-fx"
@@ -10,6 +10,8 @@ import "./TrailingCursor.css"
 export type TrailingCursorVariant = "dot-ring" | "ring-only" | "dot-only"
 
 export interface TrailingCursorProps {
+    /** Scope the effect to one element. Without it the cursor covers the page. */
+    container?: RefObject<HTMLElement | null>
     preset?: PointerFxPreset
     variant?: TrailingCursorVariant
     dotColor?: string
@@ -33,8 +35,10 @@ export interface TrailingCursorProps {
 const SETTLE_PX = 0.15
 const HIDE_CLASS = "trailing-cursor-none"
 const DEFAULT_SELECTOR = "a, button, input, select, textarea, [role='button'], [data-cursor]"
+const NO_OFFSET = { left: 0, top: 0 } as DOMRect
 
 export function TrailingCursor({
+    container,
     preset,
     variant = "dot-ring",
     dotColor,
@@ -62,6 +66,7 @@ export function TrailingCursor({
     const resizeRef = useRef<(() => void) | null>(null)
 
     const enabled = usePointerFxEnabled({ disabled, enableOnTouch, respectReducedMotion })
+    const scoped = Boolean(container)
 
     const tokens = pointerFxTokens(preset)
     const settings = useLatestRef({
@@ -85,11 +90,29 @@ export function TrailingCursor({
         const label = labelRef.current
         if (!root || !ring || !shape) return
 
+        const host = container?.current ?? null
+        if (container && !host) return
+
+        // the host is the coordinate frame when scoped, the viewport otherwise
+        let frame: DOMRect | null = null
+        const box = (): DOMRect => {
+            if (!host) return NO_OFFSET
+            if (!frame) frame = host.getBoundingClientRect()
+            return frame
+        }
+        const forget = () => {
+            frame = null
+        }
+
         let targetX = window.innerWidth / 2
         let targetY = window.innerHeight / 2
+        if (host) {
+            targetX = host.clientWidth / 2
+            targetY = host.clientHeight / 2
+        }
         let ringX = targetX
         let ringY = targetY
-        let frame: number | null = null
+        let loop: number | null = null
         let scale = 1
         let pressed = false
         let hovering = false
@@ -116,19 +139,21 @@ export function TrailingCursor({
             const settled =
                 Math.abs(targetX - ringX) < SETTLE_PX && Math.abs(targetY - ringY) < SETTLE_PX
 
-            frame = settled ? null : requestAnimationFrame(render)
+            loop = settled ? null : requestAnimationFrame(render)
         }
 
         const wake = () => {
-            if (frame === null && document.visibilityState !== "hidden") {
-                frame = requestAnimationFrame(render)
+            if (loop === null && document.visibilityState !== "hidden") {
+                loop = requestAnimationFrame(render)
             }
         }
 
         const onMove = (event: PointerEvent) => {
             if (!enableOnTouch && event.pointerType !== "mouse") return
-            targetX = event.clientX
-            targetY = event.clientY
+
+            const rect = box()
+            targetX = event.clientX - rect.left
+            targetY = event.clientY - rect.top
             root.dataset.visible = "true"
             wake()
         }
@@ -177,35 +202,43 @@ export function TrailingCursor({
         }
 
         const onVisibility = () => {
-            if (document.visibilityState === "hidden" && frame !== null) {
-                cancelAnimationFrame(frame)
-                frame = null
+            if (document.visibilityState === "hidden" && loop !== null) {
+                cancelAnimationFrame(loop)
+                loop = null
             }
         }
 
         applyRingSize()
         resizeRef.current = applyRingSize
 
-        if (hideNativeCursor) document.body.classList.add(HIDE_CLASS)
-        window.addEventListener("pointermove", onMove, { passive: true })
-        window.addEventListener("pointerover", onOver, { passive: true })
-        window.addEventListener("pointerdown", onDown, { passive: true })
-        window.addEventListener("pointerup", onUp, { passive: true })
-        document.addEventListener("pointerleave", onLeave, { passive: true })
+        const surface: EventTarget = host ?? window
+        const leaveOn: EventTarget = host ?? document
+        const hideOn = host ?? document.body
+
+        if (hideNativeCursor) hideOn.classList.add(HIDE_CLASS)
+        surface.addEventListener("pointermove", onMove as EventListener, { passive: true })
+        surface.addEventListener("pointerover", onOver as EventListener, { passive: true })
+        surface.addEventListener("pointerdown", onDown, { passive: true })
+        surface.addEventListener("pointerup", onUp, { passive: true })
+        leaveOn.addEventListener("pointerleave", onLeave, { passive: true })
         document.addEventListener("visibilitychange", onVisibility)
+        window.addEventListener("scroll", forget, { passive: true, capture: true })
+        window.addEventListener("resize", forget, { passive: true })
 
         return () => {
             resizeRef.current = null
-            document.body.classList.remove(HIDE_CLASS)
-            window.removeEventListener("pointermove", onMove)
-            window.removeEventListener("pointerover", onOver)
-            window.removeEventListener("pointerdown", onDown)
-            window.removeEventListener("pointerup", onUp)
-            document.removeEventListener("pointerleave", onLeave)
+            hideOn.classList.remove(HIDE_CLASS)
+            surface.removeEventListener("pointermove", onMove as EventListener)
+            surface.removeEventListener("pointerover", onOver as EventListener)
+            surface.removeEventListener("pointerdown", onDown)
+            surface.removeEventListener("pointerup", onUp)
+            leaveOn.removeEventListener("pointerleave", onLeave)
             document.removeEventListener("visibilitychange", onVisibility)
-            if (frame !== null) cancelAnimationFrame(frame)
+            window.removeEventListener("scroll", forget, { capture: true })
+            window.removeEventListener("resize", forget)
+            if (loop !== null) cancelAnimationFrame(loop)
         }
-    }, [enabled, hideNativeCursor, enableOnTouch, settings])
+    }, [enabled, hideNativeCursor, enableOnTouch, settings, container])
 
     useEffect(() => {
         resizeRef.current?.()
@@ -228,6 +261,7 @@ export function TrailingCursor({
             aria-hidden="true"
             className={cx("trailing-cursor", className)}
             data-variant={variant}
+            data-scoped={scoped ? "true" : "false"}
             data-visible="false"
             data-hidden="false"
             data-labelled="false"

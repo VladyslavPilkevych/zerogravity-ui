@@ -1,7 +1,7 @@
 import { expect, test } from "./fixtures"
 
 test("Reel advances with the keyboard", async ({ page, browserLog: guard }) => {
-    await page.goto("/reel")
+    await page.goto("/docs/reel")
 
     const viewport = page.locator(".reel-viewport").first()
     await expect(viewport).toBeVisible()
@@ -18,7 +18,7 @@ test("Reel advances with the keyboard", async ({ page, browserLog: guard }) => {
 })
 
 test("Reel arrows move the selection", async ({ page, browserLog: guard }) => {
-    await page.goto("/reel")
+    await page.goto("/docs/reel")
 
     const next = page.locator(".reel-arrow-next").first()
     await expect(next).toBeVisible()
@@ -39,15 +39,20 @@ test("Reel arrows move the selection", async ({ page, browserLog: guard }) => {
 })
 
 test("ScrollStack reacts to scrolling", async ({ page, browserLog: guard }) => {
-    await page.goto("/scroll-stack")
+    await page.goto("/docs/scroll-stack")
 
     const firstCard = page.locator(".scroll-stack-card").first()
     await expect(firstCard).toBeVisible()
 
     const transformBefore = await firstCard.evaluate((node) => getComputedStyle(node).transform)
 
-    await page.evaluate(() => window.scrollBy(0, window.innerHeight * 1.5))
-    await page.waitForFunction(() => window.scrollY > 0)
+    await page.evaluate(() => {
+        const port = document.querySelector(".pg-port") as HTMLElement
+        port.scrollTop = (port.scrollHeight - port.clientHeight) * 0.6
+    })
+    await page.waitForFunction(
+        () => (document.querySelector(".pg-port") as HTMLElement).scrollTop > 0,
+    )
 
     await expect
         .poll(async () => firstCard.evaluate((node) => getComputedStyle(node).transform), {
@@ -62,7 +67,7 @@ test("Stencil exposes the headline as a single accessible name", async ({
     page,
     browserLog: guard,
 }) => {
-    await page.goto("/stencil")
+    await page.goto("/docs/stencil")
 
     const headline = page.getByRole("img").first()
     await expect(headline).toBeVisible()
@@ -72,7 +77,7 @@ test("Stencil exposes the headline as a single accessible name", async ({
 })
 
 test("Antigravity mounts a canvas sized to its container", async ({ page, browserLog: guard }) => {
-    await page.goto("/")
+    await page.goto("/docs/antigravity")
 
     const canvas = page.locator("canvas").first()
     await expect(canvas).toBeAttached()

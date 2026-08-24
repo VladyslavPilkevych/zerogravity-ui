@@ -20,11 +20,44 @@ export type {
 export { Aperture } from "./aperture"
 export type { ApertureDirection, ApertureProps } from "./aperture"
 
+export { Diorama } from "./diorama"
+export type { DioramaPlane, DioramaProps } from "./diorama"
+
+export { Elemental, ELEMENTAL_VARIANTS } from "./elemental"
+export type { ElementalProps, ElementalVariant } from "./elemental"
+
 export { GridTrail, GRID_TRAIL_DEFAULTS } from "./grid-trail"
 export type { GridTrailOptions, GridTrailProps, GridTrailShape } from "./grid-trail"
 
+export { Kern } from "./kern"
+export type { KernProps } from "./kern"
+
+export { Lodestone } from "./lodestone"
+export type { LodestoneProps } from "./lodestone"
+
+export { Meadow, MEADOW_CAST, MEADOW_SPACE_CAST, MEADOW_VARIANT_SETS } from "./meadow"
+export type {
+    MeadowDensity,
+    MeadowItem,
+    MeadowKind,
+    MeadowMotion,
+    MeadowProps,
+    MeadowScene,
+    MeadowScenePart,
+    MeadowTheme,
+    MeadowVariant,
+    MeadowVariantGroup,
+    MeadowVariantSet,
+} from "./meadow"
+
+export { Overprint } from "./overprint"
+export type { OverprintProps } from "./overprint"
+
 export { Reel } from "./reel"
 export type { ReelHandle, ReelProps } from "./reel"
+
+export { Ricochet, SUPPORTED_CHARACTERS } from "./ricochet"
+export type { RicochetMode, RicochetProps, RicochetVariant } from "./ricochet"
 
 export { ScrollStack } from "./scroll-stack"
 export type { ScrollStackProps, StackEasing } from "./scroll-stack"
@@ -35,8 +68,21 @@ export type { SplitFlapMode, SplitFlapProps } from "./split-flap"
 export { Stencil, FILL_DEFAULT_COLORS } from "./stencil"
 export type { StencilFill, StencilHover, StencilProps } from "./stencil"
 
+export { TesseraProvider, useTessera, useTesseraPhase } from "./tessera"
+export type {
+    TesseraController,
+    TesseraNavigate,
+    TesseraPhase,
+    TesseraProviderProps,
+    TesseraRunOptions,
+    TesseraSequence,
+} from "./tessera"
+
 export { TrailingCursor } from "./trailing-cursor"
 export type { TrailingCursorProps, TrailingCursorVariant } from "./trailing-cursor"
+
+export { Vellum } from "./vellum"
+export type { VellumHighlight, VellumProps } from "./vellum"
 
 export {
     resolveColor,

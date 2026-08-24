@@ -1,32 +1,11 @@
 import { test as base, expect, type Page } from "@playwright/test"
 
-export const ROUTES = [
-    { path: "/", name: "Antigravity" },
-    { path: "/aperture", name: "Aperture" },
-    { path: "/grid-trail", name: "GridTrail" },
-    { path: "/reel", name: "Reel" },
-    { path: "/scroll-stack", name: "ScrollStack" },
-    { path: "/split-flap", name: "SplitFlap" },
-    { path: "/stencil", name: "Stencil" },
-    { path: "/trailing-cursor", name: "TrailingCursor" },
-] as const
+import { COMPONENT_SLUGS } from "./routes.data"
 
-export const EXPERIMENTAL_ROUTES = [
-    { path: "/x/louvre", name: "Louvre" },
-    { path: "/x/lodestone", name: "Lodestone" },
-    { path: "/x/facet", name: "Facet" },
-    { path: "/x/vellum", name: "Vellum" },
-    { path: "/x/kern", name: "Kern" },
-    { path: "/x/overprint", name: "Overprint" },
-    { path: "/x/diorama", name: "Diorama" },
-    { path: "/x/wash", name: "Wash" },
-    { path: "/x/tessera", name: "Tessera" },
-    { path: "/x/meadow", name: "Meadow" },
-    { path: "/x/meadow-assets", name: "MeadowAssets" },
-    { path: "/x/raster", name: "Raster" },
-    { path: "/x/loaders", name: "Loaders" },
-    { path: "/x/ricochet", name: "Ricochet" },
-] as const
+export const DOCS_ROUTES = COMPONENT_SLUGS.map((slug) => ({
+    slug,
+    path: `/docs/${slug}`,
+}))
 
 const ALLOWED = [
     /Download the React DevTools/i,

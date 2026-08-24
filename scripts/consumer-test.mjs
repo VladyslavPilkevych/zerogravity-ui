@@ -114,6 +114,18 @@ function viteConsumer(tarball) {
         return `${(js / 1024).toFixed(1)} kB JS, ${(css / 1024).toFixed(1)} kB CSS`
     })
 
+    step("vite: subpath entry points resolve and ship their styles", () => {
+        // the fixture imports these two through subpaths only, and an
+        // unresolvable subpath would already have failed the build above
+        const css = readdirSync(path.join(dir, "dist", "assets"))
+            .filter((file) => file.endsWith(".css"))
+            .map((file) => readFileSync(path.join(dir, "dist", "assets", file), "utf8"))
+            .join("")
+        const missing = [".aperture", ".grid-trail"].filter((rule) => !css.includes(rule))
+        if (missing.length) throw new Error(`subpath styles missing: ${missing.join(", ")}`)
+        return "zerogravity-ui/aperture and /grid-trail"
+    })
+
     step("vite: styles reach the consumer bundle", () => {
         const css = readdirSync(path.join(dir, "dist", "assets"))
             .filter((file) => file.endsWith(".css"))
@@ -141,7 +153,24 @@ function viteConsumer(tarball) {
     rmSync(dir, { recursive: true, force: true })
 }
 
-function treeShakingConsumer(tarball) {
+const HEAVY = [
+    "Antigravity",
+    "GridTrail",
+    "ScrollStack",
+    "TrailingCursor",
+    "Aperture",
+    "Reel",
+    "Meadow",
+    "Ricochet",
+    "Elemental",
+    "Diorama",
+]
+
+/**
+ * `entry` picks the import style, so the same assertions cover the root barrel
+ * and a per-component entry point.
+ */
+function treeShakingConsumer(tarball, label, entry) {
     const dir = mkdtempSync(path.join(tmpdir(), "zg-shake-"))
 
     write(dir, "package.json", JSON.stringify({ name: "s", private: true, type: "module" }))
@@ -158,39 +187,52 @@ function treeShakingConsumer(tarball) {
     write(
         dir,
         "src/main.tsx",
-        `import { createRoot } from "react-dom/client"\nimport { SplitFlap } from "${PKG}"\ncreateRoot(document.getElementById("root")!).render(<SplitFlap value="HI" />)\n`,
+        `import { createRoot } from "react-dom/client"\nimport { SplitFlap } from "${entry}"\ncreateRoot(document.getElementById("root")!).render(<SplitFlap value="HI" />)\n`,
     )
 
     install(dir, ["react@^19", "react-dom@^19", "vite", "@vitejs/plugin-react"], tarball)
 
-    step("tree shaking: one light import excludes every other component", () => {
+    // The same app built twice through the same entry: React alone, then React
+    // plus the one component. The delta is the library's actual cost.
+    const REACT_ONLY = `import { createRoot } from "react-dom/client"\ncreateRoot(document.getElementById("root")!).render(<span>HI</span>)\n`
+    const WITH_COMPONENT = readFileSync(path.join(dir, "src", "main.tsx"), "utf8")
+
+    let baseline = 0
+    step(`tree shaking (${label}): measures against a React-only baseline`, () => {
+        write(dir, "src/main.tsx", REACT_ONLY)
+        run("npx", ["vite", "build"], dir)
+        baseline = bundleBytes(dir, ".js")
+        write(dir, "src/main.tsx", WITH_COMPONENT)
+        return `${(baseline / 1024).toFixed(1)} kB of React alone`
+    })
+
+    step(`tree shaking (${label}): one light import excludes every other component`, () => {
         run("npx", ["vite", "build"], dir)
         const js = readdirSync(path.join(dir, "dist", "assets"))
             .filter((file) => file.endsWith(".js"))
             .map((file) => readFileSync(path.join(dir, "dist", "assets", file), "utf8"))
             .join("")
-        const leaked = [
-            "Antigravity",
-            "GridTrail",
-            "ScrollStack",
-            "TrailingCursor",
-            "Aperture",
-        ].filter((name) => js.includes(name))
+        const leaked = HEAVY.filter((name) => js.includes(name))
         if (leaked.length) throw new Error(`unused components pulled in: ${leaked.join(", ")}`)
+        if (/\bnext\b\/dist|react-server-dom/.test(js))
+            throw new Error("Next.js reached the bundle")
 
         const css = readdirSync(path.join(dir, "dist", "assets"))
             .filter((file) => file.endsWith(".css"))
             .map((file) => readFileSync(path.join(dir, "dist", "assets", file), "utf8"))
             .join("")
-        if (css.includes("antigravity") || css.includes("reel-item")) {
+        if (css.includes("antigravity") || css.includes("reel-item") || css.includes("meadow")) {
             throw new Error("unused component CSS pulled in")
         }
 
         const bytes = bundleBytes(dir, ".js")
+        const added = bytes - baseline
         notes.push(
-            `Tree-shaken consumer (SplitFlap only): ${(bytes / 1024).toFixed(1)} kB JS, ${(bundleBytes(dir, ".css") / 1024).toFixed(1)} kB CSS`,
+            `Tree-shaken via ${label} (SplitFlap only): ${(bytes / 1024).toFixed(1)} kB JS total, ` +
+                `${(added / 1024).toFixed(1)} kB of it the library, ` +
+                `${(bundleBytes(dir, ".css") / 1024).toFixed(1)} kB CSS`,
         )
-        return `${(bytes / 1024).toFixed(1)} kB JS including React`
+        return `${(added / 1024).toFixed(1)} kB on top of React`
     })
 
     rmSync(dir, { recursive: true, force: true })
@@ -256,7 +298,25 @@ function nextConsumer(tarball) {
         if (!reel.startsWith('"use client"')) throw new Error("Reel.js lost its directive")
         const entry = readFileSync(path.join(dir, "node_modules", PKG, "dist", "index.js"), "utf8")
         if (entry.startsWith('"use client"')) throw new Error("entry point became a client module")
+
+        // a subpath entry must stay a plain re-export too, or the whole module
+        // graph below it turns into a client boundary
+        const aperture = readFileSync(
+            path.join(dir, "node_modules", PKG, "dist", "aperture", "index.js"),
+            "utf8",
+        )
+        if (aperture.startsWith('"use client"')) throw new Error("subpath entry became client")
         return "per-module directives intact"
+    })
+
+    step("next: nothing outside the declared entry points is reachable", () => {
+        const manifest = JSON.parse(
+            readFileSync(path.join(dir, "node_modules", PKG, "package.json"), "utf8"),
+        )
+        for (const blocked of ["./internal", "./reel/engine", "./dist/index.js", "./raster"]) {
+            if (manifest.exports[blocked]) throw new Error(`${blocked} is exported`)
+        }
+        return "internal, engine and prototype paths blocked"
     })
 
     rmSync(dir, { recursive: true, force: true })
@@ -266,7 +326,8 @@ const tarball = packLibrary()
 console.log(`Consumer tests against ${path.basename(tarball)}\n`)
 
 viteConsumer(tarball)
-treeShakingConsumer(tarball)
+treeShakingConsumer(tarball, "root barrel", PKG)
+treeShakingConsumer(tarball, "subpath", `${PKG}/split-flap`)
 nextConsumer(tarball)
 
 if (notes.length) {

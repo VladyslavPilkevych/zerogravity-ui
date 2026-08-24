@@ -5,6 +5,7 @@
     justify-content: center;
     line-height: 0.92;
     user-select: none;
+    --stencil-fit: 1;
     --stencil-strength: 1;
     --stencil-wave: 0;
     --stencil-offset: 0;

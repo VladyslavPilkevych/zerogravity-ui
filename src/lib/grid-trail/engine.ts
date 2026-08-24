@@ -37,7 +37,8 @@ export class GridTrailEngine {
     private lineColor = GRID_TRAIL_DEFAULTS.gridColor
 
     private resizeObserver: ResizeObserver | null = null
-    private hostRect: DOMRect | null = null
+    /** Where the canvas sits in the viewport, cached between layout changes. */
+    private frameRect: DOMRect | null = null
 
     constructor(canvas: HTMLCanvasElement, host: HTMLElement | null, config: GridTrailConfig) {
         this.canvas = canvas
@@ -48,9 +49,9 @@ export class GridTrailEngine {
 
         this.measure()
 
-        if (host && typeof ResizeObserver === "function") {
+        if (typeof ResizeObserver === "function") {
             this.resizeObserver = new ResizeObserver(this.handleResize)
-            this.resizeObserver.observe(host)
+            this.resizeObserver.observe(host ?? canvas)
         } else {
             window.addEventListener("resize", this.handleResize)
         }
@@ -60,12 +61,10 @@ export class GridTrailEngine {
             passive: true,
         })
         document.addEventListener("visibilitychange", this.handleVisibility)
-        if (host) {
-            window.addEventListener("scroll", this.invalidateHostRect, {
-                passive: true,
-                capture: true,
-            })
-        }
+        window.addEventListener("scroll", this.invalidateFrame, {
+            passive: true,
+            capture: true,
+        })
 
         this.paint()
     }
@@ -103,9 +102,7 @@ export class GridTrailEngine {
         const target: EventTarget = this.host ?? window
         target.removeEventListener("pointermove", this.handlePointerMove as EventListener)
         document.removeEventListener("visibilitychange", this.handleVisibility)
-        if (this.host) {
-            window.removeEventListener("scroll", this.invalidateHostRect, { capture: true })
-        }
+        window.removeEventListener("scroll", this.invalidateFrame, { capture: true })
         this.cells.clear()
     }
 
@@ -119,26 +116,36 @@ export class GridTrailEngine {
         this.lineColor = resolveColor(this.cfg.gridColor, element)
     }
 
+    /**
+     * The canvas is the coordinate frame. It may be fixed to the viewport, fixed
+     * inside a transformed ancestor, or absolute inside a host, and reading its
+     * own box keeps all three cases aligned with the pointer.
+     */
+    private frame_(): DOMRect {
+        if (!this.frameRect) this.frameRect = this.canvas.getBoundingClientRect()
+        return this.frameRect
+    }
+
     private measure(): void {
         const ratio = Math.min(typeof window === "undefined" ? 1 : window.devicePixelRatio || 1, 2)
-        const width = this.host ? this.host.clientWidth : window.innerWidth
-        const height = this.host ? this.host.clientHeight : window.innerHeight
+        this.frameRect = null
+        const rect = this.frame_()
+
+        const width = rect.width || this.host?.clientWidth || window.innerWidth
+        const height = rect.height || this.host?.clientHeight || window.innerHeight
 
         this.width = width
         this.height = height
         this.canvas.width = Math.max(1, Math.floor(width * ratio))
         this.canvas.height = Math.max(1, Math.floor(height * ratio))
-        this.canvas.style.width = `${width}px`
-        this.canvas.style.height = `${height}px`
         this.ctx?.setTransform(ratio, 0, 0, ratio, 0, 0)
     }
 
-    private invalidateHostRect = (): void => {
-        this.hostRect = null
+    private invalidateFrame = (): void => {
+        this.frameRect = null
     }
 
     private handleResize = (): void => {
-        this.hostRect = null
         this.measure()
         if (this.frame === null) this.paint()
     }
@@ -155,16 +162,11 @@ export class GridTrailEngine {
     private handlePointerMove = (event: PointerEvent): void => {
         if (this.destroyed || this.paused) return
 
-        let x = event.clientX
-        let y = event.clientY
+        const rect = this.frame_()
+        const x = event.clientX - rect.left
+        const y = event.clientY - rect.top
 
-        if (this.host) {
-            if (!this.hostRect) this.hostRect = this.host.getBoundingClientRect()
-            const rect = this.hostRect
-            x -= rect.left
-            y -= rect.top
-            if (x < 0 || y < 0 || x > rect.width || y > rect.height) return
-        }
+        if (x < 0 || y < 0 || x > this.width || y > this.height) return
 
         const size = Math.max(4, this.cfg.cellSize)
         const column = Math.floor(x / size)
@@ -214,7 +216,7 @@ export class GridTrailEngine {
     }
 
     private tick = (now: number): void => {
-        this.hostRect = null
+        this.frameRect = null
         const elapsed = this.last === 0 ? 16 : now - this.last
         this.last = now
 

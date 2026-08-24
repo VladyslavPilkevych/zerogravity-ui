@@ -170,3 +170,26 @@ export const Gallery: StoryObj = {
         </div>
     ),
 }
+
+/** Spacing is one shared idea, so a single gap covers every pixel loader. */
+export const NoGap: StoryObj = {
+    parameters: still,
+    render: () => (
+        <div style={{ display: "grid", gap: 28, justifyItems: "center" }}>
+            <PixelHeart gap={0} paused size={120} label="" />
+            <PixelBlocks gap={0} paused label="" />
+            <PixelBar gap={0} paused value={0.6} label="" />
+        </div>
+    ),
+}
+
+export const WideGap: StoryObj = {
+    parameters: still,
+    render: () => (
+        <div style={{ display: "grid", gap: 28, justifyItems: "center" }}>
+            <PixelHeart gap={1.4} paused size={120} label="" />
+            <PixelBlocks gap={1.4} paused label="" />
+            <PixelBar gap={1.4} paused value={0.6} label="" />
+        </div>
+    ),
+}

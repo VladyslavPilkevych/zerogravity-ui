@@ -12,12 +12,17 @@ export interface ApertureDemoConfig {
     disabled: boolean
 }
 
+/*
+ * `open` runs the frame the readable way round for a demo: it starts as a small
+ * card and grows to fill the frame. The track is three frames tall so the
+ * change is gradual instead of over in a flick.
+ */
 export const APERTURE_DEFAULTS: ApertureDemoConfig = {
-    height: "160vh",
-    inset: 12,
-    radius: 28,
-    direction: "close",
-    scale: 0.06,
+    height: "300cqh",
+    inset: 17,
+    radius: 26,
+    direction: "open",
+    scale: 0.08,
     dim: 0,
     dimColor: "#05050a",
     easing: "smooth",
@@ -37,10 +42,10 @@ export const APERTURE_CONTROLS: ControlGroup[] = [
                 kind: "cssLength",
                 path: "height",
                 label: "Scroll length",
-                min: 100,
-                max: 320,
+                min: 150,
+                max: 500,
                 step: 10,
-                unit: "vh",
+                unit: "cqh",
             },
             {
                 kind: "number",

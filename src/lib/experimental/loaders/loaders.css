@@ -2,6 +2,8 @@
     --l-color: #f4a04f;
     --l-beat: 1.4;
     --l-size: 96;
+    --l-gap: 1;
+    --l-fill: 0.34;
 
     display: inline-block;
     line-height: 0;
@@ -12,7 +14,7 @@
 .xp-heart {
     display: grid;
     grid-template-columns: repeat(var(--l-cols), 1fr);
-    gap: calc(var(--l-size) * 0.006px);
+    gap: calc(var(--l-size) / var(--l-cols) * var(--l-gap) * 1px);
     width: calc(var(--l-size) * 1px);
 }
 
@@ -75,7 +77,7 @@
 .xp-blocks {
     display: flex;
     align-items: flex-end;
-    gap: calc(var(--l-size) * 0.34px);
+    gap: calc(var(--l-size) * var(--l-gap) * 1px);
     height: calc(var(--l-size) * 2.4px);
 }
 
@@ -145,7 +147,7 @@
 .xp-bar {
     display: grid;
     grid-template-columns: repeat(var(--l-count), 1fr);
-    gap: calc(var(--l-size) * 0.22px);
+    gap: calc(var(--l-size) * 1.2 * var(--l-gap) * 1px);
     width: 100%;
     min-width: calc(var(--l-count) * var(--l-size) * 1.2px);
 }
@@ -222,13 +224,13 @@
     mask-image:
         repeating-linear-gradient(
             90deg,
-            #000 0 calc(var(--l-cell) * 0.34px),
-            transparent calc(var(--l-cell) * 0.34px) calc(var(--l-cell) * 1px)
+            #000 0 calc(var(--l-cell) * var(--l-fill) * 1px),
+            transparent calc(var(--l-cell) * var(--l-fill) * 1px) calc(var(--l-cell) * 1px)
         ),
         repeating-linear-gradient(
             0deg,
-            #000 0 calc(var(--l-cell) * 0.34px),
-            transparent calc(var(--l-cell) * 0.34px) calc(var(--l-cell) * 1px)
+            #000 0 calc(var(--l-cell) * var(--l-fill) * 1px),
+            transparent calc(var(--l-cell) * var(--l-fill) * 1px) calc(var(--l-cell) * 1px)
         );
     mask-composite: intersect;
     animation: xp-pulse-breathe calc(var(--l-beat) * 2s) ease-in-out infinite alternate;

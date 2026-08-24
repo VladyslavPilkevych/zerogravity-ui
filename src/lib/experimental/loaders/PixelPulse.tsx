@@ -3,7 +3,7 @@
 import type { CSSProperties, ReactNode } from "react"
 
 import { cx } from "../../internal"
-import { beatOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
+import { beatOf, gapOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
 import "./loaders.css"
 
 export interface PixelPulseProps extends LoaderCommon {
@@ -24,6 +24,7 @@ export function PixelPulse({
     color = "#f4a04f",
     speed = 1,
     paused = false,
+    gap,
     respectReducedMotion = true,
     className,
     style,
@@ -42,6 +43,7 @@ export function PixelPulse({
                 {
                     ...style,
                     "--l-cell": cell,
+                    "--l-fill": 1 / (1 + gapOf(gap, 1.94)),
                     "--l-color": color,
                     "--l-scrim": scrim,
                     "--l-beat": beatOf(1.6, speed),

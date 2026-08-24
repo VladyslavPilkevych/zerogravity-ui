@@ -1,0 +1,807 @@
+.xp-el {
+    --el-radius: 16;
+    --el-bleed: 14;
+    --el-line: 1.4;
+    --el-halo: 5;
+    --el-lap: 2.6;
+    --el-beat: 0.9;
+    --el-dash: 7;
+    --el-power: 1;
+    --el-rate: 1;
+    --el-hop: 0;
+    --el-a: #5ed7ff;
+    --el-b: #ffffff;
+    --el-c: #1f5fd0;
+
+    position: relative;
+    display: block;
+    border-radius: calc(var(--el-radius) * 1px);
+}
+
+.xp-el-content {
+    position: relative;
+    z-index: 2;
+    border-radius: inherit;
+}
+
+/* ------------------------------------------------------------ the edge */
+
+/*
+ * One stroked rect per layer. `rx` comes from the same measured radius the
+ * content uses, so the line sits exactly on the border at any size, and
+ * `pathLength` normalises the perimeter so a dash travels one lap per cycle
+ * whatever the card measures.
+ */
+.xp-el-art {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+/*
+ * One layer holds the body that belongs behind the content, the other the edge
+ * and the body that belongs over it.
+ */
+.xp-el-art[data-face="in"] {
+    z-index: 3;
+}
+
+/* The inward falloff: a plateau on the line, gone before it reaches content. */
+.xp-el-band {
+    stroke-width: calc(var(--el-halo) * 5px);
+    filter: blur(calc(var(--el-halo) * 1.2px));
+}
+
+.xp-el-edge {
+    fill: none;
+    stroke-linejoin: round;
+}
+
+.xp-el-crackle {
+    filter: var(--el-warp);
+    animation: xp-el-jitter calc(var(--el-beat) * 1s / var(--el-rate)) steps(1, end) infinite;
+}
+
+/* An unbent soft wash under the line: the glow, not a second jagged edge. */
+.xp-el-halo {
+    stroke: var(--el-a);
+    stroke-width: calc(var(--el-halo) * 1px);
+    opacity: calc(0.2 * var(--el-power));
+    filter: blur(calc(var(--el-halo) * 0.45px));
+}
+
+/* A coloured filament with a hot centre: the classic arc read. */
+.xp-el-core {
+    stroke: var(--el-a);
+    stroke-width: calc(var(--el-line) * 2.2px);
+    opacity: calc(0.7 * var(--el-power));
+}
+
+.xp-el-hot {
+    stroke: var(--el-b);
+    stroke-width: calc(var(--el-line) * 0.75px);
+    opacity: calc(0.9 * var(--el-power));
+}
+
+/* An unbent hairline so the shape always reads as a deliberate rounded edge. */
+.xp-el-base {
+    stroke: var(--el-a);
+    stroke-width: 1px;
+    opacity: 0.34;
+}
+
+/* Travelling energy: short dashes running the exact rounded path. */
+.xp-el-arcs {
+    filter: var(--el-warp);
+}
+
+.xp-el-arc {
+    stroke: #fff;
+    stroke-width: calc(var(--el-line) * 1.5px);
+    stroke-linecap: round;
+    stroke-dasharray: var(--el-dash) calc(100 - var(--el-dash));
+    animation: xp-el-run calc(var(--el-lap) * 1s / var(--el-rate)) linear infinite;
+    animation-delay: calc(var(--i) * var(--el-lap) * -0.37s / var(--el-rate));
+}
+
+@keyframes xp-el-run {
+    from {
+        stroke-dashoffset: 0;
+    }
+    to {
+        stroke-dashoffset: -100;
+    }
+}
+
+/*
+ * Nudging the bent group through the fixed noise field re-cuts the jags on
+ * every step, which is what makes the line crackle instead of merely wobble.
+ */
+@keyframes xp-el-jitter {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    20% {
+        transform: translate3d(0.7px, -1.1px, 0);
+    }
+    40% {
+        transform: translate3d(-1.2px, 0.5px, 0);
+    }
+    60% {
+        transform: translate3d(0.4px, 1.3px, 0);
+    }
+    80% {
+        transform: translate3d(-0.6px, -0.4px, 0);
+    }
+}
+
+/* ------------------------------------------------------------ the body */
+
+/*
+ * Solid silhouettes cut by their own field. Each layer runs its own lap, so
+ * the crests cross rather than march, which is what stops a wave reading as a
+ * line and a flame reading as a fringe.
+ */
+.xp-el-sheet {
+    pointer-events: none;
+}
+
+.xp-el-tide {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+}
+
+.xp-el-sheet[data-from="bottom"] .xp-el-tide {
+    transform-origin: 50% 0;
+}
+
+/* One wavelength of the sheet's own noise: the loop lands on itself. */
+@keyframes xp-el-drift {
+    from {
+        transform: translate3d(0, calc(var(--i) * -8px), 0);
+    }
+    to {
+        transform: translate3d(calc(var(--el-tide) * -1px), calc(var(--i) * -8px), 0);
+    }
+}
+
+.xp-el-wash {
+    fill: color-mix(in oklab, var(--el-c) 55%, var(--el-a));
+    opacity: 0;
+}
+
+/* ------------------------------------------------------------ electric */
+
+.xp-el[data-variant="electric"] {
+    --el-a: #5ed7ff;
+    --el-b: #ffffff;
+    --el-c: #1f5fd0;
+}
+
+.xp-el[data-variant="electric"] .xp-el-crackle {
+    filter: var(--el-warp) drop-shadow(0 0 3px color-mix(in oklab, var(--el-a) 62%, transparent));
+}
+
+.xp-el[data-variant="electric"] .xp-el-base {
+    opacity: 0.46;
+}
+
+.xp-el[data-variant="electric"] .xp-el-arcs {
+    filter: var(--el-warp) drop-shadow(0 0 6px color-mix(in oklab, var(--el-a) 80%, transparent));
+}
+
+/*
+ * Dragging the strokes a long way through the fixed field and pulling the
+ * result straight back re-cuts every angle without moving the line off the
+ * border. Each snap is a different bolt, not the same bolt nudged.
+ */
+.xp-el[data-variant="electric"] .xp-el-crackle {
+    animation: none;
+}
+
+.xp-el[data-variant="electric"] .xp-el-shift {
+    animation: xp-el-hop calc(var(--el-beat) * 1s / var(--el-rate)) steps(1, end) infinite;
+}
+
+.xp-el[data-variant="electric"] .xp-el-back {
+    animation: xp-el-hop-back calc(var(--el-beat) * 1s / var(--el-rate)) steps(1, end) infinite;
+}
+
+@keyframes xp-el-hop {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    17% {
+        transform: translate3d(calc(var(--el-hop) * 0.52px), calc(var(--el-hop) * -0.81px), 0);
+    }
+    29% {
+        transform: translate3d(calc(var(--el-hop) * -0.9px), calc(var(--el-hop) * 0.41px), 0);
+    }
+    44% {
+        transform: translate3d(calc(var(--el-hop) * 1.24px), calc(var(--el-hop) * 0.95px), 0);
+    }
+    58% {
+        transform: translate3d(calc(var(--el-hop) * -0.37px), calc(var(--el-hop) * -1.35px), 0);
+    }
+    71% {
+        transform: translate3d(calc(var(--el-hop) * 0.78px), calc(var(--el-hop) * 0.26px), 0);
+    }
+    86% {
+        transform: translate3d(calc(var(--el-hop) * -1.1px), calc(var(--el-hop) * -0.58px), 0);
+    }
+}
+
+@keyframes xp-el-hop-back {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    17% {
+        transform: translate3d(calc(var(--el-hop) * -0.52px), calc(var(--el-hop) * 0.81px), 0);
+    }
+    29% {
+        transform: translate3d(calc(var(--el-hop) * 0.9px), calc(var(--el-hop) * -0.41px), 0);
+    }
+    44% {
+        transform: translate3d(calc(var(--el-hop) * -1.24px), calc(var(--el-hop) * -0.95px), 0);
+    }
+    58% {
+        transform: translate3d(calc(var(--el-hop) * 0.37px), calc(var(--el-hop) * 1.35px), 0);
+    }
+    71% {
+        transform: translate3d(calc(var(--el-hop) * -0.78px), calc(var(--el-hop) * -0.26px), 0);
+    }
+    86% {
+        transform: translate3d(calc(var(--el-hop) * 1.1px), calc(var(--el-hop) * 0.58px), 0);
+    }
+}
+
+/* Each arc runs its own length at its own pace, so the set never repeats. */
+.xp-el[data-variant="electric"] .xp-el-arc {
+    stroke-width: calc(var(--el-line) * 2.4px);
+    stroke-linecap: butt;
+    opacity: calc(0.95 * var(--el-power));
+    stroke-dasharray: calc(var(--el-dash) + var(--i) * 2.5)
+        calc(100 - var(--el-dash) - var(--i) * 2.5);
+    animation-duration: calc((var(--el-lap) + var(--i) * 0.43) * 1s / var(--el-rate));
+    animation-delay: calc(var(--i) * var(--el-lap) * -0.29s / var(--el-rate));
+}
+
+/* A rare surge that lifts the whole edge for a moment. */
+.xp-el[data-variant="electric"] .xp-el-halo {
+    animation: xp-el-surge calc(var(--el-lap) * 3.1s / var(--el-rate)) ease-out infinite;
+}
+
+@keyframes xp-el-flicker {
+    0%,
+    100% {
+        opacity: calc(0.9 * var(--el-power));
+    }
+    43% {
+        opacity: calc(0.55 * var(--el-power));
+    }
+    47% {
+        opacity: var(--el-power);
+    }
+}
+
+.xp-el[data-variant="electric"] .xp-el-hot {
+    animation: xp-el-flicker calc(var(--el-beat) * 2.7s / var(--el-rate)) ease-in-out infinite;
+}
+
+@keyframes xp-el-surge {
+    0%,
+    12%,
+    22%,
+    64%,
+    72%,
+    100% {
+        opacity: calc(0.2 * var(--el-power));
+    }
+    15% {
+        opacity: calc(0.62 * var(--el-power));
+    }
+    68% {
+        opacity: calc(0.4 * var(--el-power));
+    }
+}
+
+/* ------------------------------------------------------------ fire */
+
+.xp-el[data-variant="fire"] {
+    --el-a: #ff8a2b;
+    --el-b: #ffd980;
+    --el-c: #c62f18;
+}
+
+.xp-el[data-variant="fire"] .xp-el-crackle {
+    filter: var(--el-warp) drop-shadow(0 -2px 6px color-mix(in oklab, var(--el-a) 42%, transparent));
+    animation-name: xp-el-rise;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+
+.xp-el[data-variant="fire"] .xp-el-halo {
+    stroke: var(--el-c);
+    opacity: calc(0.3 * var(--el-power));
+}
+
+.xp-el[data-variant="fire"] .xp-el-core {
+    stroke: var(--el-a);
+    opacity: calc(0.75 * var(--el-power));
+}
+
+.xp-el[data-variant="fire"] .xp-el-hot {
+    stroke: var(--el-b);
+    opacity: calc(0.85 * var(--el-power));
+}
+
+.xp-el[data-variant="fire"] .xp-el-base {
+    stroke: var(--el-b);
+    opacity: 0.4;
+}
+
+.xp-el[data-variant="fire"] .xp-el-arc {
+    stroke: var(--el-b);
+    stroke-width: calc(var(--el-line) * 1.6px);
+    opacity: calc(0.6 * var(--el-power));
+}
+
+/* Tips are the coolest part of a flame, the base the brightest. */
+.xp-el[data-variant="fire"] .xp-el-p0 {
+    stop-color: var(--el-c);
+    stop-opacity: 0;
+}
+
+.xp-el[data-variant="fire"] .xp-el-p1 {
+    stop-color: var(--el-a);
+    stop-opacity: 0.7;
+}
+
+.xp-el[data-variant="fire"] .xp-el-p2 {
+    stop-color: var(--el-b);
+    stop-opacity: 1;
+}
+
+.xp-el[data-variant="fire"] .xp-el-sheet {
+    filter: blur(0.6px);
+}
+
+.xp-el[data-variant="fire"] .xp-el-tide {
+    opacity: calc((0.72 - var(--i) * 0.18) * var(--el-power));
+    animation: xp-el-lick calc((1.7 + var(--i) * 0.55) * 1s / var(--el-rate)) ease-in-out infinite
+        alternate;
+    animation-delay: calc(var(--i) * -0.43s / var(--el-rate));
+}
+
+/* A tongue climbs and falls back; it does not slide along the edge. */
+@keyframes xp-el-lick {
+    from {
+        transform: translate3d(-5px, 7px, 0) scaleY(0.82);
+    }
+    to {
+        transform: translate3d(5px, -3px, 0) scaleY(1.14);
+    }
+}
+
+/* Sparks leave the flames, so they start at the top and keep going up. */
+/* Flames rise, so the bent group drifts upward rather than side to side. */
+@keyframes xp-el-rise {
+    from {
+        transform: translate3d(-0.8px, 1.6px, 0);
+    }
+    to {
+        transform: translate3d(0.8px, -2.2px, 0);
+    }
+}
+
+/* ---------------------------------------------------- frost (parked) */
+/* Kept as-is, inert while the variant is commented out in variants.ts. */
+
+.xp-el[data-variant="frost"] {
+    --el-a: #a5dcff;
+    --el-b: #f2fbff;
+    --el-c: #5f92c9;
+}
+
+.xp-el[data-variant="frost"] .xp-el-crackle {
+    animation-name: xp-el-settle;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+
+.xp-el[data-variant="frost"] .xp-el-halo {
+    stroke: var(--el-c);
+    opacity: calc(0.24 * var(--el-power));
+}
+
+.xp-el[data-variant="frost"] .xp-el-core {
+    stroke: var(--el-a);
+    stroke-width: calc(var(--el-line) * 2.4px);
+    stroke-linejoin: miter;
+    stroke-miterlimit: 2;
+    opacity: calc(0.6 * var(--el-power));
+}
+
+.xp-el[data-variant="frost"] .xp-el-hot {
+    stroke: var(--el-b);
+    stroke-linejoin: miter;
+    stroke-miterlimit: 2;
+    opacity: calc(0.85 * var(--el-power));
+}
+
+.xp-el[data-variant="frost"] .xp-el-base {
+    stroke: var(--el-a);
+    opacity: 0.42;
+}
+
+/* One slow shimmer: the only thing that travels on a frozen edge. */
+.xp-el[data-variant="frost"] .xp-el-arc {
+    stroke: #fff;
+    stroke-width: calc(var(--el-line) * 2.4px);
+    stroke-linecap: butt;
+    opacity: calc(0.5 * var(--el-power));
+    filter: blur(1.5px);
+}
+
+/* Shards catch the light at their peaks and go blue where the shelf thickens. */
+.xp-el[data-variant="frost"] .xp-el-p0 {
+    stop-color: var(--el-b);
+    stop-opacity: 0.95;
+}
+
+.xp-el[data-variant="frost"] .xp-el-p1 {
+    stop-color: var(--el-a);
+    stop-opacity: 0.38;
+}
+
+.xp-el[data-variant="frost"] .xp-el-p2 {
+    stop-color: var(--el-c);
+    stop-opacity: 0.55;
+}
+
+.xp-el[data-variant="frost"] .xp-el-wash {
+    opacity: calc(0.13 * var(--el-power));
+}
+
+.xp-el[data-variant="frost"] .xp-el-tide {
+    opacity: calc((0.24 - var(--i) * 0.07) * var(--el-power));
+    animation: xp-el-drift calc((54 + var(--i) * 17) * 1s / var(--el-rate)) linear infinite;
+}
+
+/* Ice barely moves; it just tightens and eases. */
+@keyframes xp-el-settle {
+    from {
+        transform: translate3d(-0.4px, -0.3px, 0) scale(1);
+    }
+    to {
+        transform: translate3d(0.4px, 0.3px, 0) scale(1.002);
+    }
+}
+
+/* ---------------------------------------------------- water (parked) */
+/* Kept as-is, inert while the variant is commented out in variants.ts. */
+
+.xp-el[data-variant="water"] {
+    --el-a: #3fb6e8;
+    --el-b: #cdeeff;
+    --el-c: #0f5580;
+}
+
+.xp-el[data-variant="water"] .xp-el-crackle {
+    animation-name: xp-el-swell;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+
+.xp-el[data-variant="water"] .xp-el-halo {
+    stroke: var(--el-a);
+    opacity: calc(0.3 * var(--el-power));
+}
+
+.xp-el[data-variant="water"] .xp-el-core {
+    stroke: var(--el-a);
+    stroke-width: calc(var(--el-line) * 1.8px);
+    opacity: calc(0.7 * var(--el-power));
+}
+
+.xp-el[data-variant="water"] .xp-el-hot {
+    stroke: var(--el-b);
+    stroke-width: calc(var(--el-line) * 0.5px);
+    opacity: calc(0.5 * var(--el-power));
+}
+
+.xp-el[data-variant="water"] .xp-el-base {
+    stroke: var(--el-b);
+    opacity: 0.3;
+}
+
+/* A long soft highlight sliding over a wet edge. */
+.xp-el[data-variant="water"] .xp-el-arc {
+    stroke: #fff;
+    stroke-width: calc(var(--el-line) * 1.1px);
+    stroke-linecap: butt;
+    opacity: calc(0.7 * var(--el-power));
+    filter: blur(0.8px);
+}
+
+/* A crest is lit, the body below it is not. */
+.xp-el[data-variant="water"] .xp-el-p0 {
+    stop-color: var(--el-b);
+    stop-opacity: 1;
+}
+
+.xp-el[data-variant="water"] .xp-el-p1 {
+    stop-color: var(--el-a);
+    stop-opacity: 0.42;
+}
+
+.xp-el[data-variant="water"] .xp-el-p2 {
+    stop-color: var(--el-c);
+    stop-opacity: 0.62;
+}
+
+.xp-el[data-variant="water"] .xp-el-tide {
+    opacity: calc((0.26 - var(--i) * 0.06) * var(--el-power));
+    animation: xp-el-drift calc((6.5 + var(--i) * 2.1) * 1s / var(--el-rate)) linear infinite;
+    animation-delay: calc(var(--i) * -1.7s / var(--el-rate));
+}
+
+@keyframes xp-el-swell {
+    from {
+        transform: translate3d(-1.6px, 0.8px, 0);
+    }
+    to {
+        transform: translate3d(1.6px, -0.8px, 0);
+    }
+}
+
+/* ------------------------------------------------------------ particles */
+
+.xp-el-bits {
+    position: absolute;
+    inset: calc(var(--el-bleed) * -1px);
+    z-index: 1;
+    overflow: hidden;
+    border-radius: calc((var(--el-radius) + var(--el-bleed)) * 1px);
+    pointer-events: none;
+}
+
+.xp-el-bit {
+    position: absolute;
+    left: calc(var(--x) * 1%);
+    width: calc(var(--s) * 1px);
+    height: calc(var(--s) * 1px);
+    border-radius: 50%;
+    opacity: 0;
+    animation-duration: calc(var(--d) * 1s / var(--el-rate));
+    animation-delay: calc(var(--w) * -1s);
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes xp-el-fall {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, -8px, 0);
+    }
+    14% {
+        opacity: 0.8;
+    }
+    78% {
+        opacity: 0.45;
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(calc(var(--dx) * 1px), var(--reach), 0);
+    }
+}
+
+@keyframes xp-el-lift {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    18% {
+        opacity: 0.85;
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(calc(var(--dx) * 1px), var(--reach), 0) scale(0.3);
+    }
+}
+
+/* Condensation: a droplet swells on the lower edge before it lets go. */
+@keyframes xp-el-bead {
+    0%,
+    58% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(0.3);
+    }
+    66% {
+        opacity: 0.85;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    76% {
+        opacity: 0.85;
+        transform: translate3d(0, 2px, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(0, var(--reach), 0) scale(0.55);
+    }
+}
+
+/* Snow belongs in the room, not around it. */
+.xp-el[data-bits="in"] .xp-el-bits {
+    z-index: 3;
+}
+
+.xp-el[data-variant="frost"] .xp-el-bit {
+    opacity: 0;
+    top: 0;
+    --reach: calc((var(--el-h) + 40) * 1px);
+    background: var(--el-b);
+    box-shadow: 0 0 3px color-mix(in oklab, var(--el-b) 55%, transparent);
+    animation-name: xp-el-fall;
+}
+
+.xp-el[data-variant="fire"] .xp-el-bit {
+    top: calc(var(--el-bleed) * 1px);
+    --reach: -46px;
+    background: var(--el-b);
+    box-shadow: 0 0 4px color-mix(in oklab, var(--el-a) 70%, transparent);
+    animation-name: xp-el-lift;
+    animation-timing-function: ease-out;
+}
+
+.xp-el[data-variant="water"] .xp-el-bit {
+    bottom: calc(var(--el-bleed) * 0.7px);
+    --reach: 42px;
+    background: color-mix(in oklab, var(--el-b) 78%, transparent);
+    box-shadow: inset 0 -1px 1px color-mix(in oklab, var(--el-c) 65%, transparent);
+    border-radius: 50% 50% 55% 55%;
+    animation-name: xp-el-bead;
+    animation-timing-function: ease-in;
+}
+
+/* ------------------------------------------------------------ hover */
+
+.xp-el[data-live="true"] .xp-el-base {
+    transition: opacity 300ms ease;
+}
+
+.xp-el[data-live="true"]:hover .xp-el-arc {
+    animation-duration: calc(var(--el-lap) * 0.72s / var(--el-rate));
+}
+
+.xp-el[data-live="true"]:hover .xp-el-base {
+    opacity: 0.5;
+}
+
+/* ------------------------------------------------------------ cursor */
+
+.xp-el[data-cursor="true"] {
+    cursor: none;
+}
+
+.xp-el-cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+    will-change: transform;
+}
+
+.xp-el-cursor[data-on="true"] {
+    opacity: 1;
+}
+
+.xp-el-cursor::before,
+.xp-el-cursor::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.xp-el-cursor::before {
+    width: 5px;
+    height: 5px;
+    background: var(--el-b);
+    box-shadow: 0 0 7px color-mix(in oklab, var(--el-a) 85%, transparent);
+}
+
+.xp-el-cursor::after {
+    width: 20px;
+    height: 20px;
+    border: 1px solid color-mix(in oklab, var(--el-a) 65%, transparent);
+}
+
+.xp-el[data-variant="fire"] .xp-el-cursor::after {
+    width: 17px;
+    height: 17px;
+    border-color: transparent;
+    background: radial-gradient(
+        circle,
+        color-mix(in oklab, var(--el-a) 52%, transparent),
+        transparent 70%
+    );
+}
+
+.xp-el[data-variant="frost"] .xp-el-cursor::after {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    border-color: color-mix(in oklab, var(--el-b) 72%, transparent);
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.xp-el[data-variant="water"] .xp-el-cursor::after {
+    width: 22px;
+    height: 22px;
+    border-color: color-mix(in oklab, var(--el-b) 58%, transparent);
+    animation: xp-el-ripple 1.8s ease-out infinite;
+}
+
+@keyframes xp-el-ripple {
+    from {
+        transform: translate(-50%, -50%) scale(0.55);
+        opacity: 0.85;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 0;
+    }
+}
+
+/* ------------------------------------------------------------ still */
+
+.xp-el[data-still="true"] .xp-el-crackle,
+.xp-el[data-still="true"] .xp-el-shift,
+.xp-el[data-still="true"] .xp-el-back,
+.xp-el[data-still="true"] .xp-el-core,
+.xp-el[data-still="true"] .xp-el-hot,
+.xp-el[data-still="true"] .xp-el-halo,
+.xp-el[data-still="true"] .xp-el-arc,
+.xp-el[data-still="true"] .xp-el-tide,
+.xp-el[data-still="true"] .xp-el-cursor::after {
+    animation: none !important;
+}
+
+/* Frozen part-way through a lick, so the static flame still has a shape. */
+.xp-el[data-still="true"] .xp-el-tide {
+    transform: translate3d(0, 2px, 0) scaleY(1.04);
+}
+
+/* Frozen mid-lap, so the static edge still reads as travelling energy. */
+.xp-el[data-still="true"] .xp-el-arc {
+    stroke-dashoffset: calc(var(--i) * -21 - 12);
+}
+
+.xp-el[data-still="true"] .xp-el-crackle {
+    transform: translate3d(0.6px, -0.9px, 0);
+}
+
+/* Frozen on one of the snap offsets, so the static bolt is a real bolt. */
+.xp-el[data-still="true"] .xp-el-shift {
+    transform: translate3d(calc(var(--el-hop) * 0.52px), calc(var(--el-hop) * -0.81px), 0);
+}
+
+.xp-el[data-still="true"] .xp-el-back {
+    transform: translate3d(calc(var(--el-hop) * -0.52px), calc(var(--el-hop) * 0.81px), 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-el-cursor {
+        transition: none;
+    }
+}

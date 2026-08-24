@@ -1,8 +1,8 @@
 # zerogravity-ui
 
-Motion-first React components — particle fields, scroll framing, carousels and
-display type. Every component ships its own styles, stops animating when idle,
-and honours `prefers-reduced-motion`.
+Motion-first React components — particle fields, animated borders, illustrated
+scenes, scroll framing, carousels and display type. Every component ships its
+own styles, stops animating when idle, and honours `prefers-reduced-motion`.
 
 > **Not published yet.** The package name is still unresolved — see
 > [Release blockers](#release-blockers). Everything below describes the package
@@ -43,6 +43,44 @@ export function Showcase() {
     )
 }
 ```
+
+### Direct component imports
+
+Every component also has its own entry point, so you can import it without going
+through the root barrel:
+
+```tsx
+import { Reel } from "zerogravity-ui/reel"
+import { SplitFlap } from "zerogravity-ui/split-flap"
+```
+
+Both styles produce the same bundle. The root barrel is a plain re-export and
+tree-shakes cleanly: a Vite production build importing only `SplitFlap` measures
+**3.2 kB of library code and 1.5 kB of CSS** on top of a React-only baseline,
+byte-identical whichever import form is used, with every other component and
+stylesheet absent. Those numbers come from `pnpm test:consumer`, which builds
+both apps against the packed tarball on every run rather than trusting that ESM
+implies tree shaking.
+
+Reach for the subpath form when you prefer explicit module boundaries, not
+because it is smaller.
+
+The entry points are the seventeen components plus `pointer-fx`, spelled as
+the directory name:
+
+```text
+zerogravity-ui/antigravity      zerogravity-ui/meadow        zerogravity-ui/split-flap
+zerogravity-ui/aperture         zerogravity-ui/overprint     zerogravity-ui/stencil
+zerogravity-ui/diorama          zerogravity-ui/pointer-fx    zerogravity-ui/tessera
+zerogravity-ui/elemental        zerogravity-ui/reel          zerogravity-ui/trailing-cursor
+zerogravity-ui/grid-trail       zerogravity-ui/ricochet      zerogravity-ui/vellum
+zerogravity-ui/kern             zerogravity-ui/scroll-stack
+zerogravity-ui/lodestone
+```
+
+Nothing else is importable. Engines, geometry helpers, the shared `internal`
+modules and `dist/` paths have no entry point and never will — the package
+declares no wildcard exports, and the package check fails if one appears.
 
 ### Styles
 
@@ -87,16 +125,30 @@ static prerendering.
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [Antigravity](src/lib/antigravity/README.md)        | Canvas particle cloud that follows the cursor, or stays put and scatters away from it. Eighteen formations including a 3-D planet, a DNA helix and a black hole accretion disc |
 | [Aperture](src/lib/aperture/README.md)              | Full-bleed panel that closes into a framed card as you scroll, driven by `clip-path`                                                                                           |
+| [Diorama](src/lib/diorama/README.md)                | Layered planes that part around the pointer for a parallax depth effect                                                                                                        |
+| [Elemental](src/lib/elemental/README.md)            | Animated border that wraps any content: a crackling electric edge or a burning one                                                                                             |
 | [GridTrail](src/lib/grid-trail/README.md)           | Grid cells light up under the pointer and fade out. Viewport-wide or scoped to a container                                                                                     |
+| [Kern](src/lib/kern/README.md)                      | Glyphs that open up, lift and gain weight as the pointer passes them                                                                                                           |
+| [Lodestone](src/lib/lodestone/README.md)            | Magnetic buttons that lean toward the cursor without ever overlapping each other                                                                                               |
+| [Meadow](src/lib/meadow/README.md)                  | Illustrated scene that shifts with the time of day, plus an explicit space theme                                                                                               |
+| [Overprint](src/lib/overprint/README.md)            | Misregistered colour separations that converge as the section scrolls into place                                                                                               |
 | [Reel](src/lib/reel/README.md)                      | Roulette-style carousel with drag, flick, wheel, keyboard and a highlighted centre slide                                                                                       |
 | [ScrollStack](src/lib/scroll-stack/README.md)       | Sections that slide over each other on scroll and unstack on the way back                                                                                                      |
+| [Ricochet](src/lib/ricochet/README.md)              | Playable Breakout and shooter modes that demolish pixel text, with power-ups                                                                                                   |
 | [SplitFlap](src/lib/split-flap/README.md)           | Airport board that flips one character at a time. Text, clock or countdown                                                                                                     |
 | [Stencil](src/lib/stencil/README.md)                | Display type with a pattern showing through the letters, and per-letter hover effects                                                                                          |
+| [Tessera](src/lib/tessera/README.md)                | Router-agnostic page-transition overlay that covers, swaps the route, then reveals                                                                                             |
 | [TrailingCursor](src/lib/trailing-cursor/README.md) | Dot pinned to the pointer plus a lagging ring, with per-element `data-cursor-*` overrides                                                                                      |
+| [Vellum](src/lib/vellum/README.md)                  | Paper-like surface that lifts and catches light under the pointer                                                                                                              |
 | [pointer-fx](src/lib/pointer-fx/README.md)          | Shared colour resolution and the reduced-motion / pointer-type gate. No component of its own                                                                                   |
 
 Every component README carries the full prop table, accessibility notes and
 performance characteristics.
+
+### Dependencies
+
+The package has **no runtime dependencies**. React and React DOM are peers;
+nothing else is installed alongside it.
 
 ### Environment requirements
 
@@ -127,20 +179,23 @@ are not reachable from the package and can change in a patch release.
 ```bash
 corepack enable
 pnpm install
-pnpm dev        # playground at http://localhost:3000
+pnpm dev        # docs site at http://localhost:3000
 ```
 
 The project uses **pnpm** and pins the version in `packageManager`.
 
-### Playground
+### Docs site
 
-- One route per component: `/`, `/aperture`, `/grid-trail`, `/reel`,
-  `/scroll-stack`, `/split-flap`, `/stencil`, `/trailing-cursor`.
-- The panel is generated from a schema, and every row is labelled with the real
+- `/` is a short landing page, `/docs` lists every component, and each component
+  has its own page at `/docs/<slug>`.
+- The sidebar groups components by category and filters as you type.
+  <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd> jumps to the search field.
+- Each page is preview, customize, usage, props and dependencies, all generated
+  from one registry entry in `src/docs/registry.ts`.
+- Controls are generated from a schema, and every row is labelled with the real
   prop path (`pulse.waveform`, `formation.radius`).
-- At the bottom of the panel is ready-to-paste JSX containing only the props that
-  differ from the defaults, with a copy button.
-- `H` hides the panel.
+- The usage snippet contains only the props that differ from the defaults, and
+  updates as you move the controls. It is read-only, with a copy button.
 
 Anything changed by hand becomes a sticky override. Switching presets applies the
 preset underneath those edits, so tweaks survive until **Reset**:
@@ -166,18 +221,24 @@ src/
 │   ├── trailing-cursor/
 │   └── index.ts                the public entry point
 │
-├── playground/             development and documentation only
-│   ├── panel/                  schema-driven control panel
-│   └── <component>/            demo + control schema per component
+├── docs/                   the documentation site: registry, shell, search
+│   ├── registry.ts             one entry per component, the source of truth
+│   └── components/             header, sidebar, preview, code, props table
 │
-├── app/                    Next.js App Router, hosts the playground
+├── playground/             demo sources, development only
+│   ├── panel/                  schema-driven controls
+│   ├── previews/               one live preview per component
+│   └── <component>/schema.ts   defaults, controls and presets
+│
+├── app/                    Next.js App Router, hosts the docs site
 └── test/                   test harnesses (rAF, canvas, media queries)
 ```
 
 Each component owns its folder: the component, its types, its CSS, a `README.md`
 and an `index.ts` that defines its public surface.
 
-- `src/playground` may import from `src/lib`. The reverse never happens.
+- `src/docs` and `src/playground` may import from `src/lib`. The reverse never
+  happens.
 - `src/lib` imports React and browser APIs, never Next.js. An ESLint rule fails
   the build if either boundary is crossed.
 - Cross-component imports inside the library go to the specific module, not to
@@ -197,17 +258,22 @@ and an `index.ts` that defines its public surface.
 
 ### Scripts
 
-|                                     |                                             |
-| ----------------------------------- | ------------------------------------------- |
-| `pnpm dev`                          | Playground dev server                       |
-| `pnpm build`                        | Playground production build                 |
-| `pnpm build:lib`                    | Library build into `dist/` via tsup         |
-| `pnpm lint`                         | ESLint, including the library-boundary rule |
-| `pnpm format` / `pnpm format:check` | Prettier                                    |
-| `pnpm typecheck`                    | `tsc --noEmit`                              |
-| `pnpm test`                         | Vitest, jsdom                               |
-| `pnpm check`                        | Everything CI runs                          |
-| `pnpm release:check`                | `pnpm check` plus the library build         |
+|                                     |                                                  |
+| ----------------------------------- | ------------------------------------------------ |
+| `pnpm dev`                          | Docs site dev server                             |
+| `pnpm build`                        | Docs site production build                       |
+| `pnpm build:lib`                    | Library build into `dist/` via tsup              |
+| `pnpm lint`                         | ESLint, including the library-boundary rule      |
+| `pnpm format` / `pnpm format:check` | Prettier                                         |
+| `pnpm typecheck`                    | `tsc --noEmit`                                   |
+| `pnpm test`                         | Vitest, jsdom                                    |
+| `pnpm test:browser`                 | Storybook stories in a real browser, plus a11y   |
+| `pnpm test:e2e`                     | Playwright against the built docs site           |
+| `pnpm build-storybook`              | Static Storybook, also the Chromatic input       |
+| `pnpm check:package`                | Packs, then runs publint and Are The Types Wrong |
+| `pnpm test:consumer`                | Installs the tarball into Vite and Next.js apps  |
+| `pnpm check`                        | Fast local gate: static checks and both suites   |
+| `pnpm release:check`                | `pnpm check` plus build, package and consumer    |
 
 Do not run `pnpm build` while `pnpm dev` is running — both write to `.next`.
 
@@ -223,23 +289,40 @@ The release process is documented in [CONTRIBUTING.md](CONTRIBUTING.md#releasing
 
 ## Release blockers
 
-One thing cannot be inferred from the repository and must be decided by the
-project owner before a first publish:
+Everything the repository controls is ready. What is left cannot be decided from
+inside it:
 
-1. **A package name.** `zerogravity-ui` matches the repository but was already
-   taken on npm at the time of writing. Confirm an available name and update
-   `name` in `package.json` plus the install instructions above.
+1. **The package name is taken.** `zerogravity-ui` exists on npm — version
+   `0.0.6`, published by a different author — so this package cannot be
+   published under that name. Verified against the registry, not assumed. The
+   owner has to either claim a free name and update `name` in `package.json`
+   plus the install instructions above, or take over the existing one.
+   `@zerogravity/ui` and `zerogravity` were both unregistered when this was
+   checked; a scoped name already matches the `publishConfig.access: public`
+   setting in `package.json`. No name has been chosen here on purpose —
+   switching it silently would be the wrong call to make on someone's behalf.
+2. **npm publish rights.** An npm account with 2FA enabled, and ownership of
+   whichever name is settled on.
 
-`private: true` is still set in `package.json` and must be removed once that is
-resolved.
+`private: true` stays in `package.json` until the first is resolved. It is the
+only thing standing between this repository and `npm publish`, and it is
+deliberate: with an unavailable name, publishing would fail anyway, and the flag
+makes that failure a local one rather than a half-finished release.
+
+Not blockers: a custom domain (the docs site can keep deploying to its current
+host) and a Chromatic token (CI reports the visual job as skipped without one).
 
 ## Adding a component
 
 1. `src/lib/<component>/` with the component, an `index.ts` describing its public
    surface, and a `README.md` with the prop table.
 2. Re-export the intended API from `src/lib/index.ts`.
-3. `src/playground/<component>/schema.ts` plus a demo that renders `Panel`.
-4. A route in `src/app/<component>/page.tsx` and a link in `src/playground/Nav.tsx`.
+3. A control schema (`src/playground/<component>/schema.ts`, or an entry in
+   `src/playground/experimental/schemas.ts`) and a preview in
+   `src/playground/previews/`.
+4. An entry in `src/docs/registry.ts` and its preview in `src/docs/previews.tsx`.
+   The route, the sidebar, search, the props table and the usage snippet all come
+   from that one entry.
 5. A test next to the component covering rendering, keyboard or pointer
    behaviour, cleanup, and reduced-motion.
 

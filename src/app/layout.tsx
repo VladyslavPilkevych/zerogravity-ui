@@ -1,15 +1,20 @@
 import type { Metadata, Viewport } from "next"
 
-import { Nav } from "@/playground/Nav"
+import { SiteHeader } from "@/docs/components/SiteHeader"
+import "@/docs/docs.css"
 import "./globals.css"
 
 export const metadata: Metadata = {
-    title: "ui-library",
-    description: "React / Next component library with a live props playground",
+    title: {
+        default: "ZeroGravity UI",
+        template: "%s · ZeroGravity UI",
+    },
+    description:
+        "React components for motion, pointer effects and playful scenes. Zero runtime dependencies.",
 }
 
 export const viewport: Viewport = {
-    themeColor: "#050505",
+    themeColor: "#050507",
     width: "device-width",
     initialScale: 1,
 }
@@ -18,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
             <body>
-                <Nav />
+                <SiteHeader />
                 {children}
             </body>
         </html>

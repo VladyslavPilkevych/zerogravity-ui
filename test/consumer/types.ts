@@ -2,6 +2,12 @@ import {
     Antigravity,
     ANTIGRAVITY_DEFAULTS,
     Aperture,
+    Diorama,
+    Kern,
+    Lodestone,
+    Overprint,
+    Ricochet,
+    Vellum,
     GridTrail,
     Reel,
     ScrollStack,
@@ -24,9 +30,49 @@ import {
     type TrailingCursorProps,
 } from "zerogravity-ui"
 
+// The same components again, through their own entry points.
+import { Reel as DirectReel, type ReelProps as DirectReelProps } from "zerogravity-ui/reel"
+import { SplitFlap as DirectSplitFlap } from "zerogravity-ui/split-flap"
+import { Stencil as DirectStencil, type StencilFill } from "zerogravity-ui/stencil"
+import { Antigravity as DirectAntigravity } from "zerogravity-ui/antigravity"
+import { resolveColor as directResolveColor } from "zerogravity-ui/pointer-fx"
+import { Meadow, type MeadowTheme } from "zerogravity-ui/meadow"
+import { Elemental, type ElementalVariant } from "zerogravity-ui/elemental"
+import { TesseraProvider } from "zerogravity-ui/tessera"
+
+const direct = [
+    DirectReel,
+    DirectSplitFlap,
+    DirectStencil,
+    DirectAntigravity,
+    Meadow,
+    Elemental,
+    TesseraProvider,
+]
+void direct
+
+const theme: MeadowTheme = "night"
+const spark: ElementalVariant = "electric"
+void [theme, spark]
+
+const directReel: DirectReelProps = { children: null, radius: 20 }
+void directReel
+
+const fill: StencilFill = "zebra"
+void fill
+
+const directColour: string = directResolveColor("#000")
+void directColour
+
 const components = [
     Antigravity,
     Aperture,
+    Diorama,
+    Kern,
+    Lodestone,
+    Overprint,
+    Ricochet,
+    Vellum,
     GridTrail,
     Reel,
     ScrollStack,
@@ -94,3 +140,19 @@ void badEasing
 // @ts-expect-error internal engine modules are not part of the public surface
 import type { AntigravityEngine } from "zerogravity-ui/antigravity/engine"
 export type { AntigravityEngine }
+
+// @ts-expect-error shared helpers have no entry point
+import { cx } from "zerogravity-ui/internal"
+void cx
+
+// @ts-expect-error prototypes are still not published
+import { Raster } from "zerogravity-ui/raster"
+void Raster
+
+// @ts-expect-error dist is an implementation detail, not an import path
+import { Reel as DistReel } from "zerogravity-ui/dist/reel"
+void DistReel
+
+// @ts-expect-error a component entry point exports only its own component
+import { Stencil as WrongEntry } from "zerogravity-ui/reel"
+void WrongEntry

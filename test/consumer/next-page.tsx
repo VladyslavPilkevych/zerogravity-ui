@@ -5,10 +5,13 @@ import {
     Reel,
     ScrollStack,
     SplitFlap,
+    Meadow,
     Stencil,
     TrailingCursor,
     resolveAntigravityConfig,
 } from "zerogravity-ui"
+import { Aperture } from "zerogravity-ui/aperture"
+import { Elemental } from "zerogravity-ui/elemental"
 
 export default function Page() {
     const config = resolveAntigravityConfig(ANTIGRAVITY_PRESETS[0].options)
@@ -31,6 +34,13 @@ export default function Page() {
             </Reel>
             <SplitFlap value="NEXT" />
             <Stencil text="RSC" fill="stripes" />
+            <Aperture>
+                <p>Framed by a subpath import</p>
+            </Aperture>
+            <Elemental variant="fire">
+                <p>Promoted component through a subpath</p>
+            </Elemental>
+            <Meadow theme="night" />
         </main>
     )
 }

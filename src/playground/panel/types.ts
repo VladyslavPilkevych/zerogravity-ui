@@ -18,6 +18,7 @@ export type ControlDef =
           unit: string
       }
     | { kind: "select"; path: string; label: string; options: readonly string[] }
+    | { kind: "text"; path: string; label: string; maxLength?: number; placeholder?: string }
     | { kind: "boolean"; path: string; label: string }
     | { kind: "color"; path: string; label: string }
     | { kind: "colorNullable"; path: string; label: string }
@@ -37,9 +38,4 @@ export interface PanelPreset {
     id: string
     label: string
     hint: string
-}
-
-export interface PanelAction {
-    label: string
-    onClick: () => void
 }

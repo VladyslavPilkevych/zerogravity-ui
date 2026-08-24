@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { act, render } from "@testing-library/react"
+import { createRef } from "react"
 
 import { installFrameHarness, type FrameHarness } from "../../test/frames"
 import { mediaState } from "../../test/environment"
@@ -60,6 +61,12 @@ describe("TrailingCursor", () => {
         expect(document.body.classList.contains("trailing-cursor-none")).toBe(false)
     })
 
+    it("marks itself unscoped when it owns the whole page", () => {
+        const { container } = render(<TrailingCursor />)
+
+        expect(container.querySelector(".trailing-cursor")).toHaveAttribute("data-scoped", "false")
+    })
+
     it("hides the native cursor while mounted and restores it on unmount", () => {
         const { unmount } = render(<TrailingCursor />)
         expect(document.body.classList.contains("trailing-cursor-none")).toBe(true)
@@ -88,6 +95,117 @@ describe("TrailingCursor", () => {
 
         movePointer(10, 10)
         expect(frames.pending()).toBe(1)
+    })
+
+    describe("scoped to a container", () => {
+        function mount(rect = { left: 240, top: 80, width: 600, height: 400 }) {
+            const host = document.createElement("div")
+            Object.defineProperty(host, "clientWidth", { value: rect.width })
+            Object.defineProperty(host, "clientHeight", { value: rect.height })
+            host.getBoundingClientRect = () =>
+                ({
+                    ...rect,
+                    x: rect.left,
+                    y: rect.top,
+                    right: rect.left + rect.width,
+                    bottom: rect.top + rect.height,
+                    toJSON: () => ({}),
+                }) as DOMRect
+            document.body.appendChild(host)
+
+            const ref = createRef<HTMLDivElement>()
+            Object.defineProperty(ref, "current", { value: host, writable: true })
+
+            const view = render(<TrailingCursor container={ref} ease={1} />, { container: host })
+            return { host, view }
+        }
+
+        it("hides the cursor on the container and never on the body", () => {
+            const { host, view } = mount()
+
+            expect(host.classList.contains("trailing-cursor-none")).toBe(true)
+            expect(document.body.classList.contains("trailing-cursor-none")).toBe(false)
+
+            view.unmount()
+            expect(host.classList.contains("trailing-cursor-none")).toBe(false)
+            host.remove()
+        })
+
+        it("restores the cursor as soon as it unmounts", () => {
+            const { host, view } = mount()
+            view.unmount()
+
+            expect(document.querySelectorAll(".trailing-cursor-none")).toHaveLength(0)
+            host.remove()
+        })
+
+        it("marks itself scoped so it positions inside the container", () => {
+            const { host, view } = mount()
+
+            expect(host.querySelector(".trailing-cursor")).toHaveAttribute("data-scoped", "true")
+
+            view.unmount()
+            host.remove()
+        })
+
+        it("places the dot at container-local coordinates", () => {
+            const { host, view } = mount()
+            const dot = host.querySelector(".trailing-cursor-dot") as HTMLElement
+
+            act(() => {
+                host.dispatchEvent(
+                    new PointerEvent("pointermove", {
+                        clientX: 300,
+                        clientY: 130,
+                        pointerType: "mouse",
+                    }),
+                )
+            })
+            act(() => {
+                frames.advance()
+            })
+
+            expect(dot.style.transform).toBe("translate3d(60px, 50px, 0)")
+
+            view.unmount()
+            host.remove()
+        })
+
+        it("ignores pointer movement outside the container", () => {
+            const { host, view } = mount()
+            const root = host.querySelector(".trailing-cursor") as HTMLElement
+
+            movePointer(900, 900)
+
+            expect(root.dataset.visible).toBe("false")
+
+            view.unmount()
+            host.remove()
+        })
+
+        it("hides the custom cursor when the pointer leaves", () => {
+            const { host, view } = mount()
+            const root = host.querySelector(".trailing-cursor") as HTMLElement
+
+            act(() => {
+                host.dispatchEvent(
+                    new PointerEvent("pointermove", {
+                        clientX: 300,
+                        clientY: 130,
+                        pointerType: "mouse",
+                    }),
+                )
+            })
+            expect(root.dataset.visible).toBe("true")
+
+            act(() => {
+                host.dispatchEvent(new PointerEvent("pointerleave"))
+            })
+            expect(root.dataset.visible).toBe("false")
+
+            view.unmount()
+            host.remove()
+        })
     })
 
     it("applies data-cursor overrides from the hovered element", () => {

@@ -1,46 +1,3 @@
-.xpg-root {
-    min-height: 100vh;
-    padding: 96px 32px 140px;
-}
-
-.xpg-scroll {
-    padding-bottom: 40vh;
-}
-
-.xpg-head {
-    max-width: 720px;
-    margin: 0 auto 48px;
-    text-align: center;
-}
-
-.xpg-head h1 {
-    margin: 0 0 10px;
-    font-size: 34px;
-    letter-spacing: -0.02em;
-}
-
-.xpg-head p {
-    margin: 0;
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-.xpg-stage {
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.xpg-panelcard {
-    display: grid;
-    place-items: center;
-    padding: 56px 32px;
-    border-radius: 20px;
-    background: linear-gradient(150deg, #14141c, #2b1d53);
-    font-size: 26px;
-    font-weight: 700;
-}
-
 .xpg-tall {
     display: grid;
     place-items: center;
@@ -74,47 +31,10 @@
 }
 
 .xpg-hero {
-    min-height: 78vh;
+    display: grid;
+    place-items: center;
     border-radius: 22px;
     overflow: hidden;
-}
-
-.xpg-hero-copy {
-    display: grid;
-    justify-items: center;
-    gap: 18px;
-    padding: 18vh 32px;
-    text-align: center;
-}
-
-.xpg-hero-copy h2 {
-    margin: 0;
-    font-size: clamp(34px, 6vw, 60px);
-    letter-spacing: -0.03em;
-}
-
-.xpg-hero-copy p {
-    max-width: 520px;
-    margin: 0;
-    color: rgba(255, 255, 255, 0.76);
-    font-size: 17px;
-    line-height: 1.6;
-}
-
-.xpg-cta {
-    padding: 13px 24px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.92);
-    color: #0b0b12;
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.xpg-cta-ghost {
-    background: rgba(255, 255, 255, 0.06);
-    color: inherit;
 }
 
 .xpg-section {
@@ -129,8 +49,47 @@
 
 .xpg-section h2 {
     margin: 0;
-    font-size: clamp(36px, 7vw, 68px);
+    font-size: clamp(28px, 5cqw, 56px);
     letter-spacing: -0.03em;
+}
+
+/*
+ * Blinds slice whatever is behind them, so a big centred heading gets cut in
+ * half mid-turn and reads as a glitch. These two faces carry the transition in
+ * the surface itself — colour and stripe direction — with the label small
+ * enough to live inside a single slat.
+ */
+.xpg-blind {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+.xpg-blind span {
+    align-self: start;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.35);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.xpg-blind-a {
+    justify-items: start;
+    background:
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0 12px, transparent 12px 34px),
+        linear-gradient(150deg, #2a1440, #59267a);
+}
+
+.xpg-blind-b {
+    justify-items: end;
+    background:
+        repeating-linear-gradient(65deg, rgba(255, 255, 255, 0.05) 0 12px, transparent 12px 34px),
+        linear-gradient(150deg, #05302a, #0f6f5c);
 }
 
 .xpg-section p {
@@ -217,117 +176,8 @@
     background: var(--xpg-tessera-tint);
 }
 
-.xpg-tessera-status {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
 .xpg-meadow-scene {
     border-radius: 24px;
-}
-
-.xpg-meadow-copy {
-    display: grid;
-    justify-items: center;
-    gap: 20px;
-    max-width: 620px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.xpg-meadow-badge {
-    padding: 7px 16px;
-    border-radius: 999px;
-    border: 1px solid var(--meadow-edge);
-    background: var(--meadow-veil);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--meadow-ink-soft);
-}
-
-.xpg-meadow-copy h2 {
-    margin: 0;
-    font-size: clamp(34px, 5.6vw, 60px);
-    line-height: 1.04;
-    letter-spacing: -0.035em;
-    color: var(--meadow-ink);
-}
-
-.xpg-meadow-copy p {
-    max-width: 460px;
-    margin: 0;
-    font-size: 17px;
-    line-height: 1.65;
-    color: var(--meadow-ink-soft);
-}
-
-.xpg-meadow-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 4px;
-}
-
-.xpg-meadow-primary {
-    padding: 14px 28px;
-    border: none;
-    border-radius: 999px;
-    background: var(--meadow-ink);
-    color: var(--meadow-sky-top);
-    font: inherit;
-    font-weight: 650;
-    cursor: pointer;
-}
-
-.xpg-meadow-secondary {
-    padding: 14px 26px;
-    border: 1.5px solid var(--meadow-edge);
-    border-radius: 999px;
-    background: var(--meadow-veil);
-    color: var(--meadow-ink);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.xpg-assets {
-    display: grid;
-    gap: 26px;
-}
-
-.xpg-assets-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-}
-
-.xpg-assets-bar span {
-    font-size: 13px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-}
-
-.xpg-assets-pick {
-    padding: 8px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.82);
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.xpg-assets-pick[aria-pressed="true"] {
-    border-color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.14);
-    color: #ffffff;
 }
 
 .xpg-raster-stack {
@@ -340,22 +190,52 @@
     width: 100%;
 }
 
-.xpg-raster-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 14px;
+.xpg-raster-modes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
 }
 
-.xpg-raster-cell {
+.xpg-raster-mode {
     display: grid;
-    gap: 8px;
-}
-
-.xpg-raster-cell span {
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    gap: 6px;
+    width: 108px;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
     color: rgba(255, 255, 255, 0.55);
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        border-color 160ms ease,
+        background 160ms ease,
+        color 160ms ease;
+}
+
+.xpg-raster-mode:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.xpg-raster-mode[aria-pressed="true"] {
+    border-color: rgba(138, 180, 255, 0.6);
+    background: rgba(138, 180, 255, 0.12);
+    color: #fff;
+}
+
+.xpg-raster-mode .xp-raster {
+    border-radius: 6px;
+}
+
+@media (max-width: 560px) {
+    .xpg-raster-mode {
+        width: calc(33.33% - 7px);
+    }
 }
 
 .xpg-loaders {
@@ -413,67 +293,201 @@
 }
 
 .xpg-ricochet {
-    display: grid;
-    gap: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
     width: 100%;
+    height: 100%;
 }
 
 .xpg-ricochet-game {
-    height: min(62vh, 520px);
+    height: min(56vh, 460px);
     border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.xpg-ricochet-copy {
+.xpg-ricochet-foot {
     display: grid;
     justify-items: center;
-    gap: 10px;
-    text-align: center;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+.xpg-ricochet-restart {
+    padding: 9px 26px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.86);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition:
+        border-color 160ms ease,
+        background 160ms ease;
+}
+
+.xpg-ricochet-restart:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 .xpg-ricochet-eyebrow {
+    color: rgba(255, 255, 255, 0.4);
     font-size: 11px;
-    letter-spacing: 0.26em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
 }
 
-.xpg-ricochet-copy p {
-    max-width: 440px;
+/* inside a docs preview the scene fills the frame instead of the viewport */
+.xpg-hero,
+.xpg-meadow-scene {
+    min-height: inherit;
+    height: 100%;
+}
+
+.xpg-vellum {
+    width: min(760px, 86%);
+}
+
+.xpg-vellum-sheet {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    border-radius: inherit;
+    background: linear-gradient(150deg, #141420, #241c33);
+}
+
+.xpg-meadow-word {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: rgba(35, 30, 55, 0.55);
+    font-size: clamp(26px, 5vw, 46px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    user-select: none;
+}
+
+.xpg-tessera-copy {
+    display: grid;
+    justify-items: center;
+    gap: 18px;
+}
+
+.xpg-tessera-copy h2 {
     margin: 0;
-    font-size: 15px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.66);
+    font-size: clamp(26px, 4vw, 40px);
+    letter-spacing: -0.025em;
 }
 
-.xpg-ricochet-actions {
+.xpg-tessera-routes {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
-    margin-top: 4px;
 }
 
-.xpg-ricochet-tag {
-    margin-right: 2px;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
-}
-
-.xpg-ricochet-preset {
+.xpg-tessera-route {
     padding: 9px 18px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.84);
+    color: rgba(255, 255, 255, 0.82);
     font: inherit;
     font-size: 13px;
     cursor: pointer;
 }
 
-.xpg-ricochet-preset[aria-pressed="true"] {
+.xpg-tessera-route[aria-current="page"] {
     border-color: rgba(255, 255, 255, 0.5);
     background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+}
+
+.xpg-overprint {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 26px;
+    width: 100%;
+    padding: 24px;
+}
+
+.xpg-el {
+    display: grid;
+    gap: 52px;
+    justify-items: center;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.xpg-el-main {
+    width: min(460px, 100%);
+}
+
+.xpg-el-face {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 62px 34px;
+    border-radius: inherit;
+    background: linear-gradient(168deg, #0e1017, #08090d);
+}
+
+.xpg-el-face strong {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-transform: capitalize;
+}
+
+.xpg-el-face span {
+    color: rgba(255, 255, 255, 0.44);
+    font-size: 13.5px;
+}
+
+.xpg-el-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
+
+.xpg-el-pick {
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 220ms ease;
+}
+
+.xpg-el-pick:hover,
+.xpg-el-pick[aria-pressed="true"] {
+    opacity: 1;
+}
+
+.xpg-el-pick:focus-visible {
+    outline: 2px solid rgba(138, 180, 255, 0.8);
+    outline-offset: 6px;
+}
+
+.xpg-el-label {
+    display: grid;
+    place-items: center;
+    width: 116px;
+    padding: 17px 6px;
+    border-radius: inherit;
+    background: #0b0c12;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color 220ms ease;
+}
+
+.xpg-el-pick[aria-pressed="true"] .xpg-el-label {
     color: #fff;
 }

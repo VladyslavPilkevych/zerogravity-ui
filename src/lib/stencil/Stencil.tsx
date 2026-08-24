@@ -43,6 +43,7 @@ interface LetterFont {
 }
 
 const WAVE_REACH = 2.2
+const MIN_FIT = 0.35
 const VIDEO_PATTERN = /\.(mp4|webm|ogv|mov)(\?|#|$)/i
 
 export function Stencil({
@@ -74,6 +75,7 @@ export function Stencil({
     const frameRef = useRef(0)
     const pointerRef = useRef(-1)
     const centersRef = useRef<number[]>([])
+    const fitRef = useRef(1)
     const maskSigRef = useRef<string[]>([])
 
     const reducedMotion = usePrefersReducedMotion()
@@ -100,6 +102,7 @@ export function Stencil({
         const letters = lettersRef.current
         const rootBox = root.getBoundingClientRect()
         const boxes: (DOMRect | null)[] = []
+        let natural = 0
         const fonts: (LetterFont | null)[] = []
         const centers = centersRef.current
         centers.length = letters.length
@@ -113,6 +116,7 @@ export function Stencil({
             }
             const box = letter.getBoundingClientRect()
             boxes.push(box)
+            natural += box.width
             centers[index] = box.left - rootBox.left + box.width / 2
 
             if (!masksRef.current[index] || box.width === 0) {
@@ -133,6 +137,18 @@ export function Stencil({
                         ? computed.fontVariationSettings
                         : "",
             })
+        }
+
+        // widths scale with the font size, so dividing out the current factor
+        // gives the unscaled width and the next factor in one pass
+        const room = root.clientWidth
+        if (room > 0 && natural > 0) {
+            const unscaled = natural / (fitRef.current || 1)
+            const fit = Math.min(1, Math.max(MIN_FIT, room / unscaled))
+            if (Math.abs(fit - fitRef.current) > 0.002) {
+                fitRef.current = fit
+                root.style.setProperty("--stencil-fit", fit.toFixed(4))
+            }
         }
 
         for (let index = 0; index < letters.length; index += 1) {
@@ -313,7 +329,7 @@ export function Stencil({
 
     const rootStyle: CSSProperties = {
         ...style,
-        fontSize: `${size}px`,
+        fontSize: `calc(${size}px * var(--stencil-fit, 1))`,
         fontWeight: weight,
         letterSpacing: `${tracking}em`,
         fontFamily: font,
