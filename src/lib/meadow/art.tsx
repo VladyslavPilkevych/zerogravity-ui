@@ -121,33 +121,49 @@ export function MeadowSprig() {
     )
 }
 
-function MeadowBalloon() {
+/** Six envelopes in the meadow palette: light panel, mid panel, shadow panel. */
+export const MEADOW_BALLOON_SILKS: readonly (readonly [string, string, string])[] = [
+    ["#f9c7a3", "#f4a877", "#e98c4f"],
+    ["#cfe0f7", "#a8c6f0", "#84a8e4"],
+    ["#f7d4e2", "#efb0c8", "#e28eae"],
+    ["#dcefd6", "#b6dcaa", "#93c785"],
+    ["#f6e7bd", "#eed28a", "#e0b95e"],
+    ["#ded6f2", "#c0b2e6", "#a293d6"],
+]
+
+function MeadowBalloon({ silk = 0, rider = true }: { silk?: number; rider?: boolean }) {
+    const [light, mid, dark] = MEADOW_BALLOON_SILKS[silk % MEADOW_BALLOON_SILKS.length]
+
     return (
         <svg viewBox="0 0 96 132" {...svgProps}>
             <path
                 d="M48 4c20 0 34 18 34 40 0 24-20 44-34 58C34 88 14 68 14 44 14 22 28 4 48 4Z"
-                fill="#f4a877"
+                fill={mid}
             />
             <path
                 d="M48 4C36 4 14 22 14 44c0 24 20 44 34 58-8-16-14-36-14-58S42 14 48 4Z"
-                fill="#e98c4f"
+                fill={dark}
             />
             <path
                 d="M48 4c12 0 34 18 34 40 0 24-20 44-34 58 8-16 14-36 14-58S54 14 48 4Z"
-                fill="#f9c7a3"
+                fill={light}
             />
             <ellipse cx="34" cy="26" rx="7" ry="11" fill="#fdeedd" opacity="0.5" />
             <path d="M39 100v14M57 100v14" stroke="#c79a70" strokeWidth="2.4" />
-            <path
-                d="M48 95c6.6 0 10.5 4.8 10.5 11v7.5c0 2.1-2 3-3.5 1.6-1.5-1.4-3.3-1.4-4.8 0-1.5 1.4-3.3 1.4-4.8 0-1.5-1.4-3.3-1.4-4.8 0-1.5 1.4-3.6.5-3.6-1.6V106c0-6.2 4-11 11-11Z"
-                fill="var(--meadow-body)"
-                stroke="var(--meadow-outline)"
-                strokeWidth="2"
-            />
-            <ellipse cx="44.6" cy="105" rx="2.3" ry="2.9" fill="var(--meadow-face)" />
-            <ellipse cx="51.4" cy="105" rx="2.3" ry="2.9" fill="var(--meadow-face)" />
-            <circle cx="43.8" cy="103.8" r="0.9" fill="#ffffff" opacity="0.92" />
-            <ellipse cx="48" cy="110.6" rx="1.9" ry="2.2" fill="var(--meadow-face)" />
+            {rider ? (
+                <>
+                    <path
+                        d="M48 95c6.6 0 10.5 4.8 10.5 11v7.5c0 2.1-2 3-3.5 1.6-1.5-1.4-3.3-1.4-4.8 0-1.5 1.4-3.3 1.4-4.8 0-1.5-1.4-3.3-1.4-4.8 0-1.5 1.4-3.6.5-3.6-1.6V106c0-6.2 4-11 11-11Z"
+                        fill="var(--meadow-body)"
+                        stroke="var(--meadow-outline)"
+                        strokeWidth="2"
+                    />
+                    <ellipse cx="44.6" cy="105" rx="2.3" ry="2.9" fill="var(--meadow-face)" />
+                    <ellipse cx="51.4" cy="105" rx="2.3" ry="2.9" fill="var(--meadow-face)" />
+                    <circle cx="43.8" cy="103.8" r="0.9" fill="#ffffff" opacity="0.92" />
+                    <ellipse cx="48" cy="110.6" rx="1.9" ry="2.2" fill="var(--meadow-face)" />
+                </>
+            ) : null}
             <rect x="35" y="113" width="26" height="16" rx="4.5" fill="#c08b5c" />
             <rect x="35" y="113" width="26" height="5" rx="2.5" fill="#a9764a" />
         </svg>
@@ -366,8 +382,12 @@ function MeadowAstronaut() {
     )
 }
 
+export type MeadowPlanetLayer = "far" | "mid" | "near"
+
 export interface MeadowPlanetSpot {
     art: "gas" | "ring" | "moonlet" | "void"
+    /** drives parallax: far barely moves, near drifts most */
+    layer?: MeadowPlanetLayer
     x: number
     y: number
     size: number
@@ -386,14 +406,27 @@ export const MEADOW_PLANET_ART = {
 } as const
 
 export const MEADOW_PLANETS: readonly MeadowPlanetSpot[] = [
+    /* foreground: big, partly offscreen, strongest parallax */
     {
         art: "ring",
         x: -8,
         y: 58,
         size: 268,
         beat: 46,
+        layer: "near",
         compact: { x: -18, y: 79, size: 168 },
     },
+    {
+        art: "gas",
+        x: 106,
+        y: 74,
+        size: 210,
+        beat: 52,
+        layer: "near",
+        dense: true,
+        compact: { x: 112, y: 84, size: 132 },
+    },
+    /* mid-distance: the readable planets */
     {
         art: "gas",
         x: 79,
@@ -401,9 +434,22 @@ export const MEADOW_PLANETS: readonly MeadowPlanetSpot[] = [
         size: 148,
         beat: 38,
         orbit: 1.34,
+        layer: "mid",
         compact: { x: 74, y: 1, size: 104 },
     },
-    { art: "moonlet", x: 20, y: 14, size: 46, beat: 30, dense: true },
+    { art: "moonlet", x: 20, y: 14, size: 46, beat: 30, layer: "mid", dense: true },
+    {
+        art: "ring",
+        x: 58,
+        y: 84,
+        size: 96,
+        beat: 41,
+        layer: "mid",
+        dense: true,
+        compact: { x: 62, y: 90, size: 62 },
+    },
+    { art: "gas", x: 8, y: 82, size: 74, beat: 44, layer: "mid", dense: true },
+    /* far: small, faint, barely moving */
     {
         art: "void",
         x: 24,
@@ -411,13 +457,22 @@ export const MEADOW_PLANETS: readonly MeadowPlanetSpot[] = [
         size: 190,
         beat: 62,
         faint: true,
+        layer: "far",
         compact: { x: 20, y: -8, size: 120 },
     },
+    { art: "moonlet", x: 46, y: 26, size: 26, beat: 58, faint: true, layer: "far", dense: true },
+    { art: "moonlet", x: 91, y: 40, size: 32, beat: 55, faint: true, layer: "far", dense: true },
+    { art: "gas", x: 36, y: 52, size: 44, beat: 60, faint: true, layer: "far", dense: true },
+    { art: "moonlet", x: 68, y: 62, size: 22, beat: 64, faint: true, layer: "far", dense: true },
+    { art: "ring", x: 4, y: 32, size: 52, beat: 57, faint: true, layer: "far", dense: true },
+    { art: "moonlet", x: 84, y: 18, size: 18, beat: 66, faint: true, layer: "far", dense: true },
 ]
 
 export interface MeadowItem extends MeadowSpec {
     content: ReactNode
 }
+
+export { MeadowBalloon }
 
 export const MEADOW_CAST: readonly MeadowItem[] = [
     {

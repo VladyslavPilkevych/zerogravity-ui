@@ -35,15 +35,25 @@ export type { KernProps } from "./kern"
 export { Lodestone } from "./lodestone"
 export type { LodestoneProps } from "./lodestone"
 
-export { Meadow, MEADOW_CAST, MEADOW_SPACE_CAST, MEADOW_VARIANT_SETS } from "./meadow"
+export {
+    Meadow,
+    MEADOW_CAST,
+    MEADOW_LIMITS,
+    MEADOW_SPACE_CAST,
+    MEADOW_VARIANT_SETS,
+} from "./meadow"
 export type {
+    MeadowCreatures,
     MeadowDensity,
+    MeadowEventPace,
+    MeadowInteraction,
     MeadowItem,
     MeadowKind,
     MeadowMotion,
     MeadowProps,
     MeadowScene,
     MeadowScenePart,
+    MeadowSpaceScene,
     MeadowTheme,
     MeadowVariant,
     MeadowVariantGroup,

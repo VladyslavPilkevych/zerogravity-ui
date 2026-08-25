@@ -12,7 +12,7 @@ const BLUSH = "#f2a48c"
 function SunRayed() {
     return (
         <svg viewBox="0 0 120 120" data-variant="sun-1" {...art}>
-            <g fill={RAY} opacity="0.65">
+            <g className="xp-meadow-rays" fill={RAY} opacity="0.65">
                 {Array.from({ length: 12 }, (_, index) => (
                     <path
                         key={index}
@@ -42,7 +42,7 @@ function SunGlow() {
 function SunFace() {
     return (
         <svg viewBox="0 0 120 120" data-variant="sun-4" {...art}>
-            <g fill={RAY} opacity="0.55">
+            <g className="xp-meadow-rays" fill={RAY} opacity="0.55">
                 {Array.from({ length: 10 }, (_, index) => (
                     <path
                         key={index}
@@ -82,7 +82,7 @@ function SunSpiky() {
                     />
                 ))}
             </g>
-            <g fill={RAY} opacity="0.55">
+            <g className="xp-meadow-rays" fill={RAY} opacity="0.55">
                 {Array.from({ length: 8 }, (_, index) => (
                     <path
                         key={index}
@@ -100,7 +100,7 @@ function SunSpiky() {
 function SunRising() {
     return (
         <svg viewBox="0 0 120 78" data-variant="sun-6" {...art}>
-            <g fill={RAY} opacity="0.55">
+            <g className="xp-meadow-rays" fill={RAY} opacity="0.55">
                 {Array.from({ length: 7 }, (_, index) => (
                     <path
                         key={index}

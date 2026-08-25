@@ -288,6 +288,76 @@
     height: auto;
 }
 
+/*
+ * A sun that is actually shining: the disc itself throws light, a corona swells
+ * behind it on a slower beat than the halo, and the rays fade in and out so the
+ * two never pulse together and the whole thing never looks like a loop.
+ */
+.xp-meadow-orb[data-lit="sun"] svg {
+    filter: drop-shadow(0 0 14px var(--meadow-glow)) drop-shadow(0 0 42px var(--meadow-glow-soft));
+    animation: xp-meadow-radiate 6.5s ease-in-out infinite alternate;
+}
+
+.xp-meadow-corona {
+    position: absolute;
+    inset: -46%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        var(--meadow-glow) 0%,
+        var(--meadow-glow-soft) 34%,
+        transparent 62%
+    );
+    opacity: 0.5;
+    animation: xp-meadow-corona 9s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes xp-meadow-radiate {
+    from {
+        filter: drop-shadow(0 0 10px var(--meadow-glow))
+            drop-shadow(0 0 30px var(--meadow-glow-soft));
+    }
+    to {
+        filter: drop-shadow(0 0 22px var(--meadow-glow))
+            drop-shadow(0 0 58px var(--meadow-glow-soft));
+    }
+}
+
+@keyframes xp-meadow-corona {
+    from {
+        transform: scale(0.9);
+        opacity: 0.34;
+    }
+    to {
+        transform: scale(1.12);
+        opacity: 0.72;
+    }
+}
+
+/* The rays already turn; letting them breathe stops the spin reading as a loop. */
+.xp-meadow-rays {
+    animation:
+        xp-meadow-spin 90s linear infinite,
+        xp-meadow-flare 7.5s ease-in-out infinite alternate;
+}
+
+@keyframes xp-meadow-flare {
+    from {
+        opacity: 0.62;
+        scale: 0.97;
+    }
+    to {
+        opacity: 1;
+        scale: 1.05;
+    }
+}
+
+.xp-meadow-still .xp-meadow-orb[data-lit="sun"] svg,
+.xp-meadow-still .xp-meadow-corona {
+    animation: none;
+}
+
 .xp-meadow-glow {
     position: absolute;
     top: -18%;
@@ -317,7 +387,6 @@
 .xp-meadow-rays {
     transform-box: fill-box;
     transform-origin: center;
-    animation: xp-meadow-spin 90s linear infinite;
 }
 
 @keyframes xp-meadow-spin {
@@ -799,4 +868,274 @@
     .xp-meadow-orb {
         width: clamp(104px, 30vw, 140px);
     }
+}
+
+/* ------------------------------------------------------- the living layer */
+
+/*
+ * A size container, so the simulation can place creatures with `cqw`/`cqh` in
+ * a transform. Percent positions never touch layout, and the whole frame loop
+ * is two style writes per creature.
+ */
+.xp-meadow-life {
+    container-type: size;
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    pointer-events: none;
+
+    /*
+     * The landscape is the picture. The creatures arrive into it a beat later,
+     * which also gives the first paint one less layer to composite.
+     */
+    animation: xp-meadow-arrive 1s ease-out 160ms both;
+}
+
+@keyframes xp-meadow-arrive {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.xp-meadow-still .xp-meadow-life {
+    animation: none;
+}
+
+.xp-meadow-flyer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--m-size) * 1px);
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.xp-meadow-flyer svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Each variant beats at its own rate; smaller wings go faster. */
+.xp-meadow-flyer .xp-meadow-wing-left,
+.xp-meadow-flyer .xp-meadow-wing-right {
+    animation-duration: calc(var(--m-flap) * 1s);
+}
+
+/* ----------------------------------------------------------- fireflies */
+
+.xp-meadow-firefly {
+    position: absolute;
+    top: calc(var(--m-y) * 1%);
+    left: calc(var(--m-x) * 1%);
+    width: calc(var(--m-size) * 1px);
+    height: calc(var(--m-size) * 1px);
+    margin: calc(var(--m-size) * -0.5px);
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff8c4, #f4dd7a 42%, rgba(244, 221, 122, 0) 72%);
+    opacity: 0;
+    animation:
+        xp-meadow-spark calc(var(--m-beat) * 1s) ease-in-out infinite,
+        xp-meadow-lift calc(var(--m-beat) * 2.6s) ease-in-out infinite alternate;
+    animation-delay: calc(var(--m-delay) * 1s);
+}
+
+/* A dip, not a blackout: with a whole meadow of them, fully off reads as empty. */
+@keyframes xp-meadow-spark {
+    0%,
+    100% {
+        opacity: calc(var(--m-tone) * 0.18);
+    }
+    22% {
+        opacity: var(--m-tone);
+    }
+    52% {
+        opacity: calc(var(--m-tone) * 0.4);
+    }
+    74% {
+        opacity: var(--m-tone);
+    }
+}
+
+@keyframes xp-meadow-lift {
+    from {
+        transform: translate3d(calc(var(--m-reach) * -0.5px), calc(var(--m-reach) * 0.4px), 0);
+    }
+    to {
+        transform: translate3d(calc(var(--m-reach) * 0.5px), calc(var(--m-reach) * -1px), 0);
+    }
+}
+
+/* ------------------------------------------------------- UFO abduction */
+
+.xp-meadow-abduct {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 118px;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.xp-meadow-abduct[data-on="false"] {
+    display: none;
+}
+
+.xp-meadow-saucer svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* A soft cone, not a spotlight. */
+.xp-meadow-beam {
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    width: 74px;
+    height: 190px;
+    margin-left: -37px;
+    background: linear-gradient(
+        to bottom,
+        rgba(206, 240, 255, 0.55),
+        rgba(206, 240, 255, 0.12) 62%,
+        rgba(206, 240, 255, 0)
+    );
+    clip-path: polygon(34% 0, 66% 0, 100% 100%, 0 100%);
+    opacity: 0;
+    transition: opacity 700ms ease;
+}
+
+/* ----------------------------------------------------------- ghost life */
+
+/*
+ * The rare gesture gets its own element. The body is already animating its
+ * drift and the track carries the pointer lean, so a third transform simply
+ * nests rather than competing for an animation slot. `--m-rest` differs per
+ * ghost, so a crowd never gestures in unison.
+ */
+.xp-meadow-gesture {
+    display: block;
+    animation-duration: calc(var(--m-rest) * 1s);
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    animation-delay: calc(var(--m-delay) * 1s);
+}
+
+.xp-meadow-ghost[data-behaviour="0"] .xp-meadow-gesture {
+    animation-name: xp-meadow-peer;
+}
+
+.xp-meadow-ghost[data-behaviour="1"] .xp-meadow-gesture {
+    animation-name: xp-meadow-twirl;
+}
+
+.xp-meadow-ghost[data-behaviour="2"] .xp-meadow-gesture {
+    animation-name: xp-meadow-perk;
+}
+
+.xp-meadow-ghost[data-behaviour="3"] .xp-meadow-gesture {
+    animation-name: xp-meadow-wave;
+}
+
+@keyframes xp-meadow-peer {
+    0%,
+    82%,
+    100% {
+        transform: rotate(0deg);
+    }
+    88% {
+        transform: rotate(-9deg);
+    }
+    94% {
+        transform: rotate(7deg);
+    }
+}
+
+@keyframes xp-meadow-twirl {
+    0%,
+    86%,
+    100% {
+        transform: rotateY(0deg);
+    }
+    93% {
+        transform: rotateY(180deg);
+    }
+}
+
+@keyframes xp-meadow-perk {
+    0%,
+    84%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+    90% {
+        transform: translateY(-14%) scale(1.05);
+    }
+}
+
+@keyframes xp-meadow-wave {
+    0%,
+    80%,
+    100% {
+        transform: rotate(0deg);
+    }
+    86% {
+        transform: rotate(11deg);
+    }
+    92% {
+        transform: rotate(-8deg);
+    }
+}
+
+/*
+ * Pointer reaction without a per-creature listener: the root sets a hover
+ * state and the nearest ghosts lean. Foreground ghosts lean further because
+ * `--m-depth` scales the shift.
+ */
+.xp-meadow[data-interactive="true"] .xp-meadow-ghost[data-reacts="true"] .xp-meadow-track {
+    transition:
+        transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        filter 900ms ease;
+}
+
+.xp-meadow[data-interactive="true"]:hover .xp-meadow-ghost[data-reacts="true"] .xp-meadow-track {
+    transform: translateX(calc(var(--m-swing) * var(--m-depth) * 7px));
+    filter: brightness(1.07);
+}
+
+/* --------------------------------------------------------- planet depth */
+
+.xp-meadow-planet[data-layer="far"] {
+    animation-duration: calc(var(--m-beat) * 2.4s);
+    opacity: 0.55;
+}
+
+.xp-meadow-planet[data-layer="near"] {
+    animation-duration: calc(var(--m-beat) * 0.7s);
+}
+
+/* ------------------------------------------------------- reduced motion */
+
+.xp-meadow-still .xp-meadow-firefly {
+    animation: none;
+    opacity: var(--m-tone);
+}
+
+.xp-meadow-still .xp-meadow-gesture {
+    animation: none;
+}
+
+.xp-meadow-still .xp-meadow-abduct {
+    display: none;
+}
+
+/* A still scene still shows its creatures; they simply hold their pose. */
+.xp-meadow-still .xp-meadow-flyer .xp-meadow-wing-left,
+.xp-meadow-still .xp-meadow-flyer .xp-meadow-wing-right {
+    animation: none;
 }

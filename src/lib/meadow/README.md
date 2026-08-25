@@ -82,21 +82,122 @@ seconds and its glow breathes.
 </Meadow>
 ```
 
-| Prop                   | Default       | Notes                                        |
-| ---------------------- | ------------- | -------------------------------------------- |
-| `children`             | —             | Your hero content, centred                   |
-| `items`                | built-in cast | Characters and where each one sits           |
-| `density`              | `"cosy"`      | `calm` 2, `cosy` 4, `lively` 7 characters    |
-| `scene`                | everything on | Which built-in pieces are drawn              |
-| `theme`                | `"day"`       | `sunrise`, `day`, `sunset`, `night`, `space` |
-| `timeAware`            | `false`       | Follow the browser's local clock             |
-| `clock`                | 5/8/18/21     | Advanced: move the hour boundaries           |
-| `animated`             | `true`        | `false` freezes the whole scene              |
-| `trails`               | `true`        | Soft wisp behind each mascot                 |
-| `seed`                 | `5`           | Reproducible timing                          |
-| `respectReducedMotion` | `true`        | Honour `prefers-reduced-motion`              |
+| Prop                   | Default       | Notes                                             |
+| ---------------------- | ------------- | ------------------------------------------------- |
+| `children`             | —             | Your hero content, centred                        |
+| `items`                | built-in cast | Characters and where each one sits                |
+| `density`              | `"cosy"`      | `calm` 2, `cosy` 4, `lively` 7 characters         |
+| `scene`                | everything on | Which built-in pieces are drawn                   |
+| `theme`                | `"day"`       | `sunrise`, `day`, `sunset`, `night`, `space`      |
+| `timeAware`            | `false`       | Follow the browser's local clock                  |
+| `clock`                | 5/8/18/21     | Advanced: move the hour boundaries                |
+| `animated`             | `true`        | `false` freezes the whole scene                   |
+| `trails`               | `true`        | Soft wisp behind each mascot                      |
+| `creatures`            | from density  | Bee, butterfly, ghost, firefly and balloon counts |
+| `interaction`          | off           | Pointer reactions; see below                      |
+| `events`               | `true`        | Rare ambient moments                              |
+| `eventFrequency`       | `"rare"`      | `rare`, `normal`, `frequent`                      |
+| `space`                | from density  | `{ planets }` for the space theme                 |
+| `seed`                 | `5`           | Reproducible timing                               |
+| `respectReducedMotion` | `true`        | Honour `prefers-reduced-motion`                   |
 
 Never more than seven characters. The scene is meant to feel alive, not busy.
+
+## The living scene
+
+Bees, butterflies and fireflies are simulated rather than placed. One animation
+frame drives the whole meadow, whatever the count, and each creature is a pooled
+DOM node that is recycled rather than replaced — nothing is created or destroyed
+while the scene runs.
+
+```tsx
+<Meadow creatures={{ bees: 6, butterflies: 8, ghosts: 3, fireflies: 30, balloons: 4 }} />
+```
+
+`density` sets all four, and any count you give overrides it. Everything is
+clamped: `MEADOW_LIMITS` is exported if you want to read the ceilings.
+
+Which creatures appear depends on the scene, not on the count:
+
+| Scene           | Bees  | Butterflies | Fireflies | Planets |
+| --------------- | ----- | ----------- | --------- | ------- |
+| day             | yes   | yes         | —         | —       |
+| sunrise, sunset | fewer | fewer       | —         | —       |
+| night           | —     | fewer       | yes       | —       |
+| space           | —     | —           | —         | yes     |
+
+Ghosts and balloons are the exception: the built-in cast already places some, so
+`creatures.ghosts` and `creatures.balloons` add that many **extra** ones and both
+default to `0`.
+
+Each extra ghost gets its own size, pace and drift, plus a rare gesture — a
+peer, a twirl, a hop or a wave — spaced so a crowd never moves in unison.
+
+Balloons are laid out in lanes across the sky, and every one takes its envelope
+colour, height, size and pace from the seed. Roughly a third drift by with an
+empty basket. They are scenery rather than creatures, so they stay on CSS and
+never enter the frame loop.
+
+The scene paints first and the creatures ease in a beat later, so the landscape
+is on screen before anything starts moving. Bees hold back a little longer than
+that and come up to speed over a few seconds rather than darting off — and a bee
+hovering over a flower keeps whichever way it was facing instead of turning to
+follow every wobble.
+
+Bees work the flowers: they travel between seeded anchor points, hover to
+inspect one, then move on. Butterflies live a loop of `enter → wander → leave`,
+and a slot that leaves comes back later as a different variant, so the mix of
+colours changes over time without the pool ever changing size.
+
+### Pointer reactions
+
+Off by default. Switch it on and creatures notice the cursor:
+
+```tsx
+<Meadow interaction={{ enabled: true }} />
+```
+
+| Option               | Default | Effect                                          |
+| -------------------- | ------- | ----------------------------------------------- |
+| `enabled`            | `false` | The switch for everything below                 |
+| `pointerAvoidance`   | `true`  | Butterflies and bees ease away from the pointer |
+| `curiousButterflies` | `true`  | At most one drifts over to look, then leaves    |
+| `ghostsReact`        | `true`  | Nearer ghosts lean and brighten                 |
+| `radius`             | `16`    | How close the pointer gets first, in percent    |
+
+Avoidance is a force, not a jump: the push falls off with the square of the
+distance and feeds a velocity that eases, so a creature curves away and drifts
+back rather than snapping. The curious butterfly loosely orbits the pointer and
+flees if you chase it — it never becomes a follower.
+
+There is one `pointermove` listener, on the scene root. It stores a position in
+a ref; nothing re-renders. On a device without hover, or under reduced motion,
+the whole thing stays off.
+
+## Ambient events
+
+Rare moments, one at a time, from a single scheduler:
+
+| Event           | Scene | What happens                                 |
+| --------------- | ----- | -------------------------------------------- |
+| `beeGather`     | day   | Bees converge on one flower, then disperse   |
+| `butterflyLand` | day   | A butterfly settles by a flower for a moment |
+| `shootingStar`  | night | A streak crosses the sky                     |
+| `fireflyGather` | night | Fireflies drift together and part again      |
+| `ufoAbduction`  | night | A saucer lifts one butterfly away            |
+
+`eventFrequency` sets the gap between them — `rare` is roughly a minute. Events
+never overlap, always release whatever they took hold of, and are off entirely
+under reduced motion.
+
+### The abduction
+
+At night a saucer slides in, a soft beam opens, one butterfly rides it up and
+vanishes, the beam closes and the saucer leaves. It needs a butterfly actually
+in the scene, so it cannot fire into an empty meadow.
+
+Nothing is lost: the slot returns to the pool and enters again later as a new
+butterfly, so the population you configured is what you keep.
 
 ## Turning pieces on and off
 
@@ -194,6 +295,15 @@ corner: low on the left at sunrise, high near midday, low on the right at sunset
 and the moon follows the same curve across the night window. It is a sine over the
 clock window — no latitude, no astronomy. Position updates ride the same
 one-minute tick, so nothing animates per frame.
+
+## The sun
+
+The sun genuinely emits: the disc throws a drop-shadow glow that swells on one
+beat, a corona blooms behind it on a slower one, and the rays — on the variants
+that have them — turn and flare on a third. Three periods that do not divide
+into each other, so the light never reads as a loop.
+
+The moon gets none of it. Only `data-lit="sun"` is lit.
 
 ## Themes
 
@@ -376,6 +486,11 @@ and wings all stop being animated at all, so there is no work left running. The
 full scene stays on screen at its resting positions, so it still looks composed
 rather than stripped.
 
+The simulated creatures never start their loop at all. They are laid out once,
+spread across the scene, and left there: bees hovering over flowers, butterflies
+holding station in the sky. Pointer reactions and every ambient event, the
+abduction included, are off.
+
 Detection is JavaScript-only, so `respectReducedMotion={false}` genuinely
 restores the motion instead of being overridden by a stylesheet.
 
@@ -393,13 +508,29 @@ only — never information.
 
 ## Performance
 
-Around 200 DOM nodes for the full daytime scene, about 220 at night once the star
-field and shooting stars are added, and about 190 in space, which trades the
-landscape for planets — all static after mount.
-Motion is CSS animations on `transform` and `opacity` only; the repeat pause for
-gliding characters is baked into the keyframes rather than scheduled. There is
-one 1px blur on the two distant clouds and no other filters — no `backdrop-filter`,
-no canvas, no shadows on moving elements.
+One `requestAnimationFrame` drives every simulated creature, however many there
+are. Positions live in refs and are written straight to `transform` and
+`opacity` — React renders on configuration changes, not on frames. Fireflies and
+the ghost gestures are pure CSS and cost nothing in the loop.
+
+The loop waits for an `IntersectionObserver` before doing any work, so a meadow
+below the fold is idle, and it resets its clock when the tab comes back rather
+than catching up on a backlog. Frame deltas are capped, so one long stall can
+never teleport the scene.
+
+Pools are fixed at the counts you configure. Nothing is appended or removed
+while the scene runs, so the DOM node count is the same after an hour as after a
+second.
+
+### The scenery
+
+Everything that is not a simulated creature is still pure CSS: roughly 200 DOM
+nodes for the full daytime scene, about 220 at night with the star field, and
+about 190 in space, all static after mount. Motion is CSS animations on
+`transform` and `opacity` only, and the repeat pause for gliding characters is
+baked into the keyframes rather than scheduled. There is one 1px blur on the two
+distant clouds and no other filters — no `backdrop-filter`, no canvas, no
+shadows on moving elements.
 
 `will-change` is deliberately unset: browsers already promote elements running a
 transform animation, and pinning layers for characters that spend part of their

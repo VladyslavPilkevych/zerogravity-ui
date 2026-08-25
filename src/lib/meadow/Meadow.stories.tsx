@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { expect, within } from "storybook/test"
+import { expect, waitFor, within } from "storybook/test"
 
 import type { MeadowItem } from "./art"
 import { Meadow } from "./Meadow"
@@ -359,5 +359,160 @@ export const Containment: Story = {
         const page = document.documentElement
         await expect(page.scrollWidth).toBeLessThanOrEqual(page.clientWidth)
         await expect(document.body.scrollWidth).toBeLessThanOrEqual(page.clientWidth)
+    },
+}
+
+/*
+ * The living-scene stories. Every one is seeded, and the animated ones are
+ * frozen with `animated={false}` so Chromatic never catches a creature
+ * mid-flight — the pool is placed by `settleLife`, which is deterministic.
+ */
+
+export const DayDefault: Story = {
+    args: { theme: "day", seed: 12, animated: false },
+    parameters: { chromatic: { disableSnapshot: false } },
+}
+
+export const DayDense: Story = {
+    args: {
+        theme: "day",
+        density: "lively",
+        seed: 12,
+        animated: false,
+        creatures: { bees: 10, butterflies: 10, ghosts: 4 },
+    },
+    parameters: { chromatic: { disableSnapshot: false } },
+}
+
+export const DayInteractive: Story = {
+    args: {
+        theme: "day",
+        seed: 12,
+        creatures: { bees: 6, butterflies: 8 },
+        interaction: { enabled: true },
+    },
+    play: async ({ canvasElement }) => {
+        const scene = canvasElement.querySelector(".xp-meadow") as HTMLElement
+
+        await expect(scene.dataset.interactive).toBe("true")
+        await expect(canvasElement.querySelectorAll(".xp-meadow-flyer")).toHaveLength(14)
+    },
+}
+
+export const Balloons: Story = {
+    args: {
+        theme: "day",
+        seed: 12,
+        animated: false,
+        creatures: { balloons: 6, bees: 0, butterflies: 0 },
+    },
+    parameters: { chromatic: { disableSnapshot: false } },
+    play: async ({ canvasElement }) => {
+        const all = canvasElement.querySelectorAll('.xp-meadow-object[data-kind="balloon"]')
+
+        // six extra plus the one in the cast, each with its own place and size
+        await expect(all).toHaveLength(7)
+        const sizes = new Set(
+            [...all].map((node) => (node as HTMLElement).style.getPropertyValue("--m-size")),
+        )
+        await expect(sizes.size).toBeGreaterThan(3)
+    },
+}
+
+export const NightLife: Story = {
+    args: { theme: "night", seed: 12, animated: false },
+    parameters: { chromatic: { disableSnapshot: false } },
+}
+
+export const NightDenseFireflies: Story = {
+    args: {
+        theme: "night",
+        seed: 12,
+        animated: false,
+        creatures: { fireflies: 40, ghosts: 5 },
+    },
+    parameters: { chromatic: { disableSnapshot: false } },
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelectorAll(".xp-meadow-firefly")).toHaveLength(40)
+    },
+}
+
+export const NightInteractive: Story = {
+    args: {
+        theme: "night",
+        seed: 12,
+        creatures: { butterflies: 6, ghosts: 4 },
+        interaction: { enabled: true },
+    },
+    play: async ({ canvasElement }) => {
+        const scene = canvasElement.querySelector(".xp-meadow") as HTMLElement
+
+        await expect(scene.dataset.interactive).toBe("true")
+        await expect(
+            canvasElement.querySelectorAll('.xp-meadow-ghost[data-reacts="true"]'),
+        ).toHaveLength(4)
+    },
+}
+
+/** The abduction is rare on purpose, so the story asks for it directly. */
+export const NightUfoAbduction: Story = {
+    args: {
+        theme: "night",
+        seed: 12,
+        creatures: { butterflies: 5 },
+        events: false,
+    },
+    play: async ({ canvasElement }) => {
+        const scene = canvasElement.querySelector(".xp-meadow") as HTMLElement
+        const beam = canvasElement.querySelector(".xp-meadow-abduct") as HTMLElement
+        // night thins the butterflies, so read the pool rather than assume it
+        const pool = canvasElement.querySelectorAll(".xp-meadow-flyer").length
+
+        await expect(pool).toBeGreaterThan(0)
+        await expect(beam.dataset.on).toBe("false")
+
+        scene.dispatchEvent(new CustomEvent("meadow:event", { detail: "ufoAbduction" }))
+
+        await waitFor(() => expect(beam.dataset.on).toBe("true"))
+
+        // the captive is taken, not deleted: the pool comes back the same size
+        await waitFor(() => expect(beam.dataset.on).toBe("false"), { timeout: 16000 })
+        await expect(canvasElement.querySelectorAll(".xp-meadow-flyer")).toHaveLength(pool)
+    },
+}
+
+export const SpaceScene: Story = {
+    args: { theme: "space", seed: 12, animated: false },
+    parameters: { chromatic: { disableSnapshot: false } },
+}
+
+export const SpaceDensePlanets: Story = {
+    args: { theme: "space", seed: 12, animated: false, space: { planets: 20 } },
+    parameters: { chromatic: { disableSnapshot: false } },
+    play: async ({ canvasElement }) => {
+        const planets = canvasElement.querySelectorAll(".xp-meadow-planet")
+        const layers = new Set([...planets].map((planet) => planet.getAttribute("data-layer")))
+
+        await expect(layers).toEqual(new Set(["far", "mid", "near"]))
+    },
+}
+
+export const StillScene: Story = {
+    args: {
+        theme: "day",
+        seed: 12,
+        animated: false,
+        creatures: { bees: 6, butterflies: 6, ghosts: 3 },
+    },
+    parameters: { chromatic: { disableSnapshot: false } },
+    play: async ({ canvasElement }) => {
+        const scene = canvasElement.querySelector(".xp-meadow") as HTMLElement
+
+        await expect(scene.className).toContain("xp-meadow-still")
+        // a still meadow keeps its creatures; they simply hold a pose
+        for (const flyer of canvasElement.querySelectorAll(".xp-meadow-flyer")) {
+            await expect((flyer as HTMLElement).style.transform).toContain("translate")
+        }
+        await expect(canvasElement.querySelector(".xp-meadow-abduct")).not.toBeVisible()
     },
 }

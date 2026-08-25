@@ -1,8 +1,9 @@
 "use client"
 
-import type { CSSProperties, ReactNode } from "react"
+import { useRef, type CSSProperties, type ReactNode } from "react"
 
 import { cx, useMediaQuery, usePrefersReducedMotion } from "../internal"
+import { Flyers } from "./Flyers"
 import { useLocalHour } from "./clock"
 import {
     MEADOW_ART,
@@ -11,6 +12,8 @@ import {
     MEADOW_COMETS,
     MEADOW_MOON_ART,
     MEADOW_PLANET_ART,
+    MEADOW_BALLOON_SILKS,
+    MeadowBalloon,
     MEADOW_PLANETS,
     MEADOW_PLANTS,
     MEADOW_SPACE_CAST,
@@ -28,17 +31,27 @@ import {
     daypartForHour,
     orbSpot,
     pickVariant,
+    planBalloons,
     planCast,
+    planGhosts,
     planStars,
+    resolveLife,
     type MeadowClock,
+    type MeadowCreatures,
     type MeadowDaypart,
     type MeadowDensity,
+    type MeadowEventPace,
+    type MeadowBalloonSpot,
+    type MeadowGhostSpot,
+    type MeadowInteraction,
     type MeadowKind,
+    type MeadowSpaceScene,
     type MeadowPlanEntry,
     type MeadowScene,
     type MeadowScenePart,
     type MeadowTheme,
 } from "./plan"
+import { MEADOW_GHOST_VARIANTS } from "./variants"
 import "./Meadow.css"
 
 export interface MeadowProps {
@@ -53,6 +66,15 @@ export interface MeadowProps {
     clock?: Partial<MeadowClock>
     animated?: boolean
     trails?: boolean
+    /** how many bees, butterflies, ghosts and fireflies the scene carries */
+    creatures?: MeadowCreatures
+    /** pointer reactions; off unless `enabled` is set */
+    interaction?: MeadowInteraction
+    /** rare ambient moments: a bee gathering, a shooting star, an abduction */
+    events?: boolean
+    eventFrequency?: MeadowEventPace
+    /** space-only scenery */
+    space?: MeadowSpaceScene
     seed?: number
     respectReducedMotion?: boolean
     className?: string
@@ -75,6 +97,8 @@ const TOGGLE: Record<MeadowKind, MeadowScenePart> = {
     ufo: "ufos",
 }
 
+const POINTER_QUERY = "(hover: hover) and (pointer: fine)"
+
 export function Meadow({
     children,
     items,
@@ -85,6 +109,11 @@ export function Meadow({
     clock,
     animated = true,
     trails = true,
+    creatures,
+    interaction,
+    events = true,
+    eventFrequency = "rare",
+    space,
     seed = 5,
     respectReducedMotion = true,
     className,
@@ -93,7 +122,9 @@ export function Meadow({
     const reduced = usePrefersReducedMotion()
     const tight = useMediaQuery(TIGHT_QUERY)
     const small = useMediaQuery(SMALL_QUERY)
+    const fine = useMediaQuery(POINTER_QUERY)
     const local = useLocalHour(timeAware)
+    const rootRef = useRef<HTMLDivElement>(null)
 
     const bounds: MeadowClock = { ...MEADOW_CLOCK, ...clock }
     // explicit space always wins; otherwise the clock, once it is known; otherwise the prop
@@ -110,6 +141,17 @@ export function Meadow({
     const base = MEADOW_DENSITY[density] ?? MEADOW_DENSITY.cosy
     const count = small ? Math.min(base, SMALL_CAST) : base
 
+    const life = resolveLife(active, density, creatures, space, small)
+    const touchable = interaction?.enabled === true && fine && !still
+    const ghosts =
+        shows("mascots") && life.ghosts > 0
+            ? planGhosts(life.ghosts, seed, MEADOW_GHOST_VARIANTS.length, tight)
+            : []
+    const balloons =
+        shows("balloon") && life.balloons > 0
+            ? planBalloons(life.balloons, seed, MEADOW_BALLOON_SILKS.length, tight)
+            : []
+
     const cast_ = items ?? (theme === "space" ? MEADOW_SPACE_CAST : MEADOW_CAST)
     const allowed = cast_.filter((item) => !item.kind || shows(TOGGLE[item.kind]))
     const cast = planCast(allowed, count, seed, tight)
@@ -123,9 +165,10 @@ export function Meadow({
     const stars = starCount > 0 ? planStars(starCount, seed, look.starSize) : []
     const comets = look.stars > 0 && !small && shows("comets") ? MEADOW_COMETS : []
     const planets = shows("planets")
-        ? small
-            ? MEADOW_PLANETS.filter((planet) => !planet.dense)
-            : MEADOW_PLANETS
+        ? (small ? MEADOW_PLANETS.filter((planet) => !planet.dense) : MEADOW_PLANETS).slice(
+              0,
+              life.planets,
+          )
         : []
     const orb = look.orb !== null && shows("sun")
     const Orb =
@@ -138,6 +181,7 @@ export function Meadow({
 
     return (
         <div
+            ref={rootRef}
             className={cx(
                 "xp-meadow",
                 look.surface,
@@ -146,6 +190,7 @@ export function Meadow({
                 className,
             )}
             data-scene={active}
+            data-interactive={touchable ? "true" : undefined}
             style={
                 arc
                     ? {
@@ -191,7 +236,10 @@ export function Meadow({
                         {orb ? (
                             <>
                                 <div className="xp-meadow-glow" />
-                                <div className="xp-meadow-orb">
+                                <div className="xp-meadow-orb" data-lit={look.orb ?? undefined}>
+                                    {look.orb === "sun" ? (
+                                        <span className="xp-meadow-corona" />
+                                    ) : null}
                                     <Orb />
                                 </div>
                             </>
@@ -240,7 +288,7 @@ export function Meadow({
                 </div>
             ) : null}
 
-            {cast.length > 0 ? (
+            {cast.length > 0 || ghosts.length > 0 || balloons.length > 0 ? (
                 <div className="xp-meadow-layer xp-meadow-air" aria-hidden="true">
                     {cast.map((entry) => (
                         <Creature
@@ -251,7 +299,38 @@ export function Meadow({
                             glow={look.glow && entry.kind === "mascot"}
                         />
                     ))}
+
+                    {balloons.map((balloon, index) => (
+                        <Balloon key={`balloon-${index}`} balloon={balloon} />
+                    ))}
+
+                    {ghosts.map((ghost, index) => (
+                        <Ghost
+                            key={`ghost-${index}`}
+                            ghost={ghost}
+                            glow={look.glow}
+                            reacts={touchable && (interaction?.ghostsReact ?? true)}
+                        />
+                    ))}
                 </div>
+            ) : null}
+
+            {life.bees + life.butterflies + life.fireflies > 0 ? (
+                <Flyers
+                    host={rootRef}
+                    bees={life.bees}
+                    butterflies={life.butterflies}
+                    fireflies={life.fireflies}
+                    interactive={touchable}
+                    avoid={interaction?.pointerAvoidance ?? true}
+                    curious={interaction?.curiousButterflies ?? true}
+                    interactionRadius={interaction?.radius ?? 16}
+                    events={events && !still}
+                    pace={eventFrequency}
+                    night={active === "night"}
+                    still={still}
+                    seed={seed}
+                />
             ) : null}
 
             <div className="xp-meadow-content">{children}</div>
@@ -277,6 +356,7 @@ function Planet({ planet, tight }: { planet: MeadowPlanetSpot; tight: boolean })
         <div
             className="xp-meadow-planet"
             data-faint={planet.faint ? "true" : undefined}
+            data-layer={planet.layer ?? "mid"}
             style={{
                 ["--m-x" as string]: spot.x,
                 ["--m-y" as string]: spot.y,
@@ -293,6 +373,80 @@ function Planet({ planet, tight }: { planet: MeadowPlanetSpot; tight: boolean })
                     </div>
                 </div>
             ) : null}
+        </div>
+    )
+}
+
+function Balloon({ balloon }: { balloon: MeadowBalloonSpot }) {
+    return (
+        <div
+            className="xp-meadow-object"
+            data-motion="bob"
+            data-kind="balloon"
+            style={{
+                ["--m-x" as string]: balloon.x,
+                ["--m-y" as string]: balloon.y,
+                ["--m-size" as string]: balloon.size,
+                ["--m-alpha" as string]: 0.72 + balloon.depth * 0.28,
+                ["--m-beat" as string]: balloon.duration,
+                ["--m-delay" as string]: balloon.delay,
+                ["--m-reach" as string]: balloon.amplitude,
+                ["--m-sway" as string]: balloon.sway,
+                ["--m-spin" as string]: 2.4,
+                ["--m-rest" as string]: 40,
+                ["--m-swing" as string]: balloon.x < 50 ? -1 : 1,
+            }}
+        >
+            <div className="xp-meadow-track" data-motion="bob">
+                <div className="xp-meadow-body" data-motion="bob">
+                    <MeadowBalloon silk={balloon.silk} rider={balloon.rider} />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function Ghost({
+    ghost,
+    glow,
+    reacts,
+}: {
+    ghost: MeadowGhostSpot
+    glow: boolean
+    reacts: boolean
+}) {
+    const Art = MEADOW_GHOST_VARIANTS[ghost.variant % MEADOW_GHOST_VARIANTS.length].Art
+
+    return (
+        <div
+            className="xp-meadow-object xp-meadow-ghost"
+            data-motion={ghost.motion}
+            data-kind="mascot"
+            data-behaviour={ghost.behaviour}
+            data-reacts={reacts ? "true" : undefined}
+            style={{
+                ["--m-x" as string]: ghost.x,
+                ["--m-y" as string]: ghost.y,
+                ["--m-size" as string]: ghost.size,
+                ["--m-alpha" as string]: 0.62 + ghost.depth * 0.38,
+                ["--m-beat" as string]: ghost.duration,
+                ["--m-delay" as string]: ghost.delay,
+                ["--m-reach" as string]: ghost.amplitude,
+                ["--m-sway" as string]: ghost.sway,
+                ["--m-spin" as string]: 2.4,
+                ["--m-rest" as string]: ghost.beatEvery,
+                ["--m-swing" as string]: ghost.x < 50 ? -1 : 1,
+                ["--m-depth" as string]: ghost.depth,
+            }}
+        >
+            <div className="xp-meadow-track" data-motion={ghost.motion}>
+                {glow ? <div className="xp-meadow-halo" /> : null}
+                <div className="xp-meadow-gesture">
+                    <div className="xp-meadow-body" data-motion={ghost.motion}>
+                        <Art />
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

@@ -303,3 +303,212 @@ export function pickVariant(count: number, seed: number, salt: number): number {
     if (count <= 1) return 0
     return Math.floor(rngFor(seed + salt, salt)() * count) % count
 }
+
+/* ------------------------------------------------------- the living scene */
+
+export interface MeadowCreatures {
+    bees?: number
+    butterflies?: number
+    ghosts?: number
+    fireflies?: number
+    /** extra balloons beyond the one in the cast */
+    balloons?: number
+}
+
+export interface MeadowInteraction {
+    enabled?: boolean
+    pointerAvoidance?: boolean
+    curiousButterflies?: boolean
+    ghostsReact?: boolean
+    /** how close the pointer gets before creatures react, in scene percent */
+    radius?: number
+}
+
+export interface MeadowSpaceScene {
+    planets?: number
+}
+
+export type MeadowEventPace = "rare" | "normal" | "frequent"
+
+export interface MeadowLifeCounts {
+    bees: number
+    butterflies: number
+    ghosts: number
+    fireflies: number
+    balloons: number
+    planets: number
+}
+
+/** Ceilings, not suggestions: nobody renders three hundred animated creatures. */
+export const MEADOW_LIMITS = {
+    bees: 12,
+    butterflies: 16,
+    ghosts: 12,
+    fireflies: 40,
+    balloons: 8,
+    planets: 20,
+} as const
+
+/*
+ * Ghosts stay at zero: the hand-placed cast already carries mascots, and adding
+ * more by default would change every existing scene. `creatures.ghosts` asks
+ * for extra ones on top of the cast.
+ */
+const LIFE_BY_DENSITY: Record<MeadowDensity, MeadowLifeCounts> = {
+    calm: { bees: 3, butterflies: 3, ghosts: 0, fireflies: 16, balloons: 0, planets: 6 },
+    cosy: { bees: 5, butterflies: 5, ghosts: 0, fireflies: 26, balloons: 0, planets: 9 },
+    lively: { bees: 8, butterflies: 7, ghosts: 0, fireflies: 36, balloons: 0, planets: 13 },
+}
+
+function count(asked: number | undefined, fallback: number, cap: number): number {
+    if (asked === undefined || !Number.isFinite(asked)) return fallback
+    return Math.round(clampTo(asked, 0, cap))
+}
+
+function clampTo(value: number, low: number, high: number): number {
+    return value < low ? low : value > high ? high : value
+}
+
+/**
+ * Density sets the shape of the scene and any explicit count overrides it.
+ * Which creatures actually appear is then a matter of the theme: no bees at
+ * night, no fireflies by day, no meadow creatures in space.
+ */
+export function resolveLife(
+    theme: MeadowTheme,
+    density: MeadowDensity,
+    creatures: MeadowCreatures | undefined,
+    space: MeadowSpaceScene | undefined,
+    small: boolean,
+): MeadowLifeCounts {
+    const base = LIFE_BY_DENSITY[density] ?? LIFE_BY_DENSITY.cosy
+    const trim = small ? 0.55 : 1
+
+    const wanted: MeadowLifeCounts = {
+        bees: count(creatures?.bees, base.bees, MEADOW_LIMITS.bees),
+        butterflies: count(creatures?.butterflies, base.butterflies, MEADOW_LIMITS.butterflies),
+        ghosts: count(creatures?.ghosts, base.ghosts, MEADOW_LIMITS.ghosts),
+        fireflies: count(creatures?.fireflies, base.fireflies, MEADOW_LIMITS.fireflies),
+        balloons: count(creatures?.balloons, base.balloons, MEADOW_LIMITS.balloons),
+        planets: count(space?.planets, base.planets, MEADOW_LIMITS.planets),
+    }
+
+    const day = theme === "day" || theme === "sunrise" || theme === "sunset"
+    const night = theme === "night"
+
+    return {
+        bees: theme === "space" || night ? 0 : Math.round(wanted.bees * trim * (day ? 1 : 0.5)),
+        butterflies:
+            theme === "space"
+                ? 0
+                : Math.round(wanted.butterflies * trim * (night ? 0.5 : day ? 1 : 0.7)),
+        ghosts: Math.round(wanted.ghosts * (small ? 0.6 : 1)),
+        fireflies: night ? Math.round(wanted.fireflies * trim) : 0,
+        balloons: theme === "space" ? 0 : Math.round(wanted.balloons * (small ? 0.6 : 1)),
+        planets: theme === "space" ? Math.round(wanted.planets * (small ? 0.6 : 1)) : 0,
+    }
+}
+
+export interface MeadowGhostSpot {
+    variant: number
+    x: number
+    y: number
+    size: number
+    depth: number
+    motion: MeadowMotion
+    duration: number
+    delay: number
+    amplitude: number
+    sway: number
+    /** seconds between one of its rare little behaviours */
+    beatEvery: number
+    behaviour: number
+}
+
+const GHOST_MOTION: readonly MeadowMotion[] = ["float", "bob", "hover"]
+
+/**
+ * Extra ghosts beyond the hand-placed cast. Each gets its own scale, pace and
+ * drift so a crowd never moves as one.
+ */
+export function planGhosts(
+    count: number,
+    seed: number,
+    variants: number,
+    compact = false,
+): MeadowGhostSpot[] {
+    const spots: MeadowGhostSpot[] = []
+
+    for (let index = 0; index < count; index += 1) {
+        const random = rngFor(seed + 281, index)
+        const depth = round(0.25 + random() * 0.65, 2)
+        const lane = index % 2 === 0 ? 6 + random() * 30 : 64 + random() * 30
+        const motion = GHOST_MOTION[Math.floor(random() * GHOST_MOTION.length) % 3]
+
+        spots.push({
+            variant: variants > 0 ? Math.floor(random() * variants) % variants : 0,
+            x: round(lane, 1),
+            y: round(18 + random() * (compact ? 62 : 68), 1),
+            size: Math.round((compact ? 34 : 44) + depth * (compact ? 20 : 30)),
+            depth,
+            motion,
+            duration: round(BEAT[motion] * (0.8 + random() * 0.5), 2),
+            delay: round(-random() * 12, 2),
+            amplitude: round(REACH[motion] * (0.7 + random() * 0.6), 1),
+            sway: round(4 + random() * 12, 1),
+            beatEvery: round(14 + random() * 26, 1),
+            behaviour: Math.floor(random() * 4),
+        })
+    }
+
+    return spots
+}
+
+export interface MeadowBalloonSpot {
+    silk: number
+    rider: boolean
+    x: number
+    y: number
+    size: number
+    depth: number
+    duration: number
+    delay: number
+    amplitude: number
+    sway: number
+}
+
+/**
+ * Balloons are scenery rather than creatures, so they stay on CSS. Colour,
+ * size, height and whether anyone is riding all come from the seed, and they
+ * are spread across the sky in lanes so two never share a spot.
+ */
+export function planBalloons(
+    count: number,
+    seed: number,
+    silks: number,
+    compact = false,
+): MeadowBalloonSpot[] {
+    const spots: MeadowBalloonSpot[] = []
+    const lane = 100 / Math.max(1, count)
+
+    for (let index = 0; index < count; index += 1) {
+        const random = rngFor(seed + 347, index)
+        const depth = round(0.2 + random() * 0.7, 2)
+
+        spots.push({
+            silk: silks > 0 ? Math.floor(random() * silks) % silks : 0,
+            // roughly a third drift by empty
+            rider: random() > 0.34,
+            x: round(lane * index + 4 + random() * (lane - 8), 1),
+            y: round(6 + random() * (compact ? 26 : 42), 1),
+            size: Math.round((compact ? 42 : 58) + depth * (compact ? 30 : 54)),
+            depth,
+            duration: round(BEAT.bob * (0.9 + random() * 0.8), 2),
+            delay: round(-random() * 14, 2),
+            amplitude: round(REACH.bob * (0.7 + random() * 0.7), 1),
+            sway: round(5 + random() * 14, 1),
+        })
+    }
+
+    return spots
+}

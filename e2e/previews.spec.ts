@@ -230,15 +230,37 @@ test("the Stencil Dock preset stays on one line", async ({ page }) => {
     expect(lines).toBe(1)
 })
 
+// Every control a preview offers has to do something. Lodestone's magnets are
+// the demo itself, and Meadow's buttons fire ambient events that are otherwise
+// too rare to see; everything else should offer nothing to press.
+const PREVIEW_CONTROLS: Record<string, string[]> = {
+    lodestone: ["Button 1", "Button 2", "Button 3"],
+    meadow: ["Bee gathering", "Butterfly lands", "Shooting star", "UFO abduction"],
+}
+
 test("no preview leaves fake buttons behind", async ({ page }) => {
     for (const slug of ["facet", "wash", "vellum", "lodestone", "meadow"]) {
         await page.goto(`/docs/${slug}`)
         const buttons = await page.locator(".dz-preview button, .dz-preview a").allTextContents()
 
-        // Lodestone's magnets are the demo; nothing else should offer a control
-        const expected = slug === "lodestone" ? ["Button 1", "Button 2", "Button 3"] : []
-        expect(buttons.map((text) => text.trim()).slice(0, 3), slug).toEqual(expected)
+        const expected = PREVIEW_CONTROLS[slug] ?? []
+        expect(buttons.map((text) => text.trim()).slice(0, expected.length), slug).toEqual(expected)
     }
+})
+
+test("Meadow's event buttons actually start an event", async ({ page, browserLog: guard }) => {
+    await page.goto("/docs/meadow")
+    const beam = page.locator(".xp-meadow-abduct")
+    await expect(beam).toHaveAttribute("data-on", "false")
+
+    await page.getByRole("combobox", { name: "Theme" }).selectOption("night")
+    await page.getByRole("button", { name: "UFO abduction" }).click()
+
+    await expect(beam).toHaveAttribute("data-on", "true")
+    // and it clears itself up without leaving the saucer behind
+    await expect(beam).toHaveAttribute("data-on", "false", { timeout: 20000 })
+
+    guard.assertClean()
 })
 
 test("Elemental keeps its edge attached at every radius", async ({ page, browserLog: guard }) => {

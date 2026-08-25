@@ -358,6 +358,7 @@
     background: linear-gradient(150deg, #141420, #241c33);
 }
 
+/* The content slot has to stay readable once the sky goes dark. */
 .xpg-meadow-word {
     display: block;
     width: 100%;
@@ -367,6 +368,11 @@
     font-weight: 700;
     letter-spacing: -0.02em;
     user-select: none;
+}
+
+.xp-meadow[data-scene="night"] .xpg-meadow-word,
+.xp-meadow[data-scene="space"] .xpg-meadow-word {
+    color: rgba(244, 242, 255, 0.72);
 }
 
 .xpg-tessera-copy {
@@ -490,4 +496,41 @@
 
 .xpg-el-pick[aria-pressed="true"] .xpg-el-label {
     color: #fff;
+}
+
+/* Meadow's rare events are rare by design; the docs can ask for one directly. */
+.xpg-meadow-stage {
+    position: relative;
+    display: grid;
+    gap: 14px;
+    width: 100%;
+}
+
+.xpg-meadow-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.xpg-meadow-events button {
+    padding: 7px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(10, 10, 14, 0.6);
+    color: rgba(255, 255, 255, 0.72);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+}
+
+.xpg-meadow-events button:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.xpg-meadow-events button:focus-visible {
+    outline: 2px solid var(--pg-accent);
+    outline-offset: 2px;
 }

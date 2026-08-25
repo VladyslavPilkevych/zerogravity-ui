@@ -10,6 +10,15 @@ import type { MeadowScenePart } from "./plan"
 afterEach(() => {
     mediaState.reducedMotion = false
     mediaState.narrow = false
+    mediaState.fine = true
+})
+
+const flyers = (container: HTMLElement) => ({
+    all: container.querySelectorAll(".xp-meadow-flyer"),
+    bees: container.querySelectorAll('.xp-meadow-flyer[data-kind="bee"]'),
+    butterflies: container.querySelectorAll('.xp-meadow-flyer[data-kind="butterfly"]'),
+    fireflies: container.querySelectorAll(".xp-meadow-firefly"),
+    ghosts: container.querySelectorAll(".xp-meadow-ghost"),
 })
 
 const KIND_OF: Partial<Record<MeadowScenePart, string>> = {
@@ -414,6 +423,21 @@ describe("Meadow", () => {
         expect(nightPaths).not.toContain("xp-meadow-rays")
     })
 
+    it("gives the sun a corona to shine with, and the moon none", () => {
+        const day = render(<Meadow>hero</Meadow>)
+        const night = render(<Meadow theme="night">hero</Meadow>)
+
+        expect((day.container.querySelector(".xp-meadow-orb") as HTMLElement).dataset.lit).toBe(
+            "sun",
+        )
+        expect(day.container.querySelectorAll(".xp-meadow-corona")).toHaveLength(1)
+
+        expect((night.container.querySelector(".xp-meadow-orb") as HTMLElement).dataset.lit).toBe(
+            "moon",
+        )
+        expect(night.container.querySelectorAll(".xp-meadow-corona")).toHaveLength(0)
+    })
+
     it("hangs a field of stars and a couple of shooting stars at night", () => {
         const { container } = render(<Meadow theme="night">hero</Meadow>)
 
@@ -571,7 +595,7 @@ describe("Meadow", () => {
         expect(parts.hills).toBeNull()
         expect(parts.clouds).toHaveLength(0)
         expect(parts.plants).toHaveLength(0)
-        expect(container.querySelectorAll(".xp-meadow-planet")).toHaveLength(4)
+        expect(container.querySelectorAll(".xp-meadow-planet")).toHaveLength(13)
         expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(30)
         expect(container.querySelectorAll(".xp-meadow-comet")).toHaveLength(2)
     })
@@ -642,7 +666,7 @@ describe("Meadow", () => {
                 n.getAttribute("data-kind"),
             ),
         ).not.toContain("rocket")
-        expect(noRockets.container.querySelectorAll(".xp-meadow-planet")).toHaveLength(4)
+        expect(noRockets.container.querySelectorAll(".xp-meadow-planet")).toHaveLength(13)
     })
 
     it("ignores a sun asked for in space rather than drawing one", () => {
@@ -708,7 +732,7 @@ describe("Meadow", () => {
 
         expect(parts.root.className).toContain("xp-meadow-space")
         expect(parts.root.className).toContain("xp-meadow-still")
-        expect(container.querySelectorAll(".xp-meadow-planet")).toHaveLength(4)
+        expect(container.querySelectorAll(".xp-meadow-planet")).toHaveLength(13)
         expect(container.querySelectorAll(".xp-meadow-star")).toHaveLength(30)
         expect(container.querySelectorAll(".xp-meadow-orbit")).toHaveLength(1)
     })
@@ -845,8 +869,8 @@ describe("Meadow", () => {
         const { container } = render(<Meadow theme="space">hero</Meadow>)
         const faint = container.querySelectorAll('.xp-meadow-planet[data-faint="true"]')
 
-        expect(faint).toHaveLength(1)
-        expect(container.querySelectorAll(".xp-meadow-planet")).toHaveLength(4)
+        expect(faint.length).toBeGreaterThan(0)
+        expect(container.querySelectorAll(".xp-meadow-planet")).toHaveLength(9)
     })
 
     it("mirrors a gliding character's whole lane so it faces the way it travels", () => {
@@ -873,17 +897,36 @@ describe("Meadow", () => {
         expect(balloon?.querySelectorAll("ellipse").length).toBeGreaterThanOrEqual(4)
     })
 
-    it("does no scripted animation work", () => {
+    it("drives the whole scene from one animation frame and no timers", () => {
         const frame = vi.spyOn(globalThis, "requestAnimationFrame")
-        const interval = vi.spyOn(globalThis, "setInterval")
+        const cancel = vi.spyOn(globalThis, "cancelAnimationFrame")
         const timeout = vi.spyOn(globalThis, "setTimeout")
 
-        const { unmount } = render(<Meadow density="lively">hero</Meadow>)
+        const { unmount } = render(
+            <Meadow density="lively" creatures={{ bees: 8, butterflies: 8, ghosts: 6 }}>
+                hero
+            </Meadow>,
+        )
 
-        expect(frame).not.toHaveBeenCalled()
-        expect(interval).not.toHaveBeenCalled()
+        // twenty-two creatures, one loop between them
+        expect(frame).toHaveBeenCalledTimes(1)
         expect(timeout).not.toHaveBeenCalled()
 
+        unmount()
+        expect(cancel).toHaveBeenCalled()
+        vi.restoreAllMocks()
+    })
+
+    it("schedules nothing at all when the scene is still", () => {
+        const frame = vi.spyOn(globalThis, "requestAnimationFrame")
+
+        const { unmount } = render(
+            <Meadow density="lively" animated={false}>
+                hero
+            </Meadow>,
+        )
+
+        expect(frame).not.toHaveBeenCalled()
         unmount()
         vi.restoreAllMocks()
     })
@@ -896,5 +939,288 @@ describe("Meadow", () => {
             expect(object.querySelector(".xp-meadow-track")).not.toBeNull()
             expect(object.querySelector(".xp-meadow-body")).not.toBeNull()
         }
+    })
+})
+
+describe("the living scene", () => {
+    it("renders the creature counts it was given", () => {
+        const { container } = render(
+            <Meadow creatures={{ bees: 6, butterflies: 4 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(flyers(container).bees).toHaveLength(6)
+        expect(flyers(container).butterflies).toHaveLength(4)
+    })
+
+    it("clamps a count nobody should be asking for", () => {
+        const { container } = render(
+            <Meadow creatures={{ bees: 400, butterflies: -20 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(flyers(container).bees).toHaveLength(12)
+        expect(flyers(container).butterflies).toHaveLength(0)
+    })
+
+    it("scales the scene with the density preset", () => {
+        const calm = render(
+            <Meadow density="calm" seed={9}>
+                hero
+            </Meadow>,
+        )
+        const lively = render(
+            <Meadow density="lively" seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(flyers(lively.container).all.length).toBeGreaterThan(
+            flyers(calm.container).all.length,
+        )
+    })
+
+    it("lets an explicit count override the preset", () => {
+        const { container } = render(
+            <Meadow density="lively" creatures={{ bees: 1 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(flyers(container).bees).toHaveLength(1)
+    })
+
+    it("keeps each creature to the part of the day it belongs in", () => {
+        const day = render(<Meadow theme="day" seed={9} />)
+        const night = render(<Meadow theme="night" seed={9} />)
+        const space = render(<Meadow theme="space" seed={9} />)
+
+        expect(flyers(day.container).bees.length).toBeGreaterThan(0)
+        expect(flyers(day.container).fireflies).toHaveLength(0)
+
+        expect(flyers(night.container).bees).toHaveLength(0)
+        expect(flyers(night.container).fireflies.length).toBeGreaterThan(10)
+
+        expect(flyers(space.container).all).toHaveLength(0)
+        expect(flyers(space.container).fireflies).toHaveLength(0)
+    })
+
+    it("adds balloons in different colours, sizes and places", () => {
+        const { container } = render(
+            <Meadow creatures={{ balloons: 6 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+        const extra = [...container.querySelectorAll('.xp-meadow-object[data-kind="balloon"]')]
+
+        // six extra, plus the one the cast already places
+        expect(extra).toHaveLength(7)
+
+        const read = (name: string) =>
+            new Set(extra.map((node) => (node as HTMLElement).style.getPropertyValue(name)))
+        expect(read("--m-x").size).toBeGreaterThan(4)
+        expect(read("--m-size").size).toBeGreaterThan(3)
+
+        const silks = new Set(
+            extra.flatMap((node) =>
+                [...node.querySelectorAll("path")].map((p) => p.getAttribute("fill")),
+            ),
+        )
+        expect(silks.size).toBeGreaterThan(4)
+    })
+
+    it("sends some balloons up with nobody aboard", () => {
+        const { container } = render(
+            <Meadow creatures={{ balloons: 8 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+        const baskets = [...container.querySelectorAll('.xp-meadow-object[data-kind="balloon"]')]
+        const riders = baskets.filter((node) => node.innerHTML.includes("--meadow-body"))
+
+        expect(riders.length).toBeGreaterThan(0)
+        expect(riders.length).toBeLessThan(baskets.length)
+    })
+
+    it("keeps balloons out of space", () => {
+        const { container } = render(
+            <Meadow theme="space" creatures={{ balloons: 6 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(container.querySelectorAll('.xp-meadow-object[data-kind="balloon"]')).toHaveLength(0)
+    })
+
+    it("adds extra ghosts only when asked, so an old scene is unchanged", () => {
+        const plain = render(<Meadow seed={9}>hero</Meadow>)
+        const crowded = render(
+            <Meadow creatures={{ ghosts: 7 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(flyers(plain.container).ghosts).toHaveLength(0)
+        expect(flyers(crowded.container).ghosts).toHaveLength(7)
+    })
+
+    it("gives each extra ghost its own size and pace", () => {
+        const { container } = render(
+            <Meadow creatures={{ ghosts: 6 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        const sizes = new Set<string>()
+        const beats = new Set<string>()
+        for (const ghost of flyers(container).ghosts) {
+            const style = (ghost as HTMLElement).style
+            sizes.add(style.getPropertyValue("--m-size"))
+            beats.add(style.getPropertyValue("--m-beat"))
+        }
+
+        expect(sizes.size).toBeGreaterThan(2)
+        expect(beats.size).toBeGreaterThan(2)
+    })
+
+    it("respects the planet count in space and places it from the seed", () => {
+        const few = render(<Meadow theme="space" space={{ planets: 3 }} seed={9} />)
+        const same = render(<Meadow theme="space" space={{ planets: 3 }} seed={9} />)
+        const other = render(<Meadow theme="space" space={{ planets: 3 }} seed={40} />)
+
+        const spots = (view: { container: HTMLElement }) =>
+            [...view.container.querySelectorAll(".xp-meadow-planet")].map((planet) =>
+                (planet as HTMLElement).style.getPropertyValue("--m-x"),
+            )
+
+        expect(spots(few)).toHaveLength(3)
+        expect(spots(same)).toEqual(spots(few))
+        expect(new Set(spots(few)).size).toBe(3)
+        void other
+    })
+
+    it("spreads the planets over three depths", () => {
+        const { container } = render(<Meadow theme="space" density="lively" seed={9} />)
+        const layers = new Set(
+            [...container.querySelectorAll(".xp-meadow-planet")].map((planet) =>
+                planet.getAttribute("data-layer"),
+            ),
+        )
+
+        expect(layers).toEqual(new Set(["far", "mid", "near"]))
+    })
+
+    it("hides every new layer from assistive technology", () => {
+        const { container } = render(
+            <Meadow theme="night" creatures={{ ghosts: 3 }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(container.querySelector(".xp-meadow-life")).toHaveAttribute("aria-hidden", "true")
+        expect(container.querySelectorAll("[tabindex]")).toHaveLength(0)
+    })
+})
+
+describe("pointer reactions", () => {
+    it("stays out of the way unless it is switched on", () => {
+        const { container } = render(<Meadow seed={9}>hero</Meadow>)
+
+        expect(scene(container).root.dataset.interactive).toBeUndefined()
+    })
+
+    it("turns on for a fine pointer", () => {
+        const { container } = render(
+            <Meadow interaction={{ enabled: true }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(scene(container).root.dataset.interactive).toBe("true")
+    })
+
+    it("stays off on a device with no hover", () => {
+        mediaState.fine = false
+        const { container } = render(
+            <Meadow interaction={{ enabled: true }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(scene(container).root.dataset.interactive).toBeUndefined()
+    })
+
+    it("stays off under reduced motion", () => {
+        mediaState.reducedMotion = true
+        const { container } = render(
+            <Meadow interaction={{ enabled: true }} seed={9}>
+                hero
+            </Meadow>,
+        )
+
+        expect(scene(container).root.dataset.interactive).toBeUndefined()
+    })
+
+    it("listens once on the root rather than once per creature", () => {
+        // React puts its own delegated listeners on the test container, so count
+        // only the ones that land on the scene itself
+        const mine: string[] = []
+        const listen = vi
+            .spyOn(HTMLElement.prototype, "addEventListener")
+            .mockImplementation(function (this: HTMLElement, name: string) {
+                if (name === "pointermove" && this.classList.contains("xp-meadow")) {
+                    mine.push(name)
+                }
+            } as never)
+
+        const { unmount } = render(
+            <Meadow interaction={{ enabled: true }} creatures={{ bees: 8, butterflies: 8 }}>
+                hero
+            </Meadow>,
+        )
+
+        expect(mine).toHaveLength(1)
+
+        unmount()
+        listen.mockRestore()
+    })
+
+    it("takes its listeners back off on unmount", () => {
+        const drop: string[] = []
+        const off = vi
+            .spyOn(HTMLElement.prototype, "removeEventListener")
+            .mockImplementation(function (this: HTMLElement, name: string) {
+                if (this.classList.contains("xp-meadow")) drop.push(name)
+            } as never)
+
+        const { unmount } = render(
+            <Meadow interaction={{ enabled: true }} creatures={{ bees: 4, butterflies: 4 }}>
+                hero
+            </Meadow>,
+        )
+        unmount()
+
+        expect(drop).toContain("pointermove")
+        expect(drop).toContain("pointerleave")
+        expect(drop).toContain("meadow:event")
+        off.mockRestore()
+    })
+
+    it("keeps the content clickable through every decorative layer", async () => {
+        const user = userEvent.setup()
+        const onClick = vi.fn()
+
+        render(
+            <Meadow theme="night" interaction={{ enabled: true }} creatures={{ ghosts: 4 }}>
+                <button type="button" onClick={onClick}>
+                    Press me
+                </button>
+            </Meadow>,
+        )
+
+        await user.click(document.querySelector("button") as HTMLButtonElement)
+        expect(onClick).toHaveBeenCalledTimes(1)
     })
 })
