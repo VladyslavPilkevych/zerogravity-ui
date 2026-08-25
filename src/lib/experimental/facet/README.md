@@ -31,6 +31,13 @@ rather than thousands of nodes.
 the component writes exactly **two** custom properties per frame; each facet
 derives its own shading in CSS from its stored centre.
 
+Each triangle also carries a normal, so how brightly it answers depends on
+whether it faces the light as well as how close it is. Neighbouring triangles
+face opposite ways, which is what breaks the surface into facets as the pointer
+crosses it instead of sliding one soft blob around. The light lives on its own
+layer with no transition, so it tracks the pointer on the frame; only the
+ambient tone crossfades.
+
 **Ambient flow.** `ambientInterval` decides _when_ the next palette colour is
 picked; `ambientDuration` decides _how long_ the surface takes to get there. The
 two are independent, so a long duration with a short interval produces

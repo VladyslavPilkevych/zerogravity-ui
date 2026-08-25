@@ -14,6 +14,13 @@ What is left is Facet, Louvre, Raster, Wash and the pixel loaders, plus `Kbd`,
 which exists for the documentation site's search hint and is not a component in
 its own right.
 
+The `0.2.0` batch under evaluation is Undertow, Wake, Drench, Perseid, Gaze and
+Eclipse. Undertow and Wake share one wave engine in [`liquid`](./liquid), which
+is a module rather than a component and is not exported from this barrel. Gaze is
+the only thing here with a third-party dependency: `three`, loaded with a dynamic
+`import()` and held as a devDependency, because nothing in this folder ships. If
+Gaze is ever promoted, `three` has to become a peer dependency at the same time.
+
 Lodestone, Vellum, Diorama, Elemental, Kern, Overprint, Meadow, Tessera and
 Ricochet graduated in `0.1.0` and now live directly under `src/lib`.
 

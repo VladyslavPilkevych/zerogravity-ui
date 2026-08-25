@@ -487,20 +487,31 @@ export function planBalloons(
     seed: number,
     silks: number,
     compact = false,
+    /** x of a balloon already in the cast, so an extra never lands on it */
+    avoid?: number,
 ): MeadowBalloonSpot[] {
     const spots: MeadowBalloonSpot[] = []
-    const lane = 100 / Math.max(1, count)
+    const lanes = Math.max(1, count + (avoid === undefined ? 0 : 1))
+    const lane = 100 / lanes
+    const taken = avoid === undefined ? -1 : Math.min(lanes - 1, Math.floor(avoid / lane))
+    let slot = 0
 
     for (let index = 0; index < count; index += 1) {
         const random = rngFor(seed + 347, index)
         const depth = round(0.2 + random() * 0.7, 2)
+        if (slot === taken) slot += 1
+
+        const x = round(lane * slot + 4 + random() * Math.max(2, lane - 8), 1)
+        // content sits in the middle of a hero, so a balloon crossing the
+        // centre stays high; the ones near the edges may drift lower
+        const central = 1 - Math.min(1, Math.abs(x - 50) / 34)
 
         spots.push({
             silk: silks > 0 ? Math.floor(random() * silks) % silks : 0,
             // roughly a third drift by empty
             rider: random() > 0.34,
-            x: round(lane * index + 4 + random() * (lane - 8), 1),
-            y: round(6 + random() * (compact ? 26 : 42), 1),
+            x,
+            y: round(4 + random() * (compact ? 26 : 42) * (1 - central * 0.72), 1),
             size: Math.round((compact ? 42 : 58) + depth * (compact ? 30 : 54)),
             depth,
             duration: round(BEAT.bob * (0.9 + random() * 0.8), 2),
@@ -508,6 +519,8 @@ export function planBalloons(
             amplitude: round(REACH.bob * (0.7 + random() * 0.7), 1),
             sway: round(5 + random() * 14, 1),
         })
+
+        slot += 1
     }
 
     return spots

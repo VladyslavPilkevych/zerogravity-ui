@@ -10,6 +10,20 @@ import type { PreviewApi } from "./useDocsConfig"
  * Keys match `slug` in the registry.
  */
 export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
+    drench: dynamic(() =>
+        import("@/playground/previews/DrenchPreview").then((m) => m.DrenchPreview),
+    ),
+    eclipse: dynamic(() =>
+        import("@/playground/previews/EclipsePreview").then((m) => m.EclipsePreview),
+    ),
+    gaze: dynamic(() => import("@/playground/previews/GazePreview").then((m) => m.GazePreview)),
+    perseid: dynamic(() =>
+        import("@/playground/previews/PerseidPreview").then((m) => m.PerseidPreview),
+    ),
+    undertow: dynamic(() =>
+        import("@/playground/previews/UndertowPreview").then((m) => m.UndertowPreview),
+    ),
+    wake: dynamic(() => import("@/playground/previews/WakePreview").then((m) => m.WakePreview)),
     antigravity: dynamic(() =>
         import("@/playground/previews/AntigravityPreview").then((m) => m.AntigravityPreview),
     ),

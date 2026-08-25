@@ -17,29 +17,57 @@
 }
 
 .xp-facet-shard {
+    /* direction from this cell to the light */
     --dx: calc(var(--facet-lx) - var(--cx));
     --dy: calc(var(--facet-ly) - var(--cy));
-    --falloff: clamp(0, calc(1 - (var(--dx) * var(--dx) + var(--dy) * var(--dy)) * 5), 1);
-    --lit: calc(var(--facet-intensity) * var(--falloff));
-    --mix: calc(16 + var(--lit) * 44 + var(--shade) * var(--facet-variation));
+    --near: clamp(0, calc(1 - (var(--dx) * var(--dx) + var(--dy) * var(--dy)) * 2.6), 1);
+    /* how squarely this triangle faces it: neighbours differ, which is what
+       makes a moving pointer break the surface into facets */
+    --face: clamp(0, calc((var(--dx) * var(--nx) + var(--dy) * var(--ny)) * 2.4 + 0.28), 1);
+    --lit: calc(var(--facet-intensity) * var(--near) * var(--face));
+    --mix: calc(16 + var(--shade) * var(--facet-variation));
     --sweep: calc((var(--cx) * var(--facet-dx) + var(--cy) * var(--facet-dy) + 1) * 0.5);
+    position: relative;
     background: color-mix(in oklab, var(--facet-tone) calc(var(--mix) * 1%), var(--facet-ground));
     clip-path: polygon(0 0, 100% 0, 0 100%);
+    /* only the tone crossfades; the light answers the pointer on the frame */
     transition-property: background;
     transition-duration: calc(var(--facet-fade) * var(--pace));
     transition-timing-function: cubic-bezier(0.4, 0, 0.25, 1);
     transition-delay: calc(var(--facet-fade) * 0.45 * clamp(0, var(--sweep), 1));
 }
 
+.xp-facet-shard::after {
+    position: absolute;
+    inset: 0;
+    background: color-mix(
+        in oklab,
+        color-mix(in oklab, #fff 74%, var(--facet-tone)) calc(var(--lit) * 86%),
+        transparent
+    );
+    content: "";
+}
+
+.xp-facet-a {
+    --nx: -0.7;
+    --ny: -0.7;
+}
+
 .xp-facet-b {
+    --nx: 0.7;
+    --ny: 0.7;
     clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
 .xp-facet-flip.xp-facet-a {
+    --nx: 0.7;
+    --ny: -0.7;
     clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
 .xp-facet-flip.xp-facet-b {
+    --nx: -0.7;
+    --ny: 0.7;
     clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
 

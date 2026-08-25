@@ -12,6 +12,8 @@ const ALLOWED = [
     /\[Fast Refresh\]/i,
     /favicon\.ico/i,
     /was preloaded using link preload but not used/i,
+    // GL driver performance notes from the headless GPU, not page output
+    /GL Driver Message \(OpenGL, Performance/i,
 ] as const
 
 function isAllowed(message: string) {

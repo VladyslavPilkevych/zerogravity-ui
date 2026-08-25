@@ -1,0 +1,44 @@
+.xp-eclipse {
+    position: relative;
+    width: 100%;
+}
+
+/*
+ * Every panel pins at the top for exactly its own height, and later panels
+ * carry a higher z-index. Covering is then only a matter of sliding the next
+ * one in over the one already pinned.
+ */
+.xp-eclipse-panel {
+    position: sticky;
+    top: 0;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    transform-origin: center;
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+.xp-eclipse-inner {
+    width: 100%;
+    height: 100%;
+}
+
+.xp-eclipse-veil {
+    position: absolute;
+    inset: 0;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Reduced motion drops the whole mechanism and lets the sections simply stack. */
+.xp-eclipse[data-still="true"] .xp-eclipse-panel {
+    position: relative;
+    transform: none !important;
+    filter: none !important;
+}
+
+.xp-eclipse[data-still="true"] .xp-eclipse-veil {
+    display: none;
+}

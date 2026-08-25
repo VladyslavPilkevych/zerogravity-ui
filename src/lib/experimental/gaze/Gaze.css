@@ -1,0 +1,28 @@
+.xp-gaze {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 260px;
+    overflow: hidden;
+    touch-action: pan-y;
+}
+
+.xp-gaze-stage {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.xp-gaze-note {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.xp-gaze[data-phase="ready"] .xp-gaze-note {
+    display: none;
+}

@@ -4,7 +4,6 @@ import { Facet } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { PALETTES } from "../experimental/schemas"
-import { Hint } from "./parts"
 
 export function FacetPreview({ config }: PreviewApi) {
     const c = config as {
@@ -29,8 +28,6 @@ export function FacetPreview({ config }: PreviewApi) {
             ambientInterval={c.ambientInterval}
             ambientDuration={c.ambientDuration}
             className="xpg-hero"
-        >
-            <Hint>Move cursor</Hint>
-        </Facet>
+        />
     )
 }

@@ -50,6 +50,13 @@ export function installCanvasHarness(): CanvasHarness {
         fillStyle: "",
         strokeStyle: "",
         lineWidth: 1,
+        lineCap: "butt" as CanvasLineCap,
+        lineJoin: "miter" as CanvasLineJoin,
+        font: "",
+        textAlign: "start" as CanvasTextAlign,
+        textBaseline: "alphabetic" as CanvasTextBaseline,
+        save: () => {},
+        restore: () => {},
         setTransform: () => {},
         clearRect: () => {},
         fillRect: () => {},
@@ -57,6 +64,9 @@ export function installCanvasHarness(): CanvasHarness {
         moveTo: () => {},
         lineTo: () => {},
         arc: () => {},
+        closePath: () => {},
+        fillText: () => {},
+        strokeText: () => {},
         roundRect: () => {},
         fill: () => {},
         stroke: () => {},
@@ -64,6 +74,7 @@ export function installCanvasHarness(): CanvasHarness {
         createRadialGradient: () => ({ addColorStop: () => {} }),
         createLinearGradient: () => ({ addColorStop: () => {} }),
         measureText: () => ({ width: 0 }),
+        getImageData: () => ({ data: new Uint8ClampedArray(4) }),
     }
 
     const spy = vi

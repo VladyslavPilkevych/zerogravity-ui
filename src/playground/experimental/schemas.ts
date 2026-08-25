@@ -870,3 +870,237 @@ export const ELEMENTAL_CONTROLS: ControlGroup[] = [
         ],
     },
 ]
+
+/* ------------------------------------------------------------- Undertow */
+
+export const UNDERTOW_DEFAULTS = {
+    radius: 0.3,
+    strength: 0.55,
+    softness: 0.38,
+    speed: 1,
+    linger: 2.4,
+    interactive: true,
+}
+
+export const UNDERTOW_CONTROLS: ControlGroup[] = [
+    {
+        id: "disturbance",
+        title: "Disturbance",
+        hint: "how far the pointer parts the surface, and how it settles",
+        open: true,
+        controls: [
+            { kind: "number", path: "radius", label: "Radius", min: 0.08, max: 0.6, step: 0.02 },
+            { kind: "number", path: "strength", label: "Strength", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "softness", label: "Softness", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "speed", label: "Speed", min: 0.2, max: 3, step: 0.1 },
+            { kind: "number", path: "linger", label: "Linger", min: 0.2, max: 8, step: 0.2 },
+            { kind: "boolean", path: "interactive", label: "React to the pointer" },
+        ],
+    },
+]
+
+/* ----------------------------------------------------------------- Wake */
+
+export const WAKE_DEFAULTS = {
+    mode: "highlight",
+    radius: 0.26,
+    strength: 0.6,
+    speed: 1,
+    color: "#cfe8ff",
+}
+
+export const WAKE_CONTROLS: ControlGroup[] = [
+    {
+        id: "surface",
+        title: "Surface",
+        hint: "highlight lays light on it, distortion bends it",
+        open: true,
+        controls: [
+            {
+                kind: "select",
+                path: "mode",
+                label: "Mode",
+                options: ["highlight", "distortion"],
+            },
+            { kind: "number", path: "radius", label: "Radius", min: 0.08, max: 0.6, step: 0.02 },
+            { kind: "number", path: "strength", label: "Strength", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "speed", label: "Speed", min: 0.2, max: 3, step: 0.1 },
+            { kind: "color", path: "color", label: "Light" },
+        ],
+    },
+]
+
+/* --------------------------------------------------------------- Drench */
+
+export const DRENCH_DEFAULTS = {
+    text: "ZERO",
+    rain: 0.55,
+    fall: 1,
+    wetness: 0.6,
+    evaporation: 0.35,
+    outline: 0.045,
+    color: "#9fd8ff",
+}
+
+export const DRENCH_CONTROLS: ControlGroup[] = [
+    {
+        id: "weather",
+        title: "Weather",
+        hint: "the word is always there; the rain is what finds it",
+        open: true,
+        controls: [
+            { kind: "text", path: "text", label: "Text", maxLength: 12 },
+            { kind: "number", path: "rain", label: "Rain", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "fall", label: "Fall speed", min: 0.2, max: 3, step: 0.1 },
+            { kind: "number", path: "wetness", label: "Wetness", min: 0, max: 1, step: 0.05 },
+            {
+                kind: "number",
+                path: "evaporation",
+                label: "Evaporation",
+                min: 0,
+                max: 1,
+                step: 0.05,
+            },
+            {
+                kind: "number",
+                path: "outline",
+                label: "Outline",
+                min: 0.01,
+                max: 0.14,
+                step: 0.005,
+            },
+            { kind: "color", path: "color", label: "Water" },
+        ],
+    },
+]
+
+/* -------------------------------------------------------------- Perseid */
+
+export const PERSEID_DEFAULTS = {
+    count: 18,
+    speed: 1,
+    angle: 24,
+    parallax: false,
+    paletteName: "aurora",
+}
+
+export const PERSEID_PALETTES: Record<string, string[]> = {
+    aurora: ["#eaf4ff", "#8fc4ff", "#5ce1e6", "#ff8f6b", "#ff5f6d"],
+    ice: ["#ffffff", "#cfe6ff", "#8fc4ff", "#5ce1e6"],
+    ember: ["#fff1d6", "#ffb26b", "#ff8f6b", "#ff5f6d"],
+    mono: ["#ffffff", "#dfe6ff", "#a8b4d8"],
+}
+
+export const PERSEID_CONTROLS: ControlGroup[] = [
+    {
+        id: "shower",
+        title: "Shower",
+        hint: "counts are clamped; the angle leans the whole field",
+        open: true,
+        controls: [
+            { kind: "number", path: "count", label: "Meteors", min: 0, max: 60, step: 1 },
+            { kind: "number", path: "speed", label: "Speed", min: 0.2, max: 3, step: 0.1 },
+            {
+                kind: "number",
+                path: "angle",
+                label: "Angle",
+                min: -70,
+                max: 70,
+                step: 2,
+                unit: "°",
+            },
+            {
+                kind: "select",
+                path: "paletteName",
+                label: "Palette",
+                options: ["aurora", "ice", "ember", "mono"],
+            },
+            { kind: "boolean", path: "parallax", label: "Lean with the pointer" },
+        ],
+    },
+]
+
+/* ----------------------------------------------------------------- Gaze */
+
+export const GAZE_DEFAULTS = {
+    sensitivity: 1,
+    maxYaw: 26,
+    maxPitch: 16,
+    damping: 0.12,
+    headDelay: 0.45,
+}
+
+export const GAZE_CONTROLS: ControlGroup[] = [
+    {
+        id: "tracking",
+        title: "Tracking",
+        hint: "eyes lead and the head follows; both are clamped",
+        open: true,
+        controls: [
+            {
+                kind: "number",
+                path: "sensitivity",
+                label: "Sensitivity",
+                min: 0.2,
+                max: 3,
+                step: 0.1,
+            },
+            {
+                kind: "number",
+                path: "maxYaw",
+                label: "Max yaw",
+                min: 0,
+                max: 60,
+                step: 2,
+                unit: "°",
+            },
+            {
+                kind: "number",
+                path: "maxPitch",
+                label: "Max pitch",
+                min: 0,
+                max: 40,
+                step: 2,
+                unit: "°",
+            },
+            { kind: "number", path: "damping", label: "Damping", min: 0.02, max: 1, step: 0.02 },
+            {
+                kind: "number",
+                path: "headDelay",
+                label: "Head delay",
+                min: 0,
+                max: 0.9,
+                step: 0.05,
+            },
+        ],
+    },
+]
+
+/* -------------------------------------------------------------- Eclipse */
+
+export const ECLIPSE_DEFAULTS = {
+    from: "up",
+    recede: 0.06,
+    dim: 0.45,
+    blur: 0,
+}
+
+export const ECLIPSE_CONTROLS: ControlGroup[] = [
+    {
+        id: "cover",
+        title: "Cover",
+        hint: "each section pins, then the next one slides over it",
+        open: true,
+        controls: [
+            {
+                kind: "select",
+                path: "from",
+                label: "Arrives from",
+                options: ["up", "left", "right"],
+            },
+            { kind: "number", path: "recede", label: "Recede", min: 0, max: 0.2, step: 0.01 },
+            { kind: "number", path: "dim", label: "Dim", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "blur", label: "Blur", min: 0, max: 12, step: 1, unit: "px" },
+        ],
+    },
+]
