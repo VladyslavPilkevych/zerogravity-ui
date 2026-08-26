@@ -14,6 +14,13 @@ What is left is Facet, Louvre, Raster, Wash and the pixel loaders, plus `Kbd`,
 which exists for the documentation site's search hint and is not a component in
 its own right.
 
+The `0.3.0` batch under evaluation is Prism, Gnomon, Lattice, Chroma, Sonar,
+Concertina, Peel, Gantry, Tide, Palimpsest, Quiver, Ink, Phosphor, Lenticular,
+Anaglyph, Contact, Emulsion, Quartz, Nimbus and Meniscus. Everything in it runs
+on the shared internals in `src/lib/internal` — one frame clock, one seeded
+generator, one pointer-box, one canvas fitter — rather than on machinery of its
+own.
+
 The `0.2.0` batch under evaluation is Undertow, Wake, Drench, Perseid, Gaze and
 Eclipse. Undertow and Wake share one wave engine in [`liquid`](./liquid), which
 is a module rather than a component and is not exported from this barrel. Gaze is

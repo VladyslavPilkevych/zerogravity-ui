@@ -1,0 +1,45 @@
+.xp-gnomon {
+    --gn-dx: 0.15;
+    --gn-dy: 0.9;
+    --gn-far: 1;
+    --gn-lx: 35%;
+    --gn-ly: -40%;
+    --gn-reach: 22px;
+    --gn-blur: 26px;
+    --gn-depth: 0.45;
+    --gn-ink: #05070f;
+    position: relative;
+}
+
+/* one shadow per direct child, each pointing away from the lamp on its own
+   terms: a card to the left of the light and one to the right of it disagree,
+   which is what makes the light read as a place rather than a direction */
+.xp-gnomon > * {
+    --gn-far: 1;
+    filter: drop-shadow(
+        calc(var(--gn-dx) * var(--gn-reach) * var(--gn-far))
+            calc(var(--gn-dy) * var(--gn-reach) * var(--gn-far))
+            calc(var(--gn-blur) * var(--gn-far))
+            color-mix(in oklab, var(--gn-ink) calc(var(--gn-depth) * 100%), transparent)
+    );
+}
+
+.xp-gnomon-lift > * {
+    transform: translate3d(
+        calc(var(--gn-dx) * -0.12 * var(--gn-reach)),
+        calc(var(--gn-dy) * -0.12 * var(--gn-reach)),
+        0
+    );
+}
+
+.xp-gnomon[data-still="true"] > * {
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-gnomon > *,
+    .xp-gnomon-lift > * {
+        transform: none;
+        transition: none;
+    }
+}

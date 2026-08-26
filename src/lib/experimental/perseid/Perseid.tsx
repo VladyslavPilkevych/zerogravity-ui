@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react"
 
-import { cx, useLatestRef, usePrefersReducedMotion } from "../../internal"
+import {
+    cx,
+    onFrame,
+    onVisible,
+    rngFor,
+    useLatestRef,
+    usePrefersReducedMotion,
+} from "../../internal"
 import "./Perseid.css"
 
 export interface PerseidProps {
@@ -49,21 +56,8 @@ interface Meteor {
     span: number
 }
 
-const FRAME_CAP = 0.05
-
 function clamp(value: number, low: number, high: number): number {
     return value < low ? low : value > high ? high : value
-}
-
-/** Same generator the rest of the library uses, so a seed gives one sky. */
-function rngFor(seed: number, index: number): () => number {
-    let a = (Math.imul(seed | 0, 0x9e3779b1) + Math.imul(index + 1, 0xc2b2ae35)) >>> 0
-    return () => {
-        a = (a + 0x6d2b79f5) >>> 0
-        let t = Math.imul(a ^ (a >>> 15), 1 | a)
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-    }
 }
 
 export function Perseid({
@@ -111,8 +105,6 @@ export function Perseid({
         let width = 1
         let height = 1
         let dpr = 1
-        let frame = 0
-        let last = 0
         let seen = true
         let lean = { x: 0, y: 0 }
         const drift = { x: 0, y: 0 }
@@ -297,34 +289,21 @@ export function Perseid({
             }
         }
 
-        const loop = (stamp: number) => {
-            frame = requestAnimationFrame(loop)
+        const stopVisible = onVisible(host, (visible) => {
+            seen = visible
+        })
+
+        const stopFrame = onFrame((dt) => {
             if (!seen) return
-            const dt = last === 0 ? 0.016 : Math.min((stamp - last) / 1000, FRAME_CAP)
-            last = stamp
             paint(dt)
-        }
-
-        const watcher =
-            typeof IntersectionObserver === "function"
-                ? new IntersectionObserver(
-                      ([entry]) => {
-                          seen = entry.isIntersecting
-                          if (seen) last = 0
-                      },
-                      { threshold: 0 },
-                  )
-                : null
-        watcher?.observe(host)
-
-        frame = requestAnimationFrame(loop)
+        })
 
         return () => {
-            cancelAnimationFrame(frame)
+            stopFrame()
+            stopVisible()
             host.removeEventListener("pointermove", onMove)
             host.removeEventListener("pointerleave", onLeave)
             sizer?.disconnect()
-            watcher?.disconnect()
         }
     }, [settings])
 

@@ -186,6 +186,43 @@ step("internal modules stay unreachable", () => {
     return "shared helpers bundled but unexported"
 })
 
+step("the docs registry agrees with what the package ships", () => {
+    const registry = readFileSync(path.join(REPO_ROOT, "src", "docs", "registry.ts"), "utf8")
+    const entries = [
+        ...registry.matchAll(/slug: "([^"]+)",[\s\S]{0,600}?status: "(stable|experimental)"/g),
+    ].map((match) => ({ slug: match[1], status: match[2] }))
+    if (entries.length === 0) throw new Error("no registry entries were found to check")
+
+    const manifest = JSON.parse(readFileSync(path.join(REPO_ROOT, "package.json"), "utf8"))
+    const exported = new Set(
+        Object.keys(manifest.exports)
+            .filter((entry) => entry.startsWith("./") && entry !== "./package.json")
+            .map((entry) => entry.slice(2)),
+    )
+    const barrel = readFileSync(path.join(REPO_ROOT, "src", "lib", "index.ts"), "utf8")
+
+    // a component the docs call stable has to be reachable, and one they call
+    // experimental has to stay unreachable; those are the two ways this drifts
+    const missing = entries
+        .filter((entry) => entry.status === "stable")
+        .filter((entry) => !exported.has(entry.slug) && !barrel.includes(`"./${entry.slug}"`))
+        .map((entry) => entry.slug)
+    if (missing.length) {
+        throw new Error(`documented as stable but not shipped: ${missing.join(", ")}`)
+    }
+
+    const leaked = entries
+        .filter((entry) => entry.status === "experimental")
+        .filter((entry) => exported.has(entry.slug))
+        .map((entry) => entry.slug)
+    if (leaked.length) {
+        throw new Error(`experimental prototypes are exported: ${leaked.join(", ")}`)
+    }
+
+    const stable = entries.filter((entry) => entry.status === "stable").length
+    return `${stable} stable entries exported, ${entries.length - stable} prototypes withheld`
+})
+
 if (failures.length) {
     console.error(`\n${failures.length} package check(s) failed`)
     process.exit(1)

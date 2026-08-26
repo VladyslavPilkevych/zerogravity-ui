@@ -1,4 +1,7 @@
-/** Kept in step with the docs registry by src/docs/registry.test.ts. */
+/**
+ * Every documented component, generated from the registry. The route test keeps
+ * this list and `src/docs/registry.ts` in step.
+ */
 export const COMPONENT_SLUGS = [
     "antigravity",
     "scroll-stack",
@@ -11,6 +14,26 @@ export const COMPONENT_SLUGS = [
     "perseid",
     "gaze",
     "eclipse",
+    "prism",
+    "gnomon",
+    "lattice",
+    "chroma",
+    "sonar",
+    "concertina",
+    "peel",
+    "gantry",
+    "tide",
+    "palimpsest",
+    "quiver",
+    "ink",
+    "phosphor",
+    "lenticular",
+    "anaglyph",
+    "contact",
+    "emulsion",
+    "quartz",
+    "nimbus",
+    "meniscus",
     "reel",
     "raster",
     "stencil",

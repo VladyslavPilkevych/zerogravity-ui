@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, type CSSProperties } from "react"
 
-import { cx, useLatestRef, useMediaQuery, usePrefersReducedMotion } from "../../internal"
+import {
+    cx,
+    onFrame,
+    onVisible,
+    useLatestRef,
+    useMediaQuery,
+    usePrefersReducedMotion,
+} from "../../internal"
 import {
     RIPPLE_DEFAULTS,
     coverBox,
@@ -112,8 +119,6 @@ export function Undertow({
         const front = new Image()
         const back = new Image()
         let loaded = 0
-        let frame = 0
-        let last = 0
         let seen = true
 
         front.crossOrigin = "anonymous"
@@ -257,19 +262,6 @@ export function Undertow({
             context.drawImage(veil, 0, 0)
         }
 
-        const loop = (time: number) => {
-            frame = requestAnimationFrame(loop)
-            if (!seen) return
-
-            const dt = last === 0 ? 0.016 : Math.min((time - last) / 1000, FRAME_CAP)
-            last = time
-
-            stepField(field, dt * settings.current.speed, rule)
-            heal(dt)
-            stamp()
-            paint()
-        }
-
         const local = (event: PointerEvent) => {
             const box = host.getBoundingClientRect()
             if (box.width === 0 || box.height === 0) return null
@@ -315,17 +307,9 @@ export function Undertow({
                 : null
         sizer?.observe(host)
 
-        const watcher =
-            typeof IntersectionObserver === "function"
-                ? new IntersectionObserver(
-                      ([entry]) => {
-                          seen = entry.isIntersecting
-                          if (seen) last = 0
-                      },
-                      { threshold: 0 },
-                  )
-                : null
-        watcher?.observe(host)
+        const stopVisible = onVisible(host, (visible) => {
+            seen = visible
+        })
 
         if (settings.current.still) {
             // a settled scene still shows what lies underneath, just not moving
@@ -350,21 +334,27 @@ export function Undertow({
                 host.removeEventListener("pointerleave", onLeave)
                 host.removeEventListener("pointerdown", onDown)
                 sizer?.disconnect()
-                watcher?.disconnect()
+                stopVisible()
             }
         }
 
-        frame = requestAnimationFrame(loop)
+        const stopFrame = onFrame((dt) => {
+            if (!seen) return
+            stepField(field, dt * settings.current.speed, rule)
+            heal(dt)
+            stamp()
+            paint()
+        })
 
         return () => {
-            cancelAnimationFrame(frame)
+            stopFrame()
+            stopVisible()
             front.removeEventListener("load", onLoad)
             back.removeEventListener("load", onLoad)
             host.removeEventListener("pointermove", onMove)
             host.removeEventListener("pointerleave", onLeave)
             host.removeEventListener("pointerdown", onDown)
             sizer?.disconnect()
-            watcher?.disconnect()
         }
     }, [frontSrc, backSrc, settings])
 

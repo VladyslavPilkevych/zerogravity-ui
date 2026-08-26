@@ -643,3 +643,241 @@
 .xpg-eclipse-d {
     background: linear-gradient(155deg, #3a2416, #140b06);
 }
+
+/* ------------------------------------------------------- 0.3.0 batch */
+
+/*
+ * The preview frame sets `min-height`, not `height`, so a canvas component's
+ * own minimum would win unless the chain inherits it. Doubled class names keep
+ * this ahead of the component stylesheet whichever order the two land in.
+ */
+.xp-lattice.xpg-lattice,
+.xp-chroma.xpg-chroma,
+.xp-sonar.xpg-sonar,
+.xp-nimbus.xpg-nimbus,
+.xp-quartz.xpg-quartz,
+.xp-ink.xpg-ink,
+.xpg-quartz .xpg-quartz-face,
+.xpg-nimbus .xpg-nimbus-face,
+.xpg-chroma .xpg-chroma-face,
+.xpg-sonar .xpg-sonar-face {
+    min-height: inherit;
+}
+
+.xpg-lattice .xp-lattice-content,
+.xpg-chroma .xp-chroma-content,
+.xpg-sonar .xp-sonar-content,
+.xpg-nimbus .xp-nimbus-content {
+    display: grid;
+    place-items: center;
+    min-height: inherit;
+}
+
+.xpg-prism-stage,
+.xpg-gnomon-stage,
+.xpg-type-stage,
+.xpg-phosphor-stage,
+.xpg-lenticular-stage,
+.xpg-anaglyph-stage,
+.xpg-contact-stage,
+.xpg-emulsion-stage,
+.xpg-meniscus-stage {
+    display: grid;
+    place-items: center;
+    gap: 20px;
+    width: 100%;
+    min-height: inherit;
+}
+
+.xpg-prism-card {
+    display: grid;
+    gap: 12px;
+    width: min(520px, 84cqw);
+    padding: 46px 44px;
+    border-radius: inherit;
+    background: linear-gradient(150deg, #1b2440, #33224a 60%, #123a49);
+    color: #eef2ff;
+}
+
+.xpg-prism-card h3 {
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+}
+
+.xpg-prism-card p {
+    margin: 0;
+    color: rgba(238, 242, 255, 0.72);
+    font-size: 14px;
+}
+
+/* a shadow needs somewhere to fall: this demo is a lit room, not a dark one */
+.xpg-gnomon-stage {
+    padding: 44px 20px;
+    border-radius: inherit;
+    background: linear-gradient(165deg, #f2f4fa, #dde2ee);
+}
+
+.xpg-gnomon-stage .pg-hint {
+    color: rgba(24, 28, 44, 0.55);
+}
+
+.xpg-gnomon-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 34px;
+    justify-content: center;
+}
+
+.xpg-gnomon-tile {
+    display: grid;
+    place-items: center;
+    width: 124px;
+    height: 124px;
+    border-radius: 22px;
+    background: linear-gradient(160deg, #ffffff, #e7ebf6);
+    color: #1b2136;
+    font-weight: 700;
+}
+
+.xpg-chroma-face,
+.xpg-sonar-face,
+.xpg-quartz-face,
+.xpg-nimbus-face {
+    display: grid;
+    place-items: center;
+    width: 100%;
+}
+
+.xpg-chroma {
+    background: radial-gradient(circle at 50% 40%, #131a2e, #05070d);
+}
+
+.xpg-sonar {
+    background: #06080f;
+}
+
+.xpg-quartz {
+    background: linear-gradient(150deg, #2b1f3d, #123243 62%, #3d2438);
+}
+
+.xpg-quartz-face {
+    align-content: center;
+    gap: 10px;
+    padding: 40px;
+    color: #f2f4ff;
+    text-align: center;
+}
+
+.xpg-quartz-face h3 {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+}
+
+.xpg-quartz-face p {
+    margin: 0;
+    color: rgba(242, 244, 255, 0.66);
+    font-size: 14px;
+}
+
+.xpg-nimbus-face {
+    color: #f0f4ff;
+    font-size: clamp(30px, 6cqw, 62px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.xpg-concertina-face,
+.xpg-gantry-car,
+.xpg-peel-front,
+.xpg-peel-back {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    color: #f4f6ff;
+    font-size: clamp(22px, 4cqw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.xpg-fold-0 {
+    background: linear-gradient(150deg, #101017, #1d2b53);
+}
+
+.xpg-fold-1 {
+    background: linear-gradient(150deg, #101017, #2b1d53);
+}
+
+.xpg-fold-2 {
+    background: linear-gradient(150deg, #101017, #153f3a);
+}
+
+.xpg-fold-3 {
+    background: linear-gradient(150deg, #101017, #4a2b18);
+}
+
+.xpg-gantry-car {
+    border-radius: 18px;
+}
+
+.xpg-peel-front {
+    background: linear-gradient(150deg, #f6f3ec, #d8d2c4);
+    color: #1a1d28;
+}
+
+.xpg-peel-back {
+    background: linear-gradient(150deg, #10233f, #08403c);
+}
+
+.xpg-tide-stage {
+    display: grid;
+    width: 100%;
+    min-height: inherit;
+}
+
+.xpg-tide-above,
+.xpg-tide-below {
+    display: grid;
+    place-items: center;
+    padding: 34px 20px;
+    color: rgba(240, 244, 255, 0.78);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+}
+
+.xpg-tide-above {
+    background: linear-gradient(180deg, #0b1020, #101a33);
+}
+
+/* the band is transparent above the crest, so it has to sit on the colour of
+   the section it is flowing out of */
+.xpg-tide-stage .xp-tide {
+    background: #101a33;
+}
+
+.xpg-tide-below {
+    background: linear-gradient(180deg, #08201f, #071417);
+}
+
+.xpg-palimpsest,
+.xpg-quiver,
+.xpg-phosphor {
+    font-size: clamp(34px, 8cqw, 76px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.xpg-phosphor-stage {
+    background: radial-gradient(circle at 50% 45%, #0b1512, #04070a 70%);
+}
+
+.xpg-ink {
+    width: 100%;
+}
+
+.xpg-meniscus-stage {
+    grid-auto-flow: column;
+    gap: 28px;
+}

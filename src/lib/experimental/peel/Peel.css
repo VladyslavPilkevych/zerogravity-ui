@@ -1,0 +1,139 @@
+.xp-peel {
+    --pe-height: 100vh;
+    --pe-lift: 0;
+    --pe-curl: 0.7;
+    position: relative;
+    width: 100%;
+    /* two screens: one to hold the sheet still, one to take it off */
+    height: calc(var(--pe-height) * 2);
+}
+
+.xp-peel-stage {
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    width: 100%;
+    height: var(--pe-height);
+    isolation: isolate;
+}
+
+.xp-peel-back,
+.xp-peel-sheet {
+    position: absolute;
+    inset: 0;
+}
+
+.xp-peel-sheet {
+    z-index: 1;
+    /* the sheet is cut back along a diagonal as it lifts: the cut is the crease */
+    clip-path: polygon(
+        0 0,
+        calc(100% - var(--pe-lift) * 200%) 0,
+        100% calc(var(--pe-lift) * 200%),
+        100% 100%,
+        0 100%
+    );
+    transform: translate3d(calc(var(--pe-lift) * -6%), calc(var(--pe-lift) * -4%), 0)
+        rotate(calc(var(--pe-lift) * -2deg));
+    transform-origin: bottom left;
+    will-change: transform, clip-path;
+}
+
+.xp-peel-face {
+    width: 100%;
+    height: 100%;
+}
+
+/* light gathering along the lifted edge */
+.xp-peel-crease {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        225deg,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0) calc(6% + var(--pe-lift) * 20%),
+        rgba(4, 5, 10, calc(var(--pe-curl) * 0.55)) calc(10% + var(--pe-lift) * 26%),
+        rgba(4, 5, 10, 0) calc(32% + var(--pe-lift) * 34%)
+    );
+    opacity: calc(var(--pe-lift) * 1.4);
+    pointer-events: none;
+}
+
+.xp-peel[data-corner="top-left"] .xp-peel-sheet {
+    clip-path: polygon(
+        calc(var(--pe-lift) * 200%) 0,
+        100% 0,
+        100% 100%,
+        0 100%,
+        0 calc(var(--pe-lift) * 200%)
+    );
+    transform: translate3d(calc(var(--pe-lift) * 6%), calc(var(--pe-lift) * -4%), 0)
+        rotate(calc(var(--pe-lift) * 2deg));
+    transform-origin: bottom right;
+}
+
+.xp-peel[data-corner="top-left"] .xp-peel-crease {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0) calc(6% + var(--pe-lift) * 20%),
+        rgba(4, 5, 10, calc(var(--pe-curl) * 0.55)) calc(10% + var(--pe-lift) * 26%),
+        rgba(4, 5, 10, 0) calc(32% + var(--pe-lift) * 34%)
+    );
+}
+
+.xp-peel[data-corner="bottom-right"] .xp-peel-sheet {
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - var(--pe-lift) * 200%),
+        calc(100% - var(--pe-lift) * 200%) 100%,
+        0 100%
+    );
+    transform: translate3d(calc(var(--pe-lift) * -6%), calc(var(--pe-lift) * 4%), 0)
+        rotate(calc(var(--pe-lift) * 2deg));
+    transform-origin: top left;
+}
+
+.xp-peel[data-corner="bottom-left"] .xp-peel-sheet {
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 100%,
+        calc(var(--pe-lift) * 200%) 100%,
+        0 calc(100% - var(--pe-lift) * 200%)
+    );
+    transform: translate3d(calc(var(--pe-lift) * 6%), calc(var(--pe-lift) * 4%), 0)
+        rotate(calc(var(--pe-lift) * -2deg));
+    transform-origin: top right;
+}
+
+.xp-peel[data-still="true"] {
+    height: auto;
+}
+
+.xp-peel[data-still="true"] .xp-peel-stage {
+    position: relative;
+    display: grid;
+    height: auto;
+}
+
+.xp-peel[data-still="true"] .xp-peel-back,
+.xp-peel[data-still="true"] .xp-peel-sheet {
+    position: relative;
+    inset: auto;
+    min-height: var(--pe-height);
+    clip-path: none;
+    transform: none;
+    will-change: auto;
+}
+
+.xp-peel[data-still="true"] .xp-peel-crease {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-peel-sheet {
+        will-change: auto;
+    }
+}

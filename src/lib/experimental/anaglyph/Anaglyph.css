@@ -1,0 +1,95 @@
+.xp-anaglyph {
+    --an-x: 0;
+    --an-y: 0;
+    --an-near: 0;
+    --an-split: 14px;
+    --an-depth: 0.4;
+    --an-radius: 14px;
+    --an-fit: cover;
+    --an-at: 50% 50%;
+    position: relative;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--an-radius);
+    background: #05060b;
+    isolation: isolate;
+}
+
+.xp-anaglyph-plate,
+.xp-anaglyph-eye {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--an-fit);
+    object-position: var(--an-at);
+}
+
+.xp-anaglyph-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+/*
+ * The real image carries the alt text and holds the layout; it is not what you
+ * look at. The two eyes add back together over black, which is what an anaglyph
+ * is: one channel from here, two from there.
+ */
+.xp-anaglyph-plate {
+    opacity: 0;
+}
+
+.xp-anaglyph-eye {
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+/* converge: the channels are apart at rest and meet where the pointer is */
+.xp-anaglyph[data-mode="converge"] .xp-anaglyph-left {
+    transform: translate3d(calc(var(--an-split) * (var(--an-near) - 1)), 0, 0)
+        scale(calc(1 + var(--an-depth) * 0.04 * (1 - var(--an-near))));
+}
+
+.xp-anaglyph[data-mode="converge"] .xp-anaglyph-right {
+    transform: translate3d(calc(var(--an-split) * (1 - var(--an-near))), 0, 0)
+        scale(calc(1 + var(--an-depth) * 0.04 * (1 - var(--an-near))));
+}
+
+/* parallax: the split stays and the two layers slide past each other */
+.xp-anaglyph[data-mode="parallax"] .xp-anaglyph-left {
+    transform: translate3d(
+            calc(var(--an-split) * -1 - var(--an-x) * var(--an-split) * 2),
+            calc(var(--an-y) * var(--an-split) * -1),
+            0
+        )
+        scale(calc(1 + var(--an-depth) * 0.06));
+}
+
+.xp-anaglyph[data-mode="parallax"] .xp-anaglyph-right {
+    transform: translate3d(
+            calc(var(--an-split) + var(--an-x) * var(--an-split) * 2),
+            calc(var(--an-y) * var(--an-split)),
+            0
+        )
+        scale(calc(1 + var(--an-depth) * 0.06));
+}
+
+.xp-anaglyph[data-still="true"] .xp-anaglyph-eye {
+    transform: none;
+}
+
+.xp-anaglyph[data-failed="true"] {
+    background: repeating-linear-gradient(45deg, #14161f 0 12px, #191c26 12px 24px);
+}
+
+.xp-anaglyph[data-failed="true"] .xp-anaglyph-plate {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-anaglyph-eye {
+        transform: none;
+    }
+}

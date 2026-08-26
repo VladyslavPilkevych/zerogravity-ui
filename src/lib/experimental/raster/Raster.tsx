@@ -2,7 +2,7 @@
 
 import { useId, useRef, type CSSProperties } from "react"
 
-import { cx, useIsomorphicLayoutEffect, usePrefersReducedMotion } from "../../internal"
+import { cssUrl, cx, useIsomorphicLayoutEffect, usePrefersReducedMotion } from "../../internal"
 import {
     cellsFrom,
     edgeMap,
@@ -212,7 +212,8 @@ export function Raster({
     const shell: CSSProperties = {
         ...style,
         aspectRatio: typeof aspectRatio === "number" ? String(aspectRatio) : aspectRatio,
-        ["--raster-src" as string]: `url("${src}")`,
+        // encoded, so a source containing a quote cannot close the url()
+        ["--raster-src" as string]: cssUrl(src),
         ["--raster-blur" as string]: `${Math.max(0, blurStrength)}px`,
         ["--raster-bleed" as string]: Math.max(0, distortion) + 8,
     }

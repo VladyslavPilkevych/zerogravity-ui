@@ -10,6 +10,56 @@ import type { PreviewApi } from "./useDocsConfig"
  * Keys match `slug` in the registry.
  */
 export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
+    anaglyph: dynamic(() =>
+        import("@/playground/previews/AnaglyphPreview").then((m) => m.AnaglyphPreview),
+    ),
+    chroma: dynamic(() =>
+        import("@/playground/previews/ChromaPreview").then((m) => m.ChromaPreview),
+    ),
+    concertina: dynamic(() =>
+        import("@/playground/previews/ConcertinaPreview").then((m) => m.ConcertinaPreview),
+    ),
+    contact: dynamic(() =>
+        import("@/playground/previews/ContactPreview").then((m) => m.ContactPreview),
+    ),
+    emulsion: dynamic(() =>
+        import("@/playground/previews/EmulsionPreview").then((m) => m.EmulsionPreview),
+    ),
+    gantry: dynamic(() =>
+        import("@/playground/previews/GantryPreview").then((m) => m.GantryPreview),
+    ),
+    gnomon: dynamic(() =>
+        import("@/playground/previews/GnomonPreview").then((m) => m.GnomonPreview),
+    ),
+    ink: dynamic(() => import("@/playground/previews/InkPreview").then((m) => m.InkPreview)),
+    lattice: dynamic(() =>
+        import("@/playground/previews/LatticePreview").then((m) => m.LatticePreview),
+    ),
+    lenticular: dynamic(() =>
+        import("@/playground/previews/LenticularPreview").then((m) => m.LenticularPreview),
+    ),
+    meniscus: dynamic(() =>
+        import("@/playground/previews/MeniscusPreview").then((m) => m.MeniscusPreview),
+    ),
+    nimbus: dynamic(() =>
+        import("@/playground/previews/NimbusPreview").then((m) => m.NimbusPreview),
+    ),
+    palimpsest: dynamic(() =>
+        import("@/playground/previews/PalimpsestPreview").then((m) => m.PalimpsestPreview),
+    ),
+    peel: dynamic(() => import("@/playground/previews/PeelPreview").then((m) => m.PeelPreview)),
+    phosphor: dynamic(() =>
+        import("@/playground/previews/PhosphorPreview").then((m) => m.PhosphorPreview),
+    ),
+    prism: dynamic(() => import("@/playground/previews/PrismPreview").then((m) => m.PrismPreview)),
+    quartz: dynamic(() =>
+        import("@/playground/previews/QuartzPreview").then((m) => m.QuartzPreview),
+    ),
+    quiver: dynamic(() =>
+        import("@/playground/previews/QuiverPreview").then((m) => m.QuiverPreview),
+    ),
+    sonar: dynamic(() => import("@/playground/previews/SonarPreview").then((m) => m.SonarPreview)),
+    tide: dynamic(() => import("@/playground/previews/TidePreview").then((m) => m.TidePreview)),
     drench: dynamic(() =>
         import("@/playground/previews/DrenchPreview").then((m) => m.DrenchPreview),
     ),

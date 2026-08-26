@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties } from "react"
 
-import { cx, useLatestRef, usePrefersReducedMotion } from "../../internal"
+import { cx, onFrame, onVisible, useLatestRef, usePrefersReducedMotion } from "../../internal"
 import "./Drench.css"
 
 export interface DrenchProps {
@@ -52,7 +52,6 @@ interface Drip {
 
 const DROPS = 160
 const DRIPS = 26
-const FRAME_CAP = 0.05
 
 function clamp(value: number, low: number, high: number): number {
     return value < low ? low : value > high ? high : value
@@ -134,8 +133,6 @@ export function Drench({
         let width = 1
         let height = 1
         let dpr = 1
-        let frame = 0
-        let last = 0
         let seen = true
 
         const seat = (drop: Drop, top: boolean) => {
@@ -437,33 +434,19 @@ export function Drench({
             return () => sizer?.disconnect()
         }
 
-        const loop = (stamp: number) => {
-            frame = requestAnimationFrame(loop)
+        const stopVisible = onVisible(host, (visible) => {
+            seen = visible
+        })
+
+        const stopFrame = onFrame((dt) => {
             if (!seen) return
-
-            const dt = last === 0 ? 0.016 : Math.min((stamp - last) / 1000, FRAME_CAP)
-            last = stamp
             paint(dt)
-        }
-
-        const watcher =
-            typeof IntersectionObserver === "function"
-                ? new IntersectionObserver(
-                      ([entry]) => {
-                          seen = entry.isIntersecting
-                          if (seen) last = 0
-                      },
-                      { threshold: 0 },
-                  )
-                : null
-        watcher?.observe(host)
-
-        frame = requestAnimationFrame(loop)
+        })
 
         return () => {
-            cancelAnimationFrame(frame)
+            stopFrame()
+            stopVisible()
             sizer?.disconnect()
-            watcher?.disconnect()
         }
     }, [settings, text, fontFamily, fontWeight])
 

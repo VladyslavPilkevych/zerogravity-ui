@@ -1,0 +1,39 @@
+.xp-quartz {
+    --qz-alpha: 0.35;
+    --qz-size: 128px;
+    --qz-beat: 1.6s;
+    position: relative;
+    isolation: isolate;
+}
+
+.xp-quartz-grain {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-repeat: repeat;
+    background-size: var(--qz-size) var(--qz-size);
+    opacity: var(--qz-alpha);
+    pointer-events: none;
+    /* stepped, so it flickers like film rather than sliding like a texture */
+    animation: xp-quartz-shift var(--qz-beat) steps(6) infinite;
+    contain: strict;
+}
+
+@keyframes xp-quartz-shift {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: var(--qz-size) var(--qz-size);
+    }
+}
+
+.xp-quartz[data-still="true"] .xp-quartz-grain {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-quartz-grain {
+        animation: none;
+    }
+}

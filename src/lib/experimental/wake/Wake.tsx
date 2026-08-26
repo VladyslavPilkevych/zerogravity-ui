@@ -2,7 +2,14 @@
 
 import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from "react"
 
-import { cx, useLatestRef, useMediaQuery, usePrefersReducedMotion } from "../../internal"
+import {
+    cx,
+    onFrame,
+    onVisible,
+    useLatestRef,
+    useMediaQuery,
+    usePrefersReducedMotion,
+} from "../../internal"
 import {
     RIPPLE_DEFAULTS,
     createField,
@@ -76,8 +83,6 @@ export function Wake({
 
         const field = createField()
         const rule: RippleSettings = { ...RIPPLE_DEFAULTS }
-        let frame = 0
-        let last = 0
         let moved = 0
         let seen = true
         let dpr = 1
@@ -154,17 +159,6 @@ export function Wake({
             }
         }
 
-        const loop = (stamp: number) => {
-            frame = requestAnimationFrame(loop)
-            if (!seen) return
-
-            const dt = last === 0 ? 0.016 : Math.min((stamp - last) / 1000, FRAME_CAP)
-            last = stamp
-
-            stepField(field, dt * settings.current.speed, rule)
-            paint()
-        }
-
         const local = (event: PointerEvent) => {
             const box = host.getBoundingClientRect()
             if (box.width === 0 || box.height === 0) return null
@@ -207,27 +201,23 @@ export function Wake({
                 : null
         sizer?.observe(host)
 
-        const watcher =
-            typeof IntersectionObserver === "function"
-                ? new IntersectionObserver(
-                      ([entry]) => {
-                          seen = entry.isIntersecting
-                          if (seen) last = 0
-                      },
-                      { threshold: 0 },
-                  )
-                : null
-        watcher?.observe(host)
+        const stopVisible = onVisible(host, (visible) => {
+            seen = visible
+        })
 
-        frame = requestAnimationFrame(loop)
+        const stopFrame = onFrame((dt) => {
+            if (!seen) return
+            stepField(field, dt * settings.current.speed, rule)
+            paint()
+        })
 
         return () => {
-            cancelAnimationFrame(frame)
+            stopFrame()
+            stopVisible()
             host.removeEventListener("pointermove", onMove)
             host.removeEventListener("pointerleave", onLeave)
             host.removeEventListener("pointerdown", onDown)
             sizer?.disconnect()
-            watcher?.disconnect()
         }
     }, [settings])
 

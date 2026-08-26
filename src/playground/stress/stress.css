@@ -1,0 +1,73 @@
+.st-board {
+    display: grid;
+    gap: 24px;
+    padding: 24px;
+    background: #05060a;
+    color: #e8ecf8;
+}
+
+.st-bar h1 {
+    margin: 0 0 6px;
+    font-size: 22px;
+}
+
+.st-bar p {
+    max-width: 70ch;
+    margin: 0 0 14px;
+    color: rgba(232, 236, 248, 0.66);
+    font-size: 14px;
+}
+
+.st-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    font-size: 13px;
+}
+
+.st-controls fieldset {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 0;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+}
+
+.st-controls legend {
+    padding: 0 6px;
+    color: rgba(232, 236, 248, 0.6);
+}
+
+.st-controls label {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.st-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.st-cell {
+    min-height: 240px;
+    overflow: hidden;
+    border-radius: 14px;
+}
+
+.st-wide {
+    grid-column: 1 / -1;
+}
+
+.st-face {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 240px;
+    font-size: 24px;
+    font-weight: 700;
+}
