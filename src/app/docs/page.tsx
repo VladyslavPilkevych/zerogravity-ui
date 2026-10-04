@@ -18,9 +18,9 @@ export default function DocsOverview() {
                 <p className="dz-eyebrow">Documentation</p>
                 <h1>Components</h1>
                 <p>
-                    Every component has a live preview, controls that rewrite the usage snippet as
-                    you change them, a full props table and its dependency count. Pick one from the
-                    sidebar, or start below.
+                    Every component ships with a live preview, controls that rewrite the snippet as
+                    you turn them, a full props table and its dependency count. Search the sidebar,
+                    or start below.
                 </p>
             </header>
 
@@ -44,7 +44,11 @@ export default function DocsOverview() {
             </div>
 
             {groups.map((group) => (
-                <section className="dz-section" key={group.category}>
+                <section
+                    className="dz-section"
+                    key={group.category}
+                    id={group.category.toLowerCase()}
+                >
                     <h2>{group.category}</h2>
                     <div className="dz-grid">
                         {group.items.map((entry) => (
