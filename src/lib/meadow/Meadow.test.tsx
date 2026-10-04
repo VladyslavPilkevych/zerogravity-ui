@@ -1031,6 +1031,40 @@ describe("the living scene", () => {
         expect(silks.size).toBeGreaterThan(4)
     })
 
+    it("keeps extra balloons off the one the cast already flies", () => {
+        const { container } = render(
+            <Meadow creatures={{ balloons: 2 }} seed={5}>
+                hero
+            </Meadow>,
+        )
+        const lanes = [...container.querySelectorAll('.xp-meadow-object[data-kind="balloon"]')]
+            .map((node) => Number((node as HTMLElement).style.getPropertyValue("--m-x")))
+            .sort((a, b) => a - b)
+
+        expect(lanes).toHaveLength(3)
+        for (let index = 1; index < lanes.length; index += 1) {
+            expect(lanes[index] - lanes[index - 1]).toBeGreaterThan(12)
+        }
+    })
+
+    it("holds a balloon crossing the centre high, where the content is not", () => {
+        const { container } = render(
+            <Meadow creatures={{ balloons: 5 }} seed={3}>
+                hero
+            </Meadow>,
+        )
+        const spots = [...container.querySelectorAll('.xp-meadow-object[data-kind="balloon"]')].map(
+            (node) => ({
+                x: Number((node as HTMLElement).style.getPropertyValue("--m-x")),
+                y: Number((node as HTMLElement).style.getPropertyValue("--m-y")),
+            }),
+        )
+
+        for (const spot of spots.filter((one) => Math.abs(one.x - 50) < 12)) {
+            expect(spot.y).toBeLessThan(20)
+        }
+    })
+
     it("sends some balloons up with nobody aboard", () => {
         const { container } = render(
             <Meadow creatures={{ balloons: 8 }} seed={9}>

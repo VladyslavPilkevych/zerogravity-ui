@@ -1,11 +1,12 @@
 # ZeroGravity UI
 
-Motion-first React components for expressive interfaces.
+**Motion you can import.**
 
-ZeroGravity UI is a set of animated, interactive React components: pointer
-effects, scroll-driven layout, display typography, animated borders, illustrated
-scenes and route transitions. Every component ships its own styles, stops
-animating when it is idle, and honours `prefers-reduced-motion`.
+A React library for scroll, pointer and display effects — drawn with canvas, SVG
+and plain CSS, with zero runtime dependencies. Scroll-driven layout, pointer
+fields, display typography, animated borders, media treatments and illustrated
+scenes. Every component ships its own styles, stops animating when it is idle,
+and honours `prefers-reduced-motion`.
 
 Published on npm as **`zerogravity`**.
 

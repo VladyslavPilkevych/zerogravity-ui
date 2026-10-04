@@ -1,0 +1,48 @@
+.xp-palimpsest {
+    --pa-open: 0;
+    --pa-spread: 26px;
+    --pa-turn: 4deg;
+    position: relative;
+    display: inline-grid;
+    isolation: isolate;
+}
+
+.xp-palimpsest-stack,
+.xp-palimpsest-word {
+    grid-area: 1 / 1;
+    margin: 0;
+    font: inherit;
+    letter-spacing: inherit;
+}
+
+.xp-palimpsest-stack {
+    display: grid;
+    pointer-events: none;
+}
+
+.xp-palimpsest-ghost {
+    grid-area: 1 / 1;
+    opacity: calc(var(--pa-open) * (1 - var(--pa-depth) * 0.55) * 0.85);
+    mix-blend-mode: screen;
+    transform: translate3d(
+            calc(var(--pa-dx) * var(--pa-spread) * var(--pa-open) * var(--pa-depth)),
+            calc(var(--pa-dy) * var(--pa-spread) * var(--pa-open) * var(--pa-depth)),
+            0
+        )
+        rotate(calc(var(--pa-rot) * var(--pa-turn) * var(--pa-open)));
+}
+
+.xp-palimpsest-word {
+    position: relative;
+    z-index: 1;
+}
+
+.xp-palimpsest[data-still="true"] .xp-palimpsest-ghost {
+    opacity: calc((1 - var(--pa-depth) * 0.55) * 0.5);
+    transform: translate3d(
+            calc(var(--pa-dx) * var(--pa-spread) * 0.45 * var(--pa-depth)),
+            calc(var(--pa-dy) * var(--pa-spread) * 0.45 * var(--pa-depth)),
+            0
+        )
+        rotate(calc(var(--pa-rot) * var(--pa-turn) * 0.45));
+}

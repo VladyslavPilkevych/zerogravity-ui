@@ -1,0 +1,43 @@
+.xp-concertina {
+    position: relative;
+    width: 100%;
+    transform-style: preserve-3d;
+}
+
+.xp-concertina-leaf {
+    --cn-shade: 0;
+    position: relative;
+    overflow: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+.xp-concertina-inner {
+    width: 100%;
+    height: 100%;
+}
+
+/* the folded face turns away from the light, which is what sells the crease */
+.xp-concertina-fold {
+    position: absolute;
+    inset: 0;
+    background: #04050a;
+    opacity: var(--cn-shade);
+    pointer-events: none;
+}
+
+.xp-concertina[data-still="true"] .xp-concertina-leaf {
+    transform: none !important;
+    will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-concertina-leaf {
+        transform: none !important;
+        will-change: auto;
+    }
+
+    .xp-concertina-fold {
+        opacity: 0;
+    }
+}

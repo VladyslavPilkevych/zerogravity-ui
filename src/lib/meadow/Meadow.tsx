@@ -147,14 +147,17 @@ export function Meadow({
         shows("mascots") && life.ghosts > 0
             ? planGhosts(life.ghosts, seed, MEADOW_GHOST_VARIANTS.length, tight)
             : []
-    const balloons =
-        shows("balloon") && life.balloons > 0
-            ? planBalloons(life.balloons, seed, MEADOW_BALLOON_SILKS.length, tight)
-            : []
 
     const cast_ = items ?? (theme === "space" ? MEADOW_SPACE_CAST : MEADOW_CAST)
     const allowed = cast_.filter((item) => !item.kind || shows(TOGGLE[item.kind]))
     const cast = planCast(allowed, count, seed, tight)
+
+    // the cast already flies one balloon; extras take the lanes it leaves
+    const flying = cast.find((entry) => entry.kind === "balloon")
+    const balloons =
+        shows("balloon") && life.balloons > 0
+            ? planBalloons(life.balloons, seed, MEADOW_BALLOON_SILKS.length, tight, flying?.x)
+            : []
 
     const clouds = shows("clouds") ? (small ? MEADOW_CLOUDS.slice(0, 3) : MEADOW_CLOUDS) : []
     const plants = (small ? MEADOW_PLANTS.filter((plant) => !plant.dense) : MEADOW_PLANTS).filter(

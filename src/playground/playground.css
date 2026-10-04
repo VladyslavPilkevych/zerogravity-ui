@@ -1,6 +1,7 @@
 :root {
-    --pg-accent: #8ab4ff;
-    --pg-border: rgba(255, 255, 255, 0.08);
+    /* the controls answer to the same accent as the rest of the site */
+    --pg-accent: #4ee1f2;
+    --pg-border: rgba(255, 255, 255, 0.09);
     --pg-dim: rgba(255, 255, 255, 0.42);
     --pg-backdrop:
         radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.12), transparent 34%),
@@ -38,7 +39,7 @@ kbd {
     display: inline-block;
     padding: 1px 6px;
     border: 1px solid var(--pg-border);
-    border-radius: 5px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.06);
     font-family: var(--font-mono);
     font-size: 11px;
@@ -221,7 +222,7 @@ kbd {
 .pg-select {
     padding: 4px 6px;
     border: 1px solid var(--pg-border);
-    border-radius: 6px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.86);
     font-size: 11px;
@@ -262,7 +263,7 @@ kbd {
     height: 22px;
     padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 6px;
+    border-radius: 2px;
     background: transparent;
     cursor: pointer;
 }
@@ -273,7 +274,7 @@ kbd {
 
 .pg-color::-webkit-color-swatch {
     border: none;
-    border-radius: 4px;
+    border-radius: 2px;
 }
 
 .pg-palette {
@@ -313,7 +314,7 @@ kbd {
     width: 30px;
     height: 22px;
     border: 1px dashed rgba(255, 255, 255, 0.24);
-    border-radius: 6px;
+    border-radius: 2px;
     background: transparent;
     color: rgba(255, 255, 255, 0.5);
     font-size: 13px;
@@ -339,7 +340,7 @@ kbd {
 .pg-flap-next {
     padding: 8px 16px;
     border: 1px solid var(--pg-border);
-    border-radius: 8px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.78);
     font-size: 12px;
@@ -417,7 +418,7 @@ kbd {
 .pg-overlay-actions button {
     padding: 6px 12px;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 8px;
+    border-radius: 2px;
     background: rgba(10, 10, 14, 0.68);
     color: rgba(255, 255, 255, 0.82);
     font-size: 12.5px;
@@ -435,7 +436,7 @@ kbd {
     gap: 12px;
     padding: 5px 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    border-radius: 2px;
     background: rgba(10, 10, 14, 0.6);
     color: rgba(255, 255, 255, 0.5);
     font-family: var(--font-mono);
@@ -452,7 +453,7 @@ kbd {
     width: 100%;
     padding: 6px 10px;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.04);
     color: #fff;
     font-size: 13px;

@@ -1,0 +1,592 @@
+/*
+ * The marketing surface. It shares the docs tokens but leans harder into the
+ * pixel language: square corners, hard offset shadows, lit outlines and a
+ * block grid behind everything.
+ */
+
+.pz-home {
+    --pz-gutter: clamp(18px, 5vw, 56px);
+    position: relative;
+    overflow: clip;
+}
+
+/* ---------------------------------------------------------------- hero */
+
+.pz-hero {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: min(720px, calc(100vh - var(--dz-header)));
+    padding: clamp(56px, 10vh, 120px) var(--pz-gutter) clamp(64px, 12vh, 132px);
+    border-bottom: 1px solid var(--dz-line);
+    isolation: isolate;
+}
+
+.pz-hero::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background:
+        linear-gradient(transparent 0 calc(var(--pz-cell) - 1px), var(--pz-grid-line) 0),
+        linear-gradient(90deg, transparent 0 calc(var(--pz-cell) - 1px), var(--pz-grid-line) 0);
+    background-size: var(--pz-cell) var(--pz-cell);
+    mask-image: radial-gradient(120% 85% at 50% 35%, #000 20%, transparent 78%);
+    content: "";
+}
+
+.pz-hero-field {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    /* a donut: the field burns at the edges and clears out of the middle, so
+       the copy never has to compete with it */
+    mask-image: radial-gradient(
+        88% 80% at 50% 44%,
+        transparent 0 24%,
+        rgba(0, 0, 0, 0.5) 40%,
+        #000 60%,
+        transparent 97%
+    );
+    pointer-events: none;
+}
+
+.pz-hero-scrim {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    background: radial-gradient(54% 48% at 50% 44%, rgba(5, 5, 9, 0.94), transparent 74%);
+    pointer-events: none;
+}
+
+.pz-field {
+    width: 100%;
+    height: 100%;
+}
+
+.pz-hero-inner {
+    position: relative;
+    z-index: 2;
+    width: min(880px, 100%);
+    margin: 0 auto;
+    text-align: center;
+}
+
+.pz-badge {
+    display: inline-flex;
+    gap: 9px;
+    align-items: center;
+    margin: 0 0 clamp(22px, 4vh, 34px);
+    padding: 6px 12px;
+    border: 1px solid var(--dz-line-2);
+    background: rgba(8, 10, 18, 0.7);
+    color: var(--dz-muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.pz-badge-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--pz-cyan);
+    box-shadow: 0 0 10px var(--pz-cyan);
+    animation: pz-blink 2.2s steps(1, end) infinite;
+}
+
+@keyframes pz-blink {
+    0%,
+    62% {
+        opacity: 1;
+    }
+    63%,
+    100% {
+        opacity: 0.25;
+    }
+}
+
+.pz-hero-title {
+    display: grid;
+    gap: clamp(18px, 3vh, 28px);
+    justify-items: center;
+    margin: 0 0 clamp(18px, 3vh, 26px);
+}
+
+.pz-hero-mark {
+    width: min(760px, 92%);
+}
+
+.pz-hero-claim {
+    font-size: clamp(26px, 5.2vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+}
+
+.pz-hero-lede {
+    max-width: 56ch;
+    margin: 0 auto clamp(26px, 5vh, 38px);
+    color: var(--dz-muted);
+    font-size: clamp(15px, 1.4vw, 17.5px);
+    line-height: 1.65;
+    text-wrap: balance;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.pz-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: clamp(24px, 4vh, 34px);
+}
+
+/* the hard offset shadow is the whole pixel-button idiom: no blur, and the
+   block moves into its own shadow when you press it */
+.pz-btn {
+    position: relative;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 13px 22px;
+    border: 1px solid var(--dz-line-2);
+    background: rgba(10, 12, 20, 0.86);
+    box-shadow: 4px 4px 0 rgba(78, 225, 242, 0.22);
+    color: var(--dz-ink);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+        transform 110ms steps(2, end),
+        box-shadow 110ms steps(2, end),
+        border-color 140ms ease,
+        background 140ms ease;
+}
+
+.pz-btn:hover {
+    border-color: var(--pz-cyan);
+    background: rgba(18, 26, 38, 0.92);
+    box-shadow: 6px 6px 0 rgba(78, 225, 242, 0.34);
+    transform: translate(-2px, -2px);
+}
+
+.pz-btn:active {
+    box-shadow: 0 0 0 rgba(78, 225, 242, 0.3);
+    transform: translate(4px, 4px);
+}
+
+.pz-btn-solid {
+    border-color: var(--pz-cyan);
+    background: var(--pz-cyan);
+    box-shadow: 4px 4px 0 rgba(78, 225, 242, 0.3);
+    color: #04161a;
+}
+
+.pz-btn-solid:hover {
+    background: #74ecfa;
+    box-shadow: 6px 6px 0 rgba(78, 225, 242, 0.45);
+}
+
+.pz-install {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    margin: 0;
+    padding: 9px 16px;
+    border: 1px dashed var(--dz-line-2);
+    color: var(--dz-muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.pz-install-prompt {
+    color: var(--pz-lime);
+}
+
+.pz-install code {
+    color: var(--dz-ink);
+}
+
+/* ---------------------------------------------------------------- sections */
+
+.pz-section {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: clamp(46px, 7vh, 78px) var(--pz-gutter);
+    border-bottom: 1px solid var(--dz-line);
+}
+
+.pz-section-head {
+    margin-bottom: clamp(22px, 4vh, 34px);
+}
+
+.pz-section-head h2 {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 0 0 8px;
+    font-size: clamp(20px, 2.6vw, 28px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+/* a lit block instead of a bullet */
+.pz-section-tick {
+    width: 12px;
+    height: 12px;
+    background: var(--pz-lime);
+    box-shadow:
+        0 0 0 3px rgba(198, 242, 78, 0.14),
+        0 0 16px rgba(198, 242, 78, 0.45);
+}
+
+.pz-section-head p {
+    max-width: 62ch;
+    margin: 0;
+    color: var(--dz-faint);
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+/* ---------------------------------------------------------------- cards */
+
+.pz-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+}
+
+.pz-card {
+    position: relative;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    padding: 18px;
+    border: 1px solid var(--dz-line);
+    background:
+        linear-gradient(transparent 0 calc(var(--pz-cell) - 1px), var(--pz-grid-line) 0),
+        linear-gradient(90deg, transparent 0 calc(var(--pz-cell) - 1px), var(--pz-grid-line) 0),
+        var(--dz-raise);
+    background-size:
+        var(--pz-cell) var(--pz-cell),
+        var(--pz-cell) var(--pz-cell),
+        auto;
+    color: inherit;
+    text-decoration: none;
+    transition:
+        transform 120ms steps(2, end),
+        box-shadow 120ms steps(2, end),
+        border-color 140ms ease;
+}
+
+.pz-card:hover {
+    border-color: var(--pz-cyan);
+    box-shadow: 5px 5px 0 rgba(78, 225, 242, 0.26);
+    transform: translate(-2px, -2px);
+}
+
+.pz-card-top {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pz-card-top strong {
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.pz-tag {
+    padding: 3px 7px;
+    border: 1px solid var(--dz-line-2);
+    color: var(--dz-faint);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.pz-card-body {
+    color: var(--dz-faint);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.pz-card-go {
+    color: var(--pz-cyan);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    opacity: 0;
+    transition: opacity 140ms ease;
+}
+
+.pz-card:hover .pz-card-go,
+.pz-card:focus-visible .pz-card-go {
+    opacity: 1;
+}
+
+/* ---------------------------------------------------------------- traits */
+
+.pz-traits {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pz-trait {
+    padding: 20px 18px;
+    border: 1px solid var(--dz-line);
+    border-top: 2px solid var(--pz-violet);
+    background: var(--dz-raise);
+}
+
+.pz-trait:nth-child(2) {
+    border-top-color: var(--pz-cyan);
+}
+
+.pz-trait:nth-child(3) {
+    border-top-color: var(--pz-lime);
+}
+
+.pz-trait:nth-child(4) {
+    border-top-color: var(--pz-magenta);
+}
+
+.pz-trait b {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: clamp(26px, 3.4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.pz-trait-label {
+    display: block;
+    margin: 6px 0 10px;
+    color: var(--dz-faint);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.pz-trait p {
+    margin: 0;
+    color: var(--dz-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ---------------------------------------------------------------- browse */
+
+.pz-cats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.pz-cat {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 15px 16px;
+    border: 1px solid var(--dz-line);
+    background: var(--dz-raise);
+    color: var(--dz-ink);
+    text-decoration: none;
+    transition:
+        border-color 140ms ease,
+        background 140ms ease;
+}
+
+.pz-cat:hover {
+    border-color: var(--pz-lime);
+    background: var(--dz-raise-2);
+}
+
+.pz-cat b {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pz-cat span {
+    color: var(--pz-lime);
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.pz-snippet {
+    max-width: 560px;
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.pz-footer {
+    position: relative;
+    padding: 0 var(--pz-gutter);
+    overflow: clip;
+}
+
+.pz-footer[data-signed="true"] {
+    padding-top: clamp(40px, 7vh, 70px);
+}
+
+.pz-signature {
+    display: block;
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding-bottom: clamp(28px, 5vh, 54px);
+}
+
+.pz-signature .pz-word {
+    width: 100%;
+}
+
+.pz-footer-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 24px;
+    align-items: center;
+    justify-content: space-between;
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 18px 0 30px;
+    border-top: 1px solid var(--dz-line);
+}
+
+.pz-footer-note {
+    margin: 0;
+    color: var(--dz-faint);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+}
+
+.pz-footer-nav {
+    display: flex;
+    gap: 18px;
+}
+
+.pz-footer-nav a {
+    color: var(--dz-muted);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.pz-footer-nav a:hover {
+    color: var(--pz-cyan);
+}
+
+/* ---------------------------------------------------------------- wordmark */
+
+.pz-word {
+    display: block;
+    line-height: 0;
+}
+
+.pz-word svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.pz-word rect {
+    fill: var(--dz-ink);
+    /* a hair of inset keeps the blocks reading as separate pixels */
+    transform: scale(0.88);
+    transform-origin: center;
+    transform-box: fill-box;
+}
+
+.pz-word-glow rect {
+    fill: var(--pz-cyan);
+    animation: pz-sweep 5.5s steps(1, end) infinite;
+    animation-delay: var(--pz-step, 0ms);
+}
+
+@keyframes pz-sweep {
+    0%,
+    8% {
+        fill: var(--pz-lime);
+        opacity: 1;
+    }
+    14%,
+    100% {
+        fill: var(--pz-cyan);
+        opacity: 0.82;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pz-word-glow rect {
+        animation: none;
+        opacity: 0.85;
+    }
+
+    .pz-badge-dot {
+        animation: none;
+    }
+
+    .pz-btn,
+    .pz-card {
+        transition: none;
+    }
+
+    .pz-btn:hover,
+    .pz-card:hover {
+        transform: none;
+    }
+}
+
+@media (max-width: 720px) {
+    .pz-hero {
+        min-height: 0;
+        text-align: left;
+    }
+
+    .pz-hero-inner {
+        text-align: left;
+    }
+
+    .pz-hero-title {
+        justify-items: start;
+    }
+
+    .pz-hero-mark {
+        width: 100%;
+    }
+
+    .pz-hero-lede {
+        margin-inline: 0;
+    }
+
+    /* the copy is left-aligned here, so the clear space has to be too */
+    .pz-hero-scrim {
+        background: linear-gradient(95deg, rgba(5, 5, 9, 0.95) 0 58%, transparent 98%);
+    }
+
+    .pz-cta-row {
+        justify-content: flex-start;
+    }
+
+    .pz-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}

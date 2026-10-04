@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, type CSSProperties, type RefObject } from "react"
 
+import { rngFor } from "../internal"
 import {
     abductionLift,
     beginEvent,
@@ -289,13 +290,7 @@ function planFireflies(count: number, seed: number): Firefly[] {
     const out: Firefly[] = []
 
     for (let index = 0; index < count; index += 1) {
-        let a = (Math.imul(seed + 137, 0x9e3779b1) + Math.imul(index + 1, 0xc2b2ae35)) >>> 0
-        const random = () => {
-            a = (a + 0x6d2b79f5) >>> 0
-            let t = Math.imul(a ^ (a >>> 15), 1 | a)
-            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-            return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-        }
+        const random = rngFor(seed + 137, index)
 
         // most sit far back and dim; a few come forward and read as bright
         const near = random() < 0.22

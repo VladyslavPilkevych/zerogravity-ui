@@ -1,0 +1,89 @@
+.xp-lenticular {
+    --le-at: 0.5;
+    --le-strips: 46;
+    --le-tilt: 7deg;
+    --le-sheen: 0.5;
+    --le-radius: 16px;
+    --le-plate-at: 50% 50%;
+    position: relative;
+    width: 100%;
+    perspective: 1000px;
+}
+
+.xp-lenticular-card {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: var(--le-radius);
+    background: #0b0d14;
+    transform: rotateY(calc((var(--le-at) - 0.5) * 2 * var(--le-tilt)));
+}
+
+.xp-lenticular-plate {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--le-plate-at);
+}
+
+/*
+ * The front plate is cut into strips whose width answers to the pointer: wide
+ * open on one side of the card, closed on the other, interlaced in between.
+ * That is what a lenticular print does as you walk past it — a striped handover
+ * rather than a crossfade.
+ */
+.xp-lenticular-front {
+    --le-band: calc(100% / var(--le-strips));
+    --le-open: calc(var(--le-band) * (1 - var(--le-at)));
+    mask-image: repeating-linear-gradient(
+        to right,
+        #000 0,
+        #000 var(--le-open),
+        transparent var(--le-open),
+        transparent var(--le-band)
+    );
+    mask-position: calc(var(--le-at) * var(--le-band) * -1) 0;
+    mask-size: 100% 100%;
+}
+
+.xp-lenticular-lens {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.09) 0,
+        rgba(0, 0, 0, 0.16) calc(50% / var(--le-strips)),
+        rgba(255, 255, 255, 0.09) calc(100% / var(--le-strips))
+    );
+    pointer-events: none;
+}
+
+.xp-lenticular-sheen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent calc(var(--le-at) * 100% - 26%),
+        rgba(255, 255, 255, 0.5) calc(var(--le-at) * 100%),
+        transparent calc(var(--le-at) * 100% + 26%)
+    );
+    mix-blend-mode: soft-light;
+    opacity: var(--le-sheen);
+    pointer-events: none;
+}
+
+.xp-lenticular[data-still="true"] .xp-lenticular-card {
+    transform: none;
+}
+
+.xp-lenticular[data-failed="true"] .xp-lenticular-card {
+    background: repeating-linear-gradient(45deg, #14161f 0 12px, #191c26 12px 24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-lenticular-card {
+        transform: none;
+    }
+}

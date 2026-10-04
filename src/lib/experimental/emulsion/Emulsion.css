@@ -1,0 +1,100 @@
+.xp-emulsion {
+    --em-radius: 14px;
+    --em-bloom: 0.45;
+    --em-grain: 0.3;
+    --em-leak: 0.3;
+    --em-fade: 0.18;
+    --em-warm: 0.25;
+    --em-fit: cover;
+    --em-at: 50% 50%;
+    position: relative;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--em-radius);
+    background: #0a0b10;
+    isolation: isolate;
+}
+
+.xp-emulsion-plate,
+.xp-emulsion-bloom {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--em-fit);
+    object-position: var(--em-at);
+}
+
+.xp-emulsion-bloom {
+    filter: blur(14px) brightness(1.5) saturate(1.2);
+    mix-blend-mode: screen;
+    opacity: calc(var(--em-bloom) * 0.55);
+    pointer-events: none;
+}
+
+/* the stock itself: a warm or cool cast plus lifted shadows */
+.xp-emulsion-tone {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        160deg,
+        color-mix(in oklab, #ffb27a calc(max(var(--em-warm), 0) * 46%), transparent),
+        color-mix(in oklab, #6fb4ff calc(max(calc(-1 * var(--em-warm)), 0) * 46%), transparent)
+    );
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+}
+
+.xp-emulsion-tone::after {
+    position: absolute;
+    inset: 0;
+    background: #cfd6ff;
+    opacity: calc(var(--em-fade) * 0.5);
+    mix-blend-mode: lighten;
+    content: "";
+}
+
+.xp-emulsion-leak {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        70% 90% at 108% -8%,
+        rgba(255, 170, 90, 0.85),
+        rgba(255, 90, 120, 0.35) 38%,
+        transparent 66%
+    );
+    mix-blend-mode: screen;
+    opacity: var(--em-leak);
+    pointer-events: none;
+}
+
+.xp-emulsion-grain {
+    position: absolute;
+    inset: 0;
+    background-repeat: repeat;
+    background-size: 128px 128px;
+    mix-blend-mode: overlay;
+    opacity: calc(var(--em-grain) * 0.5);
+    pointer-events: none;
+    animation: xp-emulsion-shift 1.4s steps(5) infinite;
+}
+
+@keyframes xp-emulsion-shift {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 128px 96px;
+    }
+}
+
+.xp-emulsion[data-failed="true"] {
+    background: repeating-linear-gradient(45deg, #14161f 0 12px, #191c26 12px 24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-emulsion-grain {
+        animation: none;
+    }
+}

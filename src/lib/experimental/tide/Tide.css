@@ -1,0 +1,17 @@
+.xp-tide {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    pointer-events: none;
+}
+
+.xp-tide-body {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.xp-tide[data-flip="true"] .xp-tide-body {
+    transform: scaleY(-1);
+}

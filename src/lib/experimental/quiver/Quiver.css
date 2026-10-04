@@ -1,0 +1,34 @@
+.xp-quiver {
+    --qv-at: 0.5;
+    --qv-lift: 18px;
+    --qv-width: 0.22;
+    --qv-twist: 12deg;
+    display: inline-block;
+}
+
+.xp-quiver-line {
+    display: inline-flex;
+    margin: 0;
+    font: inherit;
+    white-space: pre;
+}
+
+/* distance from the crest, folded into a 0..1 falloff entirely in CSS, so a
+   moving wave costs one custom property per frame however long the word is */
+.xp-quiver-glyph {
+    --qv-d: max(calc(var(--qv-i) - var(--qv-at)), calc(var(--qv-at) - var(--qv-i)));
+    --qv-near: max(0, calc(1 - var(--qv-d) / var(--qv-width)));
+    display: inline-block;
+    transform: translateY(calc(var(--qv-near) * var(--qv-lift) * -1))
+        rotate(calc((var(--qv-i) - var(--qv-at)) * var(--qv-near) * var(--qv-twist) * 4));
+}
+
+.xp-quiver[data-still="true"] .xp-quiver-glyph {
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-quiver-glyph {
+        transform: none;
+    }
+}

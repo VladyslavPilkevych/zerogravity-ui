@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next"
 
+import { SiteFooter } from "@/docs/components/SiteFooter"
 import { SiteHeader } from "@/docs/components/SiteHeader"
 import "@/docs/docs.css"
+import "@/docs/home.css"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -10,7 +12,7 @@ export const metadata: Metadata = {
         template: "%s · ZeroGravity UI",
     },
     description:
-        "React components for motion, pointer effects and playful scenes. Zero runtime dependencies.",
+        "A React library for scroll, pointer and display effects \u2014 drawn with canvas, SVG and plain CSS, with zero runtime dependencies.",
 }
 
 export const viewport: Viewport = {
@@ -25,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body>
                 <SiteHeader />
                 {children}
+                <SiteFooter />
             </body>
         </html>
     )

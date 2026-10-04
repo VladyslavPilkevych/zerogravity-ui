@@ -1,0 +1,78 @@
+.xp-gantry {
+    --gy-height: 80vh;
+    --gy-width: clamp(220px, 32vw, 420px);
+    --gy-gap: 24px;
+    --gy-pace: 1;
+    --gy-lean: 0;
+    position: relative;
+    width: 100%;
+    /* the stage is pinned for as long as the rail has left to travel, measured
+       in stages rather than viewports so an internal scroller behaves */
+    height: calc(var(--gy-height) * (1 + var(--gy-pace)));
+}
+
+.xp-gantry-stage {
+    position: sticky;
+    top: 0;
+    display: grid;
+    align-content: center;
+    height: var(--gy-height);
+}
+
+.xp-gantry-window {
+    overflow: hidden;
+    width: 100%;
+    height: var(--gy-height);
+}
+
+.xp-gantry-rail {
+    display: flex;
+    gap: var(--gy-gap);
+    align-items: stretch;
+    height: 100%;
+    padding-inline: var(--gy-gap);
+    will-change: transform;
+}
+
+.xp-gantry-car {
+    flex: 0 0 var(--gy-width);
+    height: 100%;
+    transform: rotate(calc(var(--gy-lean) * -1deg));
+    transition: transform 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* no pinning at all: the rail becomes an ordinary horizontal scroller */
+.xp-gantry[data-still="true"] {
+    height: auto;
+}
+
+.xp-gantry[data-still="true"] .xp-gantry-stage {
+    position: relative;
+    height: auto;
+}
+
+.xp-gantry[data-still="true"] .xp-gantry-window {
+    overflow-x: auto;
+}
+
+.xp-gantry-window:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 3px;
+}
+
+.xp-gantry[data-still="true"] .xp-gantry-rail {
+    transform: none;
+    will-change: auto;
+}
+
+.xp-gantry[data-still="true"] .xp-gantry-car {
+    transform: none;
+    transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-gantry-car {
+        transition: none;
+        transform: none;
+    }
+}

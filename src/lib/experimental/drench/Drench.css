@@ -1,0 +1,27 @@
+.xp-drench {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 220px;
+    overflow: hidden;
+    background: #070a12;
+}
+
+/* Readable by anything that reads, invisible to anything that looks. */
+.xp-drench-word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.xp-drench-rain {
+    display: block;
+    width: 100%;
+    height: 100%;
+}

@@ -170,3 +170,41 @@ test.describe("on a phone", () => {
         await expect(pre).toHaveCSS("overflow-x", "auto")
     })
 })
+
+test("the home page shows the brand, the claim and a way in", async ({
+    page,
+    browserLog: guard,
+}) => {
+    await page.goto("/")
+
+    await expect(page.getByRole("img", { name: "ZeroGravity" }).first()).toBeVisible()
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Motion you can import.")
+    await expect(page.getByRole("link", { name: "Browse components" })).toBeVisible()
+
+    // the hero field is decoration and says nothing
+    await expect(page.locator(".pz-hero-field")).toHaveAttribute("aria-hidden", "true")
+
+    guard.assertClean()
+})
+
+test("the signature closes the home page and stays out of the docs", async ({ page }) => {
+    await page.goto("/")
+    await expect(page.locator(".pz-signature")).toBeVisible()
+
+    await page.goto("/docs/reel")
+    await expect(page.locator(".pz-signature")).toHaveCount(0)
+    await expect(page.locator(".pz-footer-bar")).toBeVisible()
+})
+
+test("every component button on the docs index is a real link", async ({ page }) => {
+    await page.goto("/docs")
+
+    const tiles = page.locator(".dz-tile")
+    const count = await tiles.count()
+    expect(count).toBeGreaterThan(40)
+
+    await tiles.first().focus()
+    await expect(tiles.first()).toBeFocused()
+    await page.keyboard.press("Enter")
+    await expect(page).toHaveURL(/\/docs\/[a-z-]+$/)
+})

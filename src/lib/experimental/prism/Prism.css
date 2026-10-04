@@ -1,0 +1,98 @@
+.xp-prism {
+    --pr-x: 0.5;
+    --pr-y: 0.5;
+    --pr-rx: 0;
+    --pr-ry: 0;
+    --pr-radius: 20px;
+    --pr-split: 0.6;
+    --pr-sheen: 0.7;
+    position: relative;
+    perspective: 900px;
+}
+
+.xp-prism-slab {
+    position: relative;
+    border-radius: var(--pr-radius);
+    transform: rotateX(calc(var(--pr-rx) * 1deg)) rotateY(calc(var(--pr-ry) * 1deg));
+    transform-style: preserve-3d;
+    isolation: isolate;
+}
+
+.xp-prism-body {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+.xp-prism-split,
+.xp-prism-sheen,
+.xp-prism-rim {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+/*
+ * The dispersion: a warm edge and a cool edge, pushed to opposite sides of the
+ * slab by however far it is leaning. That is what light does on its way through
+ * a wedge of glass, and unlike a rim shadow it is visible from across a room.
+ */
+.xp-prism-split {
+    background:
+        linear-gradient(
+            calc(90deg + var(--pr-ry) * 4deg),
+            rgba(255, 40, 120, 0.85),
+            rgba(255, 40, 120, 0) 34%
+        ),
+        linear-gradient(
+            calc(270deg + var(--pr-ry) * 4deg),
+            rgba(40, 220, 255, 0.85),
+            rgba(40, 220, 255, 0) 34%
+        ),
+        linear-gradient(180deg, rgba(180, 120, 255, 0.5), rgba(120, 255, 220, 0) 46%);
+    mix-blend-mode: screen;
+    opacity: calc(var(--pr-split) * 0.55);
+    transform: translate3d(
+        calc(var(--pr-ry) * 0.9px * var(--pr-split)),
+        calc(var(--pr-rx) * -0.9px * var(--pr-split)),
+        0
+    );
+}
+
+/* one narrow, bright specular band that stays under the pointer */
+.xp-prism-sheen {
+    background:
+        radial-gradient(
+            50% 55% at calc(var(--pr-x) * 100%) calc(var(--pr-y) * 100%),
+            rgba(255, 255, 255, 0.85),
+            rgba(255, 255, 255, 0.16) 38%,
+            transparent 62%
+        ),
+        linear-gradient(
+            calc(100deg + var(--pr-ry) * 2deg),
+            transparent calc(var(--pr-x) * 100% - 16%),
+            rgba(255, 255, 255, 0.34) calc(var(--pr-x) * 100%),
+            transparent calc(var(--pr-x) * 100% + 16%)
+        );
+    mix-blend-mode: screen;
+    opacity: calc(var(--pr-sheen) * 0.7);
+}
+
+.xp-prism-rim {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.xp-prism[data-still="true"] .xp-prism-slab {
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-prism-slab {
+        transform: none;
+    }
+}

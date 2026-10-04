@@ -220,3 +220,19 @@ describe("Raster", () => {
         expect(second.container.querySelector(".xp-raster")?.outerHTML).toBe(before)
     })
 })
+
+describe("Raster source safety", () => {
+    it("encodes a source that tries to close the url() it is put in", () => {
+        const { container } = render(
+            <Raster src={'a.png"); background: url("evil.png'} alt="" mode="blur" />,
+        )
+        const host = container.querySelector(".xp-raster") as HTMLElement
+        const value = host.style.getPropertyValue("--raster-src")
+
+        // one url(), and the quote and paren that would have closed it are
+        // percent-encoded, so the rest is inert text inside the URL
+        expect(value.match(/url\(/g)).toHaveLength(1)
+        expect(value).toContain("%22%29")
+        expect(value).not.toContain('");')
+    })
+})

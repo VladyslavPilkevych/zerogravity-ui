@@ -61,17 +61,34 @@ export function GitHubIcon() {
 }
 
 export function Logo() {
+    // a Z of lit blocks: the same alphabet the wordmark is drawn from
+    const cells = [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [3, 0],
+        [3, 1],
+        [2, 2],
+        [1, 2],
+        [0, 3],
+        [1, 3],
+        [2, 3],
+        [3, 3],
+    ]
+
     return (
-        <svg width="20" height="20" viewBox="0 0 32 32" aria-hidden="true">
-            <rect width="32" height="32" rx="7" fill="#0a0a0f" />
-            <circle cx="16" cy="7" r="2.1" fill="#ffffff" />
-            <circle cx="24" cy="11" r="1.6" fill="#d2e1ff" />
-            <circle cx="26" cy="19" r="2.3" fill="#e6d2ff" />
-            <circle cx="20" cy="25" r="1.5" fill="#c8fff5" />
-            <circle cx="12" cy="26" r="2" fill="#ffffff" opacity="0.8" />
-            <circle cx="6" cy="20" r="1.7" fill="#d2e1ff" opacity="0.75" />
-            <circle cx="6" cy="11" r="2.2" fill="#8ab4ff" />
-            <circle cx="11" cy="6" r="1.3" fill="#ffffff" opacity="0.6" />
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <rect width="20" height="20" fill="#0a0c12" />
+            {cells.map(([x, y]) => (
+                <rect
+                    key={`${x}-${y}`}
+                    x={3 + x * 3.6}
+                    y={3.6 + y * 3.6}
+                    width={2.8}
+                    height={2.8}
+                    fill={y === 0 ? "#c6f24e" : "#4ee1f2"}
+                />
+            ))}
         </svg>
     )
 }

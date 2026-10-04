@@ -1,3 +1,5 @@
+import { rngFor } from "../internal"
+
 /**
  * The living layer: pooled flyers, their steering, and the ambient event
  * scheduler. Everything here is pure and frame-driven so it can be stepped in a
@@ -96,18 +98,6 @@ const EVENT_SPAN: Record<EventName, number> = {
     shootingStar: 2.4,
     fireflyGather: 8,
     ufoAbduction: 11,
-}
-
-/** Same generator the scene planner uses, so one seed drives the whole meadow. */
-export function rngFor(seed: number, index: number): () => number {
-    let a = (Math.imul(seed | 0, 0x9e3779b1) + Math.imul(index + 1, 0xc2b2ae35)) >>> 0
-
-    return () => {
-        a = (a + 0x6d2b79f5) >>> 0
-        let t = Math.imul(a ^ (a >>> 15), 1 | a)
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-    }
 }
 
 export function clamp(value: number, low: number, high: number): number {

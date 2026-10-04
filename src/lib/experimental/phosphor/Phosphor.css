@@ -1,0 +1,98 @@
+.xp-phosphor {
+    --ph-ink: #54ffbe;
+    --ph-bloom: 0.6;
+    --ph-pitch: 4px;
+    --ph-fringe: 2px;
+    --ph-jitter: 0.4;
+    display: inline-block;
+    isolation: isolate;
+}
+
+.xp-phosphor-tube {
+    position: relative;
+    display: inline-grid;
+    animation: xp-phosphor-roll calc(6s - var(--ph-jitter) * 3s) steps(1) infinite;
+}
+
+.xp-phosphor-line,
+.xp-phosphor-ghost {
+    grid-area: 1 / 1;
+    margin: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    white-space: pre;
+}
+
+.xp-phosphor-line {
+    position: relative;
+    z-index: 2;
+    color: var(--ph-ink);
+    text-shadow:
+        0 0 calc(var(--ph-bloom) * 10px) color-mix(in oklab, var(--ph-ink) 70%, transparent),
+        0 0 calc(var(--ph-bloom) * 32px) color-mix(in oklab, var(--ph-ink) 40%, transparent);
+}
+
+.xp-phosphor-ghost {
+    z-index: 1;
+    mix-blend-mode: screen;
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.xp-phosphor-red {
+    color: #ff3860;
+    transform: translateX(calc(var(--ph-fringe) * -1));
+}
+
+.xp-phosphor-blue {
+    color: #3aa0ff;
+    transform: translateX(var(--ph-fringe));
+}
+
+.xp-phosphor-mask {
+    position: absolute;
+    z-index: 3;
+    inset: -0.25em -0.15em;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.42) 0 1px,
+        transparent 1px var(--ph-pitch)
+    );
+    pointer-events: none;
+    animation: xp-phosphor-drift 5s linear infinite;
+}
+
+@keyframes xp-phosphor-drift {
+    to {
+        background-position: 0 var(--ph-pitch);
+    }
+}
+
+@keyframes xp-phosphor-roll {
+    0%,
+    92%,
+    100% {
+        transform: translateY(0);
+        filter: brightness(1);
+    }
+    94% {
+        transform: translateY(calc(var(--ph-jitter) * -2px));
+        filter: brightness(1.25);
+    }
+    96% {
+        transform: translateY(calc(var(--ph-jitter) * 1px));
+        filter: brightness(0.9);
+    }
+}
+
+.xp-phosphor[data-still="true"] .xp-phosphor-tube,
+.xp-phosphor[data-still="true"] .xp-phosphor-mask {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xp-phosphor-tube,
+    .xp-phosphor-mask {
+        animation: none;
+    }
+}
