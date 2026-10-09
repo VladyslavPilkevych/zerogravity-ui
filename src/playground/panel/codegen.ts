@@ -19,6 +19,7 @@ export function propLines(
     config: Record<string, unknown>,
     omit: string[] = [],
     indent = "    ",
+    required: string[] = [],
 ): string[] {
     const lines: string[] = []
 
@@ -39,7 +40,7 @@ export function propLines(
             if (entries.length > 0) {
                 lines.push(`${indent}${key}={{ ${entries.join(", ")} }}`)
             }
-        } else if (!equal(value, base)) {
+        } else if (!equal(value, base) || required.includes(key)) {
             if (value === true) lines.push(`${indent}${key}`)
             else if (typeof value === "string" && !value.includes('"'))
                 lines.push(`${indent}${key}="${value}"`)

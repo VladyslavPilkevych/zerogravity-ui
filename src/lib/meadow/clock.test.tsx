@@ -314,8 +314,11 @@ describe("the sun on its arc", () => {
         const root = container.querySelector(".xp-meadow") as HTMLElement
         const morning = root.style.getPropertyValue("--orb-x")
 
+        // jump the wall clock, then let one minute tick sample it; stepping
+        // through four hours of fake frames took seconds on CI
         act(() => {
-            vi.advanceTimersByTime(4 * 60 * 60_000)
+            vi.setSystemTime(Date.now() + 4 * 60 * 60_000)
+            vi.advanceTimersByTime(60_000)
         })
 
         expect(root.style.getPropertyValue("--orb-x")).not.toBe(morning)

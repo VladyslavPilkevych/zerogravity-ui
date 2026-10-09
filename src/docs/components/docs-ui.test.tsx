@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { COMPONENTS, REPOSITORY_URL, sidebarIndex } from "../registry"
+import { DOC_CATEGORIES, type DocCategory } from "../types"
 import { CodeBlock } from "./CodeBlock"
 import { Dependencies } from "./Dependencies"
 import { DocsShell } from "./DocsShell"
@@ -67,10 +68,17 @@ describe("DocsShell", () => {
     it("lists every component", () => {
         render(<DocsShell index={index}>page</DocsShell>)
 
+        // one pass over the links: a role query per component took seconds on CI
+        const links = new Map(
+            [...document.querySelectorAll<HTMLAnchorElement>(".dz-side a.dz-link")].map((link) => [
+                link.getAttribute("href"),
+                link.textContent,
+            ]),
+        )
         for (const entry of COMPONENTS) {
-            expect(
-                screen.getByRole("link", { name: new RegExp(`^${entry.name}( exp)?$`) }),
-            ).toHaveAttribute("href", `/docs/${entry.slug}`)
+            expect(links.get(`/docs/${entry.slug}`), entry.slug).toMatch(
+                new RegExp(`^${entry.name} ${entry.label}( exp)?$`),
+            )
         }
     })
 
@@ -85,7 +93,37 @@ describe("DocsShell", () => {
         render(<DocsShell index={index}>page</DocsShell>)
 
         expect(screen.getByRole("heading", { name: "Typography" })).toBeInTheDocument()
-        expect(screen.getByRole("heading", { name: "Motion" })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: "Scroll" })).toBeInTheDocument()
+    })
+
+    it("orders groups by the taxonomy and names alphabetically", () => {
+        render(<DocsShell index={index}>page</DocsShell>)
+
+        const titles = screen
+            .getAllByRole("heading", { level: 2 })
+            .map((node) => node.textContent)
+            .filter((text) => DOC_CATEGORIES.includes(text as DocCategory))
+        expect(titles).toEqual([...DOC_CATEGORIES])
+
+        const scroll = screen.getByRole("heading", { name: "Scroll" }).nextElementSibling!
+        const names = [...scroll.querySelectorAll(".dz-link-name")].map((node) => node.textContent!)
+        expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)))
+    })
+
+    it("puts the best search match first, whatever its category", async () => {
+        const user = userEvent.setup()
+        render(<DocsShell index={index}>page</DocsShell>)
+
+        await user.type(screen.getByLabelText("Search components"), "carousel")
+
+        const side = document.querySelector(".dz-side")!
+        expect(side.querySelector(".dz-link-name")?.textContent).toBe("Reel")
+    })
+
+    it("shows what each component is next to its brand name", () => {
+        render(<DocsShell index={index}>page</DocsShell>)
+
+        expect(screen.getByRole("link", { name: /^Wake Water ripple/ })).toBeInTheDocument()
     })
 
     it("filters as you type", async () => {

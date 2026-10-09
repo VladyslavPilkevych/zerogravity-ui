@@ -7,6 +7,7 @@ import {
     APERTURE_PRESETS,
     APERTURE_PRESET_VALUES,
 } from "@/playground/aperture/schema"
+import { PRISM_CONTROLS, PRISM_DEFAULTS, PRISM_PRESETS } from "@/playground/prism/schema"
 import {
     ANAGLYPH_CONTROLS,
     ANAGLYPH_DEFAULTS,
@@ -18,10 +19,13 @@ import {
     CONTACT_DEFAULTS,
     DIORAMA_CONTROLS,
     DIORAMA_DEFAULTS,
+    DIORAMA_EXAMPLES,
+    DIORAMA_PRESET_VALUES,
     EMULSION_CONTROLS,
     EMULSION_DEFAULTS,
     GANTRY_CONTROLS,
     GANTRY_DEFAULTS,
+    GANTRY_PRESETS,
     GNOMON_CONTROLS,
     GNOMON_DEFAULTS,
     INK_CONTROLS,
@@ -34,14 +38,14 @@ import {
     MENISCUS_DEFAULTS,
     NIMBUS_CONTROLS,
     NIMBUS_DEFAULTS,
+    NIMBUS_DOC_PRESETS,
     PALIMPSEST_CONTROLS,
     PALIMPSEST_DEFAULTS,
     PEEL_CONTROLS,
     PEEL_DEFAULTS,
+    PEEL_PRESETS,
     PHOSPHOR_CONTROLS,
     PHOSPHOR_DEFAULTS,
-    PRISM_CONTROLS,
-    PRISM_DEFAULTS,
     QUARTZ_CONTROLS,
     QUARTZ_DEFAULTS,
     QUIVER_CONTROLS,
@@ -90,6 +94,12 @@ import {
     WASH_DEFAULTS,
 } from "@/playground/experimental/schemas"
 import {
+    BITMAP_CONTROLS,
+    BITMAP_DEFAULTS,
+    BITMAP_PRESETS,
+    BITMAP_PRESET_VALUES,
+} from "@/playground/bitmap/schema"
+import {
     GRID_TRAIL_CONTROLS,
     GRID_TRAIL_DEMO_DEFAULTS,
     GRID_TRAIL_PRESETS,
@@ -125,9 +135,24 @@ import {
     TRAILING_CURSOR_PRESETS,
     TRAILING_CURSOR_PRESET_VALUES,
 } from "@/playground/trailing-cursor/schema"
+import {
+    BEZEL_CONTROLS,
+    BEZEL_DEFAULTS,
+    BEZEL_PRESETS,
+    DITHER_CONTROLS,
+    DITHER_DEFAULTS,
+    DITHER_PRESETS,
+    KEYCAP_CONTROLS,
+    KEYCAP_DEFAULTS,
+    TAG_CONTROLS,
+    TAG_DEFAULTS,
+    SEAM_CONTROLS,
+    SEAM_DEFAULTS,
+    SEAM_PRESETS,
+} from "@/playground/interface/schemas"
 import type { PanelPreset } from "@/playground/panel/types"
 
-import type { DocCategory, DocEntry, DocPreset } from "./types"
+import { DOC_CATEGORIES, type DocCategory, type DocEntry, type DocPreset } from "./types"
 
 /** Bridges the older `PanelPreset[]` + values map onto one preset shape. */
 function presetsFrom(
@@ -142,25 +167,38 @@ function presetsFrom(
     }))
 }
 
+/** A stronger pull than the component default, so the demo reads at a glance. */
+const LODESTONE_DEMO_PULL = { radius: 150, strength: 0.5, maxDisplacement: 30, lift: 0.05 }
+
 export const REPOSITORY_URL = "https://github.com/VladyslavPilkevych/zerogravity-ui"
 
 export const COMPONENTS: DocEntry[] = [
     {
         slug: "antigravity",
         name: "Antigravity",
+        label: "Particle field",
         description: "A particle field that flows around the cursor and settles into formations.",
-        category: "Pointer",
+        category: "Backgrounds",
         status: "stable",
         dependencies: [],
-        tags: ["particles", "canvas", "cursor", "hero"],
+        tags: ["particles", "background", "hero", "cursor", "pixel", "canvas", "interactive"],
         defaults: ANTIGRAVITY_DEFAULTS as unknown as Record<string, unknown>,
         controls: ANTIGRAVITY_CONTROLS,
-        presets: ANTIGRAVITY_PRESETS.map((preset) => ({
-            id: preset.id,
-            label: preset.label,
-            hint: preset.hint,
-            values: preset.options as Record<string, unknown>,
-        })),
+        presets: [...ANTIGRAVITY_PRESETS]
+            // the docs open on the strongest demonstration; the exported order stays stable
+            .sort((a, b) => Number(b.id === "pixel") - Number(a.id === "pixel"))
+            .map((preset) => ({
+                id: preset.id,
+                label: preset.label,
+                hint: preset.hint,
+                values: (preset.id === "pixel"
+                    ? // the hero grid is sized for a full viewport; fit it to the preview frame
+                      {
+                          ...preset.options,
+                          formation: { ...preset.options.formation, radius: 290 },
+                      }
+                    : preset.options) as Record<string, unknown>,
+            })),
         extraProps: [
             {
                 name: "onStats",
@@ -180,11 +218,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "scroll-stack",
         name: "ScrollStack",
+        label: "Stacking sections",
         description: "Full-height sections that slide over each other on scroll, and unstack back.",
-        category: "Motion",
+        category: "Scroll",
         status: "stable",
         dependencies: [],
-        tags: ["scroll", "sticky", "cards", "sections"],
+        tags: ["scroll", "stack", "sticky", "cards", "sections"],
         defaults: SCROLL_STACK_DEFAULTS as unknown as Record<string, unknown>,
         controls: SCROLL_STACK_CONTROLS,
         presets: presetsFrom(
@@ -223,11 +262,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "aperture",
         name: "Aperture",
+        label: "Scroll-framed reveal",
         description: "A full-bleed panel that closes into a framed card as you scroll, or opens.",
-        category: "Motion",
+        category: "Scroll",
         status: "stable",
         dependencies: [],
-        tags: ["scroll", "clip-path", "frame", "reveal"],
+        tags: ["scroll", "frame", "clip-path", "reveal", "zoom", "hero"],
         defaults: APERTURE_DEFAULTS as unknown as Record<string, unknown>,
         controls: APERTURE_CONTROLS,
         presets: presetsFrom(
@@ -259,11 +299,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "elemental",
         name: "Elemental",
+        label: "Electric and fire border",
         description: "An animated edge that wraps any content in electricity or fire.",
-        category: "Media",
+        category: "Surfaces",
         status: "stable",
         dependencies: [],
-        tags: ["border", "glow", "card", "effect", "decorative", "wrapper"],
+        tags: ["border", "glow", "fire", "electricity", "card", "wrapper", "effect"],
         defaults: ELEMENTAL_DEFAULTS,
         controls: ELEMENTAL_CONTROLS,
         extraProps: [
@@ -292,11 +333,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "louvre",
         name: "Louvre",
+        label: "Rotating blinds reveal",
         description: "Sticky blinds whose slats rotate away to reveal the section behind them.",
-        category: "Motion",
-        status: "experimental",
+        category: "Scroll",
+        status: "stable",
         dependencies: [],
-        tags: ["scroll", "blinds", "transition", "reveal"],
+        tags: ["scroll", "blinds", "slats", "reveal", "transition"],
+        fixedProps: ["front={<Cover />}", "back={<Revealed />}"],
         defaults: LOUVRE_DEFAULTS,
         controls: LOUVRE_CONTROLS,
         extraProps: [
@@ -312,6 +355,18 @@ export const COMPONENTS: DocEntry[] = [
                 default: "—",
                 description: "What is revealed once the slats open.",
             },
+            {
+                name: "scrollContainer",
+                type: "RefObject<HTMLElement>",
+                default: "—",
+                description: "Drive the reveal from a scrollable element instead of the page.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Skip the transition and show the back section.",
+            },
         ],
         preview: {
             port: true,
@@ -323,12 +378,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "undertow",
         name: "Undertow",
+        label: "Liquid image reveal",
         description:
             "Two images and one membrane: the pointer parts the surface and the picture beneath comes through.",
         category: "Media",
         status: "experimental",
         dependencies: [],
-        tags: ["image", "reveal", "liquid", "pointer", "canvas"],
+        tags: ["image", "reveal", "before after", "liquid", "pointer", "canvas"],
         defaults: UNDERTOW_DEFAULTS,
         controls: UNDERTOW_CONTROLS,
         extraProps: [
@@ -377,11 +433,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "wake",
         name: "Wake",
-        description: "A surface that answers the pointer: waves spread from wherever it moved.",
-        category: "Pointer",
-        status: "experimental",
+        label: "Water ripple",
+        description:
+            "Water over a floor: the pointer pushes waves that spread, interfere and bend what lies underneath.",
+        category: "Backgrounds",
+        status: "stable",
         dependencies: [],
-        tags: ["pointer", "liquid", "ripple", "surface", "canvas"],
+        tags: ["water", "ripple", "liquid", "background", "pointer", "refraction", "canvas"],
         defaults: WAKE_DEFAULTS,
         controls: WAKE_CONTROLS,
         extraProps: [
@@ -389,34 +447,85 @@ export const COMPONENTS: DocEntry[] = [
                 name: "children",
                 type: "ReactNode",
                 default: "—",
-                description: "The surface the waves run over. Stays interactive.",
+                description: "Content above the water. Stays crisp and interactive.",
+            },
+            {
+                name: "src",
+                type: "string",
+                default: "—",
+                description:
+                    "An image to lay under the water, cover-fitted. Falls back to surface.",
+            },
+            {
+                name: "enableOnTouch",
+                type: "boolean",
+                default: "true",
+                description:
+                    "Answer a finger: a tap drops a ripple, a sideways drag leaves a wake. Vertical scrolling and pinch-zoom still work.",
             },
             {
                 name: "disabled",
                 type: "boolean",
                 default: "false",
-                description: "Holds the surface still.",
+                description: "Holds one still, refracted frame instead of animating.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Under prefers-reduced-motion, show the still frame.",
             },
         ],
-        children: "<Section />",
+        children: "<Content />",
         preview: { minHeight: 400, bleed: true },
     },
     {
         slug: "drench",
         name: "Drench",
+        label: "Rain-revealed text",
         description: "A word that is already there, and rain that finds it.",
         category: "Typography",
         status: "experimental",
         dependencies: [],
-        tags: ["type", "rain", "reveal", "canvas", "weather"],
+        tags: ["text", "rain", "water", "reveal", "weather", "drops", "canvas"],
         defaults: DRENCH_DEFAULTS,
         controls: DRENCH_CONTROLS,
         extraProps: [
             {
+                name: "as",
+                type: "ElementType",
+                default: '"p"',
+                description: "The element the real text renders as, e.g. h1 for a hero heading.",
+            },
+            {
+                name: "seed",
+                type: "number",
+                default: "1",
+                description: "Fixes every drop, bead and drip.",
+            },
+            {
+                name: "freezeAt",
+                type: "number",
+                default: "—",
+                description: "Simulate this many frames, draw once and hold (for snapshots).",
+            },
+            {
+                name: "fontFamily / fontWeight",
+                type: "string / number",
+                default: '"system-ui, sans-serif" / 800',
+                description: "Face of the letters; heavy weights hold more water.",
+            },
+            {
                 name: "disabled",
                 type: "boolean",
                 default: "false",
-                description: "Holds the still, soaked state instead of animating.",
+                description: "Holds a still, soaked state with no falling rain.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Under prefers-reduced-motion, show the still soaked state.",
             },
         ],
         preview: {
@@ -428,11 +537,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "perseid",
         name: "Perseid",
+        label: "Meteor shower",
         description: "A meteor shower with bright heads, tapered trails and real depth.",
-        category: "Scenes",
+        category: "Backgrounds",
         status: "experimental",
         dependencies: [],
-        tags: ["meteor", "background", "canvas", "space", "ambient"],
+        tags: ["meteor", "stars", "space", "background", "ambient", "canvas"],
         defaults: PERSEID_DEFAULTS,
         controls: PERSEID_CONTROLS,
         omit: ["paletteName"],
@@ -467,11 +577,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "gaze",
         name: "Gaze",
+        label: "3D pointer tracking",
         description: "A model whose eyes lead and whose head follows, wherever the pointer goes.",
-        category: "Scenes",
+        category: "Media",
         status: "experimental",
         dependencies: ["three"],
-        tags: ["3d", "model", "pointer", "gltf", "webgl"],
+        tags: ["3d", "model", "eyes", "head", "cursor", "look", "follow", "webgl", "gltf"],
         defaults: GAZE_DEFAULTS,
         controls: GAZE_CONTROLS,
         extraProps: [
@@ -479,7 +590,7 @@ export const COMPONENTS: DocEntry[] = [
                 name: "src",
                 type: "string",
                 default: "—",
-                description: "A `.glb` or `.gltf` URL. Omit it for the built-in stand-in head.",
+                description: "A `.glb` or `.gltf` URL. Omit it for the built-in low-poly owl.",
             },
             {
                 name: "tracking",
@@ -502,17 +613,18 @@ export const COMPONENTS: DocEntry[] = [
         ],
         preview: {
             minHeight: 420,
-            note: "Three.js loads only when a Gaze mounts, so no other component pulls it in.",
+            note: "The owl is original, built from primitives: no asset to download or credit. Three.js loads only when a Gaze mounts.",
         },
     },
     {
         slug: "eclipse",
         name: "Eclipse",
+        label: "Covering sections",
         description: "Each section pins, and the next one slides over it until nothing is left.",
-        category: "Motion",
-        status: "experimental",
+        category: "Scroll",
+        status: "stable",
         dependencies: [],
-        tags: ["scroll", "sections", "cover", "sticky", "transition"],
+        tags: ["scroll", "sections", "cover", "sticky", "pin", "transition"],
         defaults: ECLIPSE_DEFAULTS,
         controls: ECLIPSE_CONTROLS,
         tag: "Eclipse",
@@ -559,14 +671,28 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "prism",
         name: "Prism",
+        label: "Glass refraction",
         description:
-            "A slab of glass that leans with the pointer and splits the light at its edges.",
-        category: "Pointer",
+            "A slab of glass that takes the pointer as its light source: the content splits into red, green and blue, the edge turns to a rainbow and a spectrum falls behind it.",
+        category: "Surfaces",
         status: "experimental",
         dependencies: [],
-        tags: ["glass", "refraction", "card", "tilt", "wrapper"],
+        tags: [
+            "glass",
+            "prism",
+            "refraction",
+            "spectrum",
+            "rainbow",
+            "3d",
+            "tilt",
+            "card",
+            "wrapper",
+        ],
         defaults: PRISM_DEFAULTS,
         controls: PRISM_CONTROLS,
+        presets: PRISM_PRESETS,
+        // the docs open louder than the library defaults, so the snippet has to say so
+        required: ["strength", "tilt", "depth", "dispersion"],
         extraProps: [
             {
                 name: "children",
@@ -575,24 +701,36 @@ export const COMPONENTS: DocEntry[] = [
                 description: "Whatever sits inside the glass. Stays interactive.",
             },
             {
+                name: "pointer",
+                type: "{ x: number; y: number }",
+                default: "\u2014",
+                description:
+                    "Pins the light to a point, 0 to 1 in the slab's own box, instead of following the pointer.",
+            },
+            {
                 name: "disabled",
                 type: "boolean",
                 default: "false",
-                description: "Holds the slab flat.",
+                description: "Holds the light at rest and ignores the pointer.",
             },
         ],
         children: "<Card />",
-        preview: { minHeight: 420 },
+        preview: {
+            minHeight: 480,
+            bleed: true,
+            note: "Drag on touch screens. Under reduced motion the light rests in the top left corner.",
+        },
     },
     {
         slug: "gnomon",
         name: "Gnomon",
+        label: "Pointer light and shadows",
         description:
             "The pointer becomes a lamp, and everything inside casts a shadow away from it.",
-        category: "Pointer",
-        status: "experimental",
+        category: "Surfaces",
+        status: "stable",
         dependencies: [],
-        tags: ["shadow", "light", "depth", "wrapper", "css"],
+        tags: ["shadow", "light", "lamp", "depth", "pointer", "wrapper", "css"],
         defaults: GNOMON_DEFAULTS,
         controls: GNOMON_CONTROLS,
         extraProps: [
@@ -608,6 +746,12 @@ export const COMPONENTS: DocEntry[] = [
                 default: "false",
                 description: "Pins the light where it started.",
             },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Holds the light at rest when the user asks for less motion.",
+            },
         ],
         children: "<Card />",
         preview: { minHeight: 380 },
@@ -615,12 +759,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "lattice",
         name: "Lattice",
+        label: "Elastic line mesh",
         description:
             "A line mesh that bulges away from the pointer, and lets go where it stretches.",
-        category: "Pointer",
-        status: "experimental",
+        category: "Backgrounds",
+        status: "stable",
         dependencies: [],
-        tags: ["mesh", "lines", "canvas", "field", "background"],
+        tags: ["mesh", "grid", "lines", "background", "pointer", "canvas"],
         defaults: LATTICE_DEFAULTS,
         controls: LATTICE_CONTROLS,
         extraProps: [
@@ -630,17 +775,25 @@ export const COMPONENTS: DocEntry[] = [
                 default: "\u2014",
                 description: "Content laid over the mesh.",
             },
+            {
+                name: "enableOnTouch",
+                type: "boolean",
+                default: "false",
+                description: "Let a coarse pointer push the mesh too.",
+            },
         ],
         preview: { minHeight: 420, bleed: true },
     },
     {
         slug: "chroma",
         name: "Chroma",
-        description: "A drag trail whose colour channels lag behind each other at speed.",
-        category: "Pointer",
-        status: "experimental",
+        label: "Colour cursor trail",
+        description:
+            "A soft chromatic cursor trail that curves smoothly behind the pointer and fades out.",
+        category: "Cursor",
+        status: "stable",
         dependencies: [],
-        tags: ["trail", "chromatic", "pointer", "canvas", "rgb"],
+        tags: ["cursor", "trail", "pointer", "rainbow", "chromatic", "canvas"],
         defaults: CHROMA_DEFAULTS,
         controls: CHROMA_CONTROLS,
         extraProps: [
@@ -650,17 +803,55 @@ export const COMPONENTS: DocEntry[] = [
                 default: "\u2014",
                 description: "The surface the trail is drawn over.",
             },
+            {
+                name: "colors",
+                type: "[string, string, string]",
+                default: "CHROMA_COLORS",
+                description:
+                    "Fresh, middle and faded tint of the trail. Any CSS colour, including var().",
+            },
+            {
+                name: "enableOnTouch",
+                type: "boolean",
+                default: "false",
+                description:
+                    "Let a finger draw the trail too. A sideways drag draws; vertical scrolling still works.",
+            },
+            {
+                name: "paused",
+                type: "boolean",
+                default: "false",
+                description: "Time advances one frame per pointer sample, never on its own.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "No trail at all.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description:
+                    "Under prefers-reduced-motion, a still glow under the pointer instead.",
+            },
         ],
-        preview: { minHeight: 400, bleed: true },
+        preview: {
+            minHeight: 400,
+            bleed: true,
+            note: "A cursor effect: on a touch screen it stays off unless enableOnTouch is set.",
+        },
     },
     {
         slug: "sonar",
         name: "Sonar",
+        label: "Shockwave dot field",
         description: "A dot field that a shockwave crosses whenever the surface is pressed.",
-        category: "Pointer",
-        status: "experimental",
+        category: "Backgrounds",
+        status: "stable",
         dependencies: [],
-        tags: ["shockwave", "dots", "ripple", "canvas", "press"],
+        tags: ["dots", "shockwave", "ripple", "click", "press", "background", "canvas"],
         defaults: SONAR_DEFAULTS,
         controls: SONAR_CONTROLS,
         extraProps: [
@@ -676,13 +867,14 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "concertina",
         name: "Concertina",
+        label: "Folding panels",
         tag: "Concertina",
         description:
             "Panels hinged alternately, folding flat as they reach the middle of the view.",
-        category: "Motion",
+        category: "Scroll",
         status: "experimental",
         dependencies: [],
-        tags: ["scroll", "fold", "sections", "3d", "paper"],
+        tags: ["scroll", "fold", "accordion", "paper", "3d", "sections"],
         defaults: CONCERTINA_DEFAULTS,
         controls: CONCERTINA_CONTROLS,
         extraProps: [
@@ -711,13 +903,17 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "peel",
         name: "Peel",
+        label: "Page peel reveal",
         description: "The top sheet lifts off the one underneath as the section scrolls past.",
-        category: "Motion",
-        status: "experimental",
+        category: "Scroll",
+        status: "stable",
         dependencies: [],
-        tags: ["scroll", "reveal", "sheet", "sticky", "transition"],
+        tags: ["scroll", "peel", "page", "sheet", "curl", "reveal", "sticky"],
         defaults: PEEL_DEFAULTS,
         controls: PEEL_CONTROLS,
+        presets: PEEL_PRESETS,
+        // front and back are required JSX, the same whichever corner is picked
+        fixedProps: ["front={<Cover />}", "back={<Underneath />}"],
         extraProps: [
             {
                 name: "front",
@@ -743,19 +939,39 @@ export const COMPONENTS: DocEntry[] = [
                 default: "\u2014",
                 description: "Drive it from a scrollable element instead of the page.",
             },
+            {
+                name: "progress",
+                type: "number",
+                default: "\u2014",
+                description: "Set the lift yourself, 0 to 1. Scroll is then ignored.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Drops the peel: both layers stack as ordinary blocks.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Stacks the layers when the user asks for less motion.",
+            },
         ],
         preview: { port: true, minHeight: 520, wide: true },
     },
     {
         slug: "gantry",
         name: "Gantry",
+        label: "Horizontal scroll rail",
         description: "A rail of cards that travels sideways while the page scrolls down.",
-        category: "Motion",
-        status: "experimental",
+        category: "Scroll",
+        status: "stable",
         dependencies: [],
-        tags: ["scroll", "horizontal", "rail", "sticky", "gallery"],
+        tags: ["scroll", "horizontal", "rail", "carousel", "gallery", "sticky", "pixel"],
         defaults: GANTRY_DEFAULTS,
         controls: GANTRY_CONTROLS,
+        presets: GANTRY_PRESETS,
         extraProps: [
             {
                 name: "children",
@@ -781,6 +997,12 @@ export const COMPONENTS: DocEntry[] = [
                 default: "\u2014",
                 description: "Called with 0 to 1 as the rail travels.",
             },
+            {
+                name: "progress",
+                type: "number",
+                default: "\u2014",
+                description: "Set the rail position yourself, 0 to 1. Scroll is then ignored.",
+            },
         ],
         children: "<Card />",
         preview: { port: true, minHeight: 520, wide: true },
@@ -788,32 +1010,47 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "tide",
         name: "Tide",
-        description: "A liquid separator between two sections that never sits still.",
-        category: "Motion",
-        status: "experimental",
+        label: "Wavy edge",
+        description: "A wavy, slowly drifting contour for any card, section or image.",
+        category: "Surfaces",
+        status: "stable",
         dependencies: [],
-        tags: ["divider", "wave", "svg", "separator", "ambient"],
+        tags: ["wave", "contour", "edge", "clip-path", "liquid", "card", "image", "wrapper"],
         defaults: TIDE_DEFAULTS,
         controls: TIDE_CONTROLS,
-        omit: ["layers"],
         extraProps: [
             {
-                name: "layers",
-                type: "1 | 2",
-                default: "2",
-                description: "A second, slower wave behind the first.",
+                name: "children",
+                type: "ReactNode",
+                default: "—",
+                description: "Whatever gets the contour. It stays fully interactive.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Hold a static wavy contour.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Hold the static contour when the user asks for less motion.",
             },
         ],
-        preview: { minHeight: 340, bleed: true },
+        children: "<Card />",
+        preview: { minHeight: 420 },
     },
     {
         slug: "palimpsest",
         name: "Palimpsest",
+        label: "Layered draft text",
         description: "A word that comes apart into the drafts written underneath it.",
         category: "Typography",
-        status: "experimental",
+        status: "stable",
         dependencies: [],
-        tags: ["type", "layers", "ghost", "decomposition", "hover"],
+        tags: ["text", "type", "layers", "ghost", "hover", "heading"],
+        required: ["text"],
         defaults: PALIMPSEST_DEFAULTS,
         controls: PALIMPSEST_CONTROLS,
         extraProps: [
@@ -835,11 +1072,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "quiver",
         name: "Quiver",
+        label: "Letter wave",
         description: "A crest that travels along a line of type, lifting letters as it passes.",
         category: "Typography",
         status: "experimental",
         dependencies: [],
-        tags: ["type", "wave", "pointer", "letters", "css"],
+        tags: ["text", "type", "wave", "letters", "pointer", "css"],
         defaults: QUIVER_DEFAULTS,
         controls: QUIVER_CONTROLS,
         extraProps: [
@@ -855,27 +1093,45 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "ink",
         name: "Ink",
-        description: "A word that soaks into the paper instead of fading in.",
+        label: "Ink bleed text",
+        description:
+            "A word that soaks into the paper: ink wicks out along the fibres, feathers, and dries to a darker tide line.",
         category: "Typography",
         status: "experimental",
         dependencies: [],
-        tags: ["type", "ink", "diffusion", "canvas", "paper"],
+        tags: ["text", "type", "ink", "bleed", "paper", "diffusion", "canvas"],
         defaults: INK_DEFAULTS,
         controls: INK_CONTROLS,
+        extraProps: [
+            {
+                name: "time",
+                type: "number",
+                default: "—",
+                description: "Hold the soak this many seconds in, for stills and snapshots.",
+            },
+            {
+                name: "fontFamily / fontWeight",
+                type: "string / number",
+                default: "Georgia, 700",
+                description: "The face the word is set in before it is pressed into the paper.",
+            },
+        ],
         preview: {
             minHeight: 360,
             bleed: true,
-            note: "The word stays real text; the canvas is only how it is drawn.",
+            note: "Drag on the paper to write. The word stays real text; the canvas is only how it is drawn.",
         },
     },
     {
         slug: "phosphor",
         name: "Phosphor",
+        label: "CRT text",
         description: "Type burned into a tube: scanlines, bloom and three guns that disagree.",
         category: "Typography",
-        status: "experimental",
+        status: "stable",
         dependencies: [],
-        tags: ["type", "crt", "scanline", "retro", "glow"],
+        tags: ["text", "type", "crt", "retro", "scanlines", "glow", "terminal"],
+        required: ["text"],
         defaults: PHOSPHOR_DEFAULTS,
         controls: PHOSPHOR_CONTROLS,
         extraProps: [
@@ -891,11 +1147,17 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "lenticular",
         name: "Lenticular",
+        label: "Two-image lens flip",
         description: "Two pictures interlaced under one lens, swapping as you move across it.",
         category: "Media",
-        status: "experimental",
+        status: "stable",
         dependencies: [],
-        tags: ["image", "lens", "print", "pointer", "mask"],
+        tags: ["image", "before after", "compare", "lens", "hologram", "pointer"],
+        fixedProps: [
+            'frontSrc="/day.jpg"',
+            'backSrc="/night.jpg"',
+            'alt="The same street by day and by night"',
+        ],
         defaults: LENTICULAR_DEFAULTS,
         controls: LENTICULAR_CONTROLS,
         extraProps: [
@@ -917,17 +1179,52 @@ export const COMPONENTS: DocEntry[] = [
                 default: "\u2014",
                 description: "Describes the pair; one card, one description.",
             },
+            {
+                name: "position",
+                type: "number",
+                default: "\u2014",
+                description: "Holds the print at a position, 0 to 1, and ignores the pointer.",
+            },
+            {
+                name: "aspect",
+                type: "string",
+                default: '"4 / 3"',
+                description: "Locks the card to a ratio.",
+            },
+            {
+                name: "objectPosition",
+                type: "string",
+                default: '"50% 50%"',
+                description: "Where both pictures sit when cropped.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Holds the print head-on, both pictures interlaced.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description:
+                    "Under prefers-reduced-motion, no tilt or easing: the swap follows the pointer directly.",
+            },
         ],
-        preview: { minHeight: 460 },
+        preview: {
+            minHeight: 460,
+            note: "On a touch screen a tap or a sideways drag scrubs the print; vertical scrolling still works.",
+        },
     },
     {
         slug: "anaglyph",
         name: "Anaglyph",
+        label: "3D anaglyph image",
         description: "A picture split into two eyes that converge wherever the pointer rests.",
         category: "Media",
         status: "experimental",
         dependencies: [],
-        tags: ["image", "3d", "chromatic", "depth", "pointer"],
+        tags: ["image", "3d", "red cyan", "stereo", "chromatic", "depth"],
         defaults: ANAGLYPH_DEFAULTS,
         controls: ANAGLYPH_CONTROLS,
         extraProps: [
@@ -949,11 +1246,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "contact",
         name: "Contact",
+        label: "Scrubbable contact sheet",
         description: "A contact sheet you scrub through with the pointer or the arrow keys.",
         category: "Media",
         status: "experimental",
         dependencies: [],
-        tags: ["image", "sequence", "scrub", "slider", "gallery"],
+        tags: ["image", "sequence", "scrub", "film", "gallery", "slider"],
         defaults: CONTACT_DEFAULTS,
         controls: CONTACT_CONTROLS,
         extraProps: [
@@ -981,11 +1279,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "emulsion",
         name: "Emulsion",
+        label: "Film photo filter",
         description: "A photographic treatment: halation, grain, a light leak and lifted shadows.",
         category: "Media",
         status: "experimental",
         dependencies: [],
-        tags: ["image", "film", "grain", "halation", "css"],
+        tags: ["image", "film", "photo", "filter", "halation", "grain", "vintage"],
         defaults: EMULSION_DEFAULTS,
         controls: EMULSION_CONTROLS,
         extraProps: [
@@ -1013,11 +1312,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "quartz",
         name: "Quartz",
+        label: "Film grain overlay",
         description: "Film grain over anything, from one tile painted once and repeated by CSS.",
         category: "Media",
         status: "experimental",
         dependencies: [],
-        tags: ["grain", "noise", "texture", "wrapper", "overlay"],
+        tags: ["grain", "noise", "texture", "overlay", "film", "wrapper"],
         defaults: QUARTZ_DEFAULTS,
         controls: QUARTZ_CONTROLS,
         extraProps: [
@@ -1034,38 +1334,73 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "nimbus",
         name: "Nimbus",
-        description: "Slow coloured fog for a section background, drawn small and stretched up.",
-        category: "Scenes",
+        label: "Ambient scene",
+        description:
+            "A living section background: layered fog at depth, a slow camera, dust, light sweeps and crossfading colour moods.",
+        category: "Backgrounds",
         status: "experimental",
         dependencies: [],
-        tags: ["fog", "background", "ambient", "canvas", "gradient"],
+        tags: [
+            "fog",
+            "clouds",
+            "ambient",
+            "background",
+            "gradient",
+            "parallax",
+            "loading screen",
+            "canvas",
+            "cinematic",
+            "ken burns",
+        ],
         defaults: NIMBUS_DEFAULTS,
         controls: NIMBUS_CONTROLS,
+        presets: NIMBUS_DOC_PRESETS,
         omit: ["paletteName"],
         extraProps: [
             {
                 name: "children",
                 type: "ReactNode",
                 default: "\u2014",
-                description: "Content laid over the fog.",
+                description: "Content laid over the fog, kept above every layer.",
             },
             {
                 name: "colors",
                 type: "string[]",
-                default: "NIMBUS_COLORS",
-                description: "The clouds it is built from.",
+                default: "from the preset",
+                description: "One fog palette, replacing the preset's moods.",
+            },
+            {
+                name: "scenes",
+                type: "NimbusScene[]",
+                default: "from the preset",
+                description:
+                    "Colour moods ({ fog, sky?, light? }) that crossfade slowly; wins over colors.",
+            },
+            {
+                name: "time",
+                type: "number",
+                default: "\u2014",
+                description: "Hold the field this many seconds in, for stills and screenshots.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Paint one frame and hold it.",
             },
         ],
+        children: "<Hero />",
         preview: { minHeight: 420, bleed: true },
     },
     {
         slug: "meniscus",
         name: "Meniscus",
+        label: "Liquid progress",
         description: "A vessel that fills with liquid, and keeps sloshing while it waits.",
-        category: "Feedback",
+        category: "Loading & transitions",
         status: "experimental",
         dependencies: [],
-        tags: ["loader", "progress", "liquid", "svg", "feedback"],
+        tags: ["loading", "progress", "liquid", "fill", "svg"],
         defaults: MENISCUS_DEFAULTS,
         controls: MENISCUS_CONTROLS,
         extraProps: [
@@ -1087,11 +1422,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "reel",
         name: "Reel",
+        label: "Carousel",
         description: "A roulette-style carousel you can drag, flick, scroll sideways or step.",
         category: "Media",
         status: "stable",
         dependencies: [],
-        tags: ["carousel", "slider", "coverflow", "drag"],
+        tags: ["carousel", "slider", "gallery", "cards", "coverflow", "drag", "swipe"],
         defaults: REEL_DEFAULTS as unknown as Record<string, unknown>,
         controls: REEL_CONTROLS,
         presets: presetsFrom(
@@ -1131,11 +1467,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "raster",
         name: "Raster",
+        label: "Stylised image filter",
         description: "One picture through four stylised abstractions: blur, glass, glyph, pixel.",
         category: "Media",
         status: "experimental",
         dependencies: [],
-        tags: ["image", "canvas", "pixel", "ascii", "filter"],
+        tags: ["image", "filter", "pixelate", "ascii", "glass", "blur", "canvas"],
         defaults: RASTER_DEFAULTS,
         controls: RASTER_CONTROLS,
         extraProps: [
@@ -1163,11 +1500,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "stencil",
         name: "Stencil",
+        label: "Pattern-filled text",
         description: "Display type filled with stripes, checks, gradients, an image or video.",
         category: "Typography",
         status: "stable",
+        required: ["text"],
         dependencies: [],
-        tags: ["type", "text", "pattern", "mask", "heading"],
+        tags: ["text", "type", "mask", "pattern", "image", "video", "heading"],
         defaults: STENCIL_DEFAULTS as unknown as Record<string, unknown>,
         controls: STENCIL_CONTROLS,
         presets: presetsFrom(
@@ -1187,12 +1526,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "split-flap",
         name: "SplitFlap",
+        label: "Flip board text",
         description:
             "An airport board that flips one character at a time: text, clock or countdown.",
         category: "Typography",
         status: "stable",
         dependencies: [],
-        tags: ["board", "flip", "clock", "countdown", "text"],
+        tags: ["text", "flip", "board", "airport", "clock", "countdown", "timer"],
         defaults: SPLIT_FLAP_DEFAULTS as unknown as Record<string, unknown>,
         controls: SPLIT_FLAP_CONTROLS,
         presets: presetsFrom(
@@ -1212,11 +1552,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "kern",
         name: "Kern",
+        label: "Variable font hover",
         description: "Glyphs that open up, lift and gain weight as the pointer passes them.",
         category: "Typography",
         status: "stable",
+        required: ["text"],
         dependencies: [],
-        tags: ["type", "text", "pointer", "variable font"],
+        tags: ["text", "type", "variable font", "hover", "pointer", "weight"],
         defaults: KERN_DEFAULTS,
         controls: KERN_CONTROLS,
         preview: { minHeight: 340 },
@@ -1224,12 +1566,14 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "overprint",
         name: "Overprint",
+        label: "Misregistered print text",
         description:
             "Colour separations that misregister on scroll and converge back into register.",
         category: "Typography",
         status: "stable",
+        required: ["text"],
         dependencies: [],
-        tags: ["type", "text", "scroll", "print", "cmyk"],
+        tags: ["text", "type", "cmyk", "print", "risograph", "scroll"],
         defaults: OVERPRINT_DEFAULTS,
         controls: OVERPRINT_CONTROLS,
         preview: {
@@ -1238,13 +1582,53 @@ export const COMPONENTS: DocEntry[] = [
         },
     },
     {
+        slug: "bitmap",
+        name: "Bitmap",
+        label: "Pixel text",
+        description:
+            "Pixel text set on a 5x7 grid, lit by a sweep, a wave or a cycling palette in pure CSS.",
+        category: "Typography",
+        status: "stable",
+        required: ["text"],
+        dependencies: [],
+        tags: ["text", "pixel", "8-bit", "retro", "wordmark", "logo", "svg"],
+        defaults: BITMAP_DEFAULTS as unknown as Record<string, unknown>,
+        controls: BITMAP_CONTROLS,
+        presets: presetsFrom(
+            BITMAP_PRESETS,
+            BITMAP_PRESET_VALUES as Record<string, Record<string, unknown>>,
+        ),
+        extraProps: [
+            {
+                name: "color",
+                type: "string",
+                default: '"currentColor"',
+                description: "Single colour used when colors is empty.",
+            },
+            {
+                name: "as",
+                type: '"span" | "div" | "p" | "strong" | "h1" … "h6"',
+                default: '"span"',
+                description: "Element that carries the real, screen-reader text.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Render the static palette when the reader prefers reduced motion.",
+            },
+        ],
+        preview: { minHeight: 340 },
+    },
+    {
         slug: "grid-trail",
         name: "GridTrail",
+        label: "Grid cell trail",
         description: "A pointer trail that lights cells on an invisible grid, then stops the loop.",
-        category: "Pointer",
+        category: "Cursor",
         status: "stable",
         dependencies: [],
-        tags: ["cursor", "grid", "trail", "background"],
+        tags: ["cursor", "trail", "grid", "cells", "pixel", "background"],
         defaults: GRID_TRAIL_DEMO_DEFAULTS as unknown as Record<string, unknown>,
         controls: GRID_TRAIL_CONTROLS,
         presets: presetsFrom(
@@ -1271,11 +1655,12 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "trailing-cursor",
         name: "TrailingCursor",
+        label: "Custom cursor ring",
         description: "A dot pinned to the pointer and a ring that lags, grows and recolours.",
-        category: "Pointer",
+        category: "Cursor",
         status: "stable",
         dependencies: [],
-        tags: ["cursor", "pointer", "ring", "hover"],
+        tags: ["cursor", "pointer", "ring", "dot", "follow", "hover"],
         defaults: TRAILING_CURSOR_DEFAULTS as unknown as Record<string, unknown>,
         controls: TRAILING_CURSOR_CONTROLS,
         presets: presetsFrom(
@@ -1287,13 +1672,44 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "lodestone",
         name: "Lodestone",
+        label: "Magnetic buttons",
         description: "Magnetic buttons that lean toward the pointer but never overlap each other.",
-        category: "Pointer",
+        category: "Cursor",
         status: "stable",
         dependencies: [],
-        tags: ["button", "magnet", "cursor", "cta"],
-        defaults: LODESTONE_DEFAULTS,
-        controls: LODESTONE_CONTROLS,
+        tags: ["magnetic", "magnet", "button", "cursor", "hover", "cta"],
+        defaults: { ...LODESTONE_DEFAULTS, variant: "soft" },
+        controls: [
+            {
+                id: "look",
+                title: "Look",
+                hint: "the button face",
+                open: true,
+                controls: [
+                    {
+                        kind: "select",
+                        path: "variant",
+                        label: "Variant",
+                        options: ["soft", "pixel"],
+                    },
+                ],
+            },
+            ...LODESTONE_CONTROLS,
+        ],
+        presets: [
+            {
+                id: "pixel",
+                label: "Pixel",
+                hint: "Stepped corners, a 2px ring and a hard shadow the face presses into",
+                values: { variant: "pixel", ...LODESTONE_DEMO_PULL },
+            },
+            {
+                id: "soft",
+                label: "Soft",
+                hint: "The original translucent pill",
+                values: { ...LODESTONE_DEMO_PULL },
+            },
+        ],
         omit: ["buttons", "spacing"],
         extraProps: [
             {
@@ -1309,13 +1725,29 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "vellum",
         name: "Vellum",
-        description: "A sheet that leans toward the pointer, with an optional dent and sheen.",
-        category: "Pointer",
+        label: "Flexible tilt card",
+        description:
+            "A flexible sheet that leans toward the pointer and dents where it rests, lit smooth or in stepped square cells.",
+        category: "Surfaces",
         status: "stable",
         dependencies: [],
-        tags: ["tilt", "card", "3d", "hover"],
+        tags: ["tilt", "card", "3d", "hover", "dent", "sheet", "pixel"],
         defaults: VELLUM_DEFAULTS,
         controls: VELLUM_CONTROLS,
+        presets: [
+            {
+                id: "pixel",
+                label: "Pixel",
+                hint: "The dent drawn in stepped square cells that pinch toward the pointer",
+                values: { surface: "pixel", radius: 6 },
+            },
+            {
+                id: "smooth",
+                label: "Smooth",
+                hint: "The original gradient dent and sheen",
+                values: {},
+            },
+        ],
         omit: ["highlight", "dent", "sheen", "sheenColor"],
         extraProps: [
             {
@@ -1327,8 +1759,16 @@ export const COMPONENTS: DocEntry[] = [
             {
                 name: "highlight",
                 type: "VellumHighlight | false",
-                default: "false",
-                description: "Dent and sheen settings, or false to switch both off.",
+                default: "true",
+                description:
+                    "Dent and sheen settings, or false to remove the highlight (both surfaces) entirely.",
+            },
+            {
+                name: "pointer",
+                type: "{ x: number; y: number }",
+                default: "—",
+                description:
+                    "Presses the sheet at a fixed point, 0 to 1 in its own box, instead of following the pointer.",
             },
         ],
         children: "<div>Card</div>",
@@ -1337,14 +1777,50 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "diorama",
         name: "Diorama",
+        label: "Layered parallax",
         description:
-            "Depth layers that part as the pointer moves, letting you see past the foreground.",
-        category: "Pointer",
+            "Near and far layers that move at different speeds, so a flat composition gains real depth.",
+        category: "Surfaces",
         status: "stable",
         dependencies: [],
-        tags: ["parallax", "depth", "layers", "pointer"],
+        tags: ["parallax", "depth", "layers", "3d", "pointer", "hero"],
         defaults: DIORAMA_DEFAULTS,
         controls: DIORAMA_CONTROLS,
+        presets: presetsFrom(DIORAMA_EXAMPLES, DIORAMA_PRESET_VALUES),
+        omit: ["example"],
+        exampleProps: {
+            key: "example",
+            props: {
+                product: [
+                    "background={<ProductCard />}",
+                    "planes={[",
+                    "    { content: <SpecLabels />, depth: 0.5 },",
+                    "    { content: <SoftShapes />, depth: 1 },",
+                    "]}",
+                ],
+                editorial: [
+                    "background={<ArticleWithPicture />}",
+                    "planes={[",
+                    "    { content: <PictureCaption />, depth: 0.4 },",
+                    "    { content: <SoftShapes />, depth: 1 },",
+                    "]}",
+                ],
+                poster: [
+                    "background={<SkyAndTitle />}",
+                    "planes={[",
+                    "    { content: <FarRidge />, depth: 0.45 },",
+                    "    { content: <NearHills />, depth: 1 },",
+                    "]}",
+                ],
+                frame: [
+                    "background={<CentralMessage />}",
+                    "planes={[",
+                    "    { content: <SideFoliage />, depth: 0.55 },",
+                    "    { content: <CornerFoliage />, depth: 1 },",
+                    "]}",
+                ],
+            },
+        },
         extraProps: [
             {
                 name: "background",
@@ -1356,20 +1832,25 @@ export const COMPONENTS: DocEntry[] = [
                 name: "planes",
                 type: "DioramaPlane[]",
                 default: "[]",
-                description: "Foreground layers, each with its own content and depth.",
+                description:
+                    "Layers in front of the background, ordered far to near: { content, depth 0–1, blur?, opacity? }.",
             },
         ],
-        preview: { minHeight: 420 },
+        preview: {
+            minHeight: 420,
+            note: "Use it when a hero, product shot or poster needs depth: the background stays sharp, nearer planes move further and blur more.",
+        },
     },
     {
         slug: "facet",
         name: "Facet",
+        label: "Faceted colour surface",
         description:
             "A faceted surface whose colour migrates across the slats instead of switching.",
-        category: "Pointer",
+        category: "Surfaces",
         status: "experimental",
         dependencies: [],
-        tags: ["background", "hero", "gradient", "ambient"],
+        tags: ["facets", "slats", "gradient", "colour", "background", "hero"],
         defaults: FACET_DEFAULTS,
         controls: FACET_CONTROLS,
         omit: ["paletteName"],
@@ -1393,14 +1874,22 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "wash",
         name: "Wash",
+        label: "Click colour bloom",
         description: "A new colour that spreads outward from wherever the surface was touched.",
-        category: "Pointer",
-        status: "experimental",
+        category: "Surfaces",
+        status: "stable",
         dependencies: [],
-        tags: ["background", "ripple", "colour", "click"],
+        tags: ["click", "tap", "colour", "bloom", "ripple", "burst", "pixel", "background"],
         defaults: WASH_DEFAULTS,
         controls: WASH_CONTROLS,
         omit: ["paletteName"],
+        exampleProps: {
+            key: "paletteName",
+            props: {
+                clay: ['colors={["#4a3328", "#5a4030", "#3d2b2b", "#63483a"]}'],
+                tide: ['colors={["#123040", "#17414a", "#0f3a3a", "#1b4c56"]}'],
+            },
+        },
         extraProps: [
             {
                 name: "children",
@@ -1411,8 +1900,34 @@ export const COMPONENTS: DocEntry[] = [
             {
                 name: "colors",
                 type: "string[]",
+                default: "five muted tones",
+                description:
+                    "The cycle of colours to bloom through. Any CSS colour, including var().",
+            },
+            {
+                name: "easing",
+                type: "string",
+                default: '"cubic-bezier(0.22, 1, 0.36, 1)"',
+                description: "Timing function for the spread.",
+            },
+            {
+                name: "seed",
+                type: "number",
+                default: "1",
+                description: "Fixes the fragment pattern of the pixel burst.",
+            },
+            {
+                name: "freezeAt",
+                type: "number",
                 default: "—",
-                description: "The cycle of colours to bloom through.",
+                description:
+                    "Holds the pour and burst at a 0 to 1 progress, for stories and screenshots.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Holds the current colour and pours nothing.",
             },
         ],
         children: "<div>Hero copy</div>",
@@ -1421,12 +1936,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "meadow",
         name: "Meadow",
+        label: "Animated hero scene",
         description:
             "A living pastel hero scene that drifts, bobs and flutters around your content.",
-        category: "Scenes",
+        category: "Backgrounds",
         status: "stable",
         dependencies: [],
-        tags: ["hero", "illustration", "scene", "svg", "playful"],
+        tags: ["hero", "illustration", "scene", "nature", "playful", "svg", "background"],
         defaults: MEADOW_DEFAULTS,
         controls: MEADOW_CONTROLS,
         omit: [
@@ -1464,13 +1980,14 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "tessera",
         name: "Tessera",
+        label: "Route transition",
         description:
             "A tiled route transition: tiles cover the viewport, the route swaps, they retreat.",
-        category: "Scenes",
+        category: "Loading & transitions",
         status: "stable",
         tag: "TesseraProvider",
         dependencies: [],
-        tags: ["route", "transition", "page", "tiles", "navigation"],
+        tags: ["route", "transition", "page", "tiles", "navigation", "router", "pixel"],
         defaults: TESSERA_DEFAULTS,
         controls: TESSERA_CONTROLS,
         extraProps: [
@@ -1492,12 +2009,13 @@ export const COMPONENTS: DocEntry[] = [
     {
         slug: "ricochet",
         name: "Ricochet",
+        label: "Breakable pixel text game",
         description:
             "Short text built from destructible pixel blocks, with breakout or shooter play.",
-        category: "Scenes",
+        category: "Typography",
         status: "stable",
         dependencies: [],
-        tags: ["404", "game", "pixel", "canvas", "arcade"],
+        tags: ["game", "404", "pixel", "arcade", "breakout", "text", "canvas"],
         defaults: RICOCHET_DEFAULTS,
         controls: RICOCHET_CONTROLS,
         extraProps: [
@@ -1523,15 +2041,198 @@ export const COMPONENTS: DocEntry[] = [
         preview: { minHeight: 480 },
     },
     {
+        slug: "dither",
+        name: "Dither",
+        label: "Pixel hover highlight",
+        description:
+            "A pixel hover layer for any card, link or button: blocks sweep in from the pointer, or a quick block frame lights the edge.",
+        category: "Interface",
+        status: "stable",
+        dependencies: [],
+        tags: ["hover", "focus", "pixel", "card", "link", "button", "navigation", "dither"],
+        defaults: DITHER_DEFAULTS,
+        controls: DITHER_CONTROLS,
+        presets: DITHER_PRESETS,
+        children: "<YourCard />",
+        extraProps: [
+            {
+                name: "as",
+                type: "ElementType",
+                default: '"div"',
+                description:
+                    'Element or component to render, such as "a", "button" or a router Link.',
+            },
+            {
+                name: "children",
+                type: "ReactNode",
+                default: "—",
+                description: "Content drawn above the pixel layer and left fully interactive.",
+            },
+            {
+                name: "colors",
+                type: "string[]",
+                default: "—",
+                description: "Several block colours, assigned per cell. Overrides color.",
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                default: "false",
+                description: "Render the element without the pixel layer.",
+            },
+            {
+                name: "respectReducedMotion",
+                type: "boolean",
+                default: "true",
+                description: "Show the settled state instantly instead of sweeping or stepping in.",
+            },
+        ],
+        preview: {
+            minHeight: 340,
+            note: "The cards are a radio choice and never navigate. Pass as={Link} when a card should.",
+        },
+    },
+    {
+        slug: "keycap",
+        name: "Keycap",
+        label: "Pixel button",
+        description:
+            "A native button with notched pixel corners, a hard cast shadow it presses into, and a block sweep on hover.",
+        category: "Interface",
+        status: "stable",
+        dependencies: [],
+        tags: ["button", "pixel", "press", "cta", "form", "keyboard"],
+        defaults: KEYCAP_DEFAULTS,
+        controls: KEYCAP_CONTROLS,
+        children: "Deploy",
+        extraProps: [
+            {
+                name: "variant",
+                type: '"solid" | "outline" | "ghost"',
+                default: '"solid"',
+                description: "Filled cap, accent outline, or no frame until hovered.",
+            },
+            {
+                name: "children",
+                type: "ReactNode",
+                default: "—",
+                description: "Button label. Every native button attribute is passed through.",
+            },
+            {
+                name: "type",
+                type: '"button" | "submit" | "reset"',
+                default: '"button"',
+                description:
+                    "Defaults to button, so a Keycap inside a form never submits by accident.",
+            },
+        ],
+        preview: { minHeight: 260 },
+    },
+    {
+        slug: "bezel",
+        name: "Bezel",
+        label: "Pixel frame",
+        description:
+            "A frame for any content with stepped corners, a mono label tab and corner ticks that lock on when hovered.",
+        category: "Interface",
+        status: "stable",
+        dependencies: [],
+        tags: ["frame", "panel", "card", "border", "pixel", "label"],
+        defaults: BEZEL_DEFAULTS,
+        controls: BEZEL_CONTROLS,
+        presets: BEZEL_PRESETS,
+        children: "<YourContent />",
+        extraProps: [
+            {
+                name: "as",
+                type: '"div" | "section" | "article" | "aside" | "figure" | "nav" | "li"',
+                default: '"div"',
+                description: "The element to render.",
+            },
+            {
+                name: "padding",
+                type: "number | string",
+                default: "20",
+                description: "Inner padding; numbers are pixels.",
+            },
+        ],
+        preview: { minHeight: 360 },
+    },
+    {
+        slug: "seam",
+        name: "Seam",
+        label: "Pixel divider",
+        description:
+            "A section divider built from pixel blocks: dashes, stairs, a dithered fade or a travelling pulse.",
+        category: "Interface",
+        status: "stable",
+        dependencies: [],
+        tags: ["divider", "separator", "hr", "line", "pixel", "section"],
+        defaults: SEAM_DEFAULTS,
+        controls: SEAM_CONTROLS,
+        presets: SEAM_PRESETS,
+        extraProps: [
+            {
+                name: "pattern",
+                type: '"dash" | "stair" | "dither" | "pulse"',
+                default: '"dash"',
+                description: "Block pattern. Pulse animates unless animated is set to false.",
+            },
+            {
+                name: "label",
+                type: "ReactNode",
+                default: "—",
+                description: "Centred mono caption; a string also names the separator.",
+            },
+            {
+                name: "decorative",
+                type: "boolean",
+                default: "false",
+                description: "Hide from assistive technology instead of exposing a separator.",
+            },
+        ],
+        preview: { minHeight: 320 },
+    },
+    {
+        slug: "tag",
+        name: "Tag",
+        label: "Status tag",
+        description:
+            "A square status tag whose indicator is a pixel glyph, so the state never relies on colour alone.",
+        category: "Interface",
+        status: "stable",
+        dependencies: [],
+        tags: ["tag", "badge", "status", "label", "chip", "pill", "live", "pixel"],
+        defaults: TAG_DEFAULTS,
+        controls: TAG_CONTROLS,
+        children: "Release",
+        extraProps: [
+            {
+                name: "tone",
+                type: "string",
+                default: "—",
+                description: "Override the status colour.",
+            },
+            {
+                name: "children",
+                type: "ReactNode",
+                default: "—",
+                description: "The tag text, rendered as real text.",
+            },
+        ],
+        preview: { minHeight: 220 },
+    },
+    {
         slug: "loaders",
         name: "Pixel loaders",
+        label: "Pixel loaders",
         description:
             "Four retro-digital loading states: a heart, blocks, a bar and a full-screen pulse.",
-        category: "Feedback",
+        category: "Loading & transitions",
         status: "experimental",
         tag: "PixelHeart",
         dependencies: [],
-        tags: ["loading", "spinner", "pixel", "progress", "skeleton"],
+        tags: ["loading", "loader", "spinner", "progress", "skeleton", "pixel"],
         defaults: LOADERS_DEFAULTS,
         controls: LOADERS_CONTROLS,
         omit: ["heartVariant", "blocksVariant", "determinate", "value"],
@@ -1566,6 +2267,7 @@ export function sidebarIndex() {
     return COMPONENTS.map((entry) => ({
         slug: entry.slug,
         name: entry.name,
+        label: entry.label,
         description: entry.description,
         category: entry.category,
         status: entry.status,
@@ -1577,16 +2279,36 @@ export function findComponent(slug: string): DocEntry | undefined {
     return COMPONENTS.find((entry) => entry.slug === slug)
 }
 
+/** A URL fragment for a category, since some names carry spaces and "&". */
+export function categoryId(category: DocCategory): string {
+    return category
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+}
+
+/**
+ * Groups in sidebar order, components alphabetical within each group. Search
+ * results pass `ranked` instead, so the best match leads and its group with it.
+ */
 export function groupByCategory(
     entries: DocEntry[],
+    { ranked = false }: { ranked?: boolean } = {},
 ): { category: DocCategory; items: DocEntry[] }[] {
-    const groups: { category: DocCategory; items: DocEntry[] }[] = []
-
-    for (const entry of entries) {
-        const found = groups.find((group) => group.category === entry.category)
-        if (found) found.items.push(entry)
-        else groups.push({ category: entry.category, items: [entry] })
+    if (ranked) {
+        const groups: { category: DocCategory; items: DocEntry[] }[] = []
+        for (const entry of entries) {
+            const found = groups.find((group) => group.category === entry.category)
+            if (found) found.items.push(entry)
+            else groups.push({ category: entry.category, items: [entry] })
+        }
+        return groups
     }
 
-    return groups
+    return DOC_CATEGORIES.map((category) => ({
+        category,
+        items: entries
+            .filter((entry) => entry.category === category)
+            .sort((a, b) => a.name.localeCompare(b.name)),
+    })).filter((group) => group.items.length > 0)
 }

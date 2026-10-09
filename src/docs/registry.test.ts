@@ -97,6 +97,7 @@ describe("the component registry", () => {
         expect(Object.keys(index[0]).sort()).toEqual([
             "category",
             "description",
+            "label",
             "name",
             "slug",
             "status",

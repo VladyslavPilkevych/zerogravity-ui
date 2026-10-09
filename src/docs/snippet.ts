@@ -10,7 +10,13 @@ const PACKAGE = "zerogravity"
  */
 export function snippetFor(entry: DocEntry, config: Record<string, unknown>): string {
     const tag = entry.tag ?? entry.name
-    const lines = propLines(entry.defaults, config, entry.omit)
+    const example = entry.exampleProps
+    const extra = example ? (example.props[String(config[example.key])] ?? []) : []
+    const lines = [
+        ...(entry.fixedProps ?? []).map((line) => `    ${line}`),
+        ...extra.map((line) => `    ${line}`),
+        ...propLines(entry.defaults, config, entry.omit, "    ", entry.required),
+    ]
 
     const open =
         lines.length === 0
@@ -24,5 +30,6 @@ export function snippetFor(entry: DocEntry, config: Record<string, unknown>): st
     const element = entry.children ? `${open}\n    ${entry.children}\n</${tag}>` : open
 
     if (entry.status !== "stable") return element
-    return `import { ${tag} } from "${PACKAGE}"\n\n${element}`
+    // the subpath keeps a dev build from parsing every other component
+    return `import { ${tag} } from "${PACKAGE}/${entry.slug}"\n\n${element}`
 }

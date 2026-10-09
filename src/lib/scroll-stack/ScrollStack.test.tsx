@@ -100,6 +100,88 @@ describe("ScrollStack", () => {
         expect(frames.pending()).toBe(1)
     })
 
+    describe("the last card", () => {
+        let restoreHeight: () => void
+
+        beforeEach(() => {
+            const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetHeight")
+            Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+                configurable: true,
+                get(this: HTMLElement) {
+                    return Number.parseFloat(this.style.height) || 0
+                },
+            })
+            restoreHeight = () => {
+                if (original) Object.defineProperty(HTMLElement.prototype, "offsetHeight", original)
+            }
+        })
+
+        afterEach(() => {
+            restoreHeight()
+        })
+
+        function stack(hold?: number) {
+            return render(
+                <ScrollStack
+                    heights={["900px", "500px", "900px", "400px"]}
+                    top={10}
+                    peek={20}
+                    scaleTo={0.8}
+                    hold={hold}
+                >
+                    {cards(4)}
+                </ScrollStack>,
+            )
+        }
+
+        it("leaves room below it so the stack stays pinned until it has docked, and then holds", () => {
+            const { container } = stack(0.5)
+            const space = container.querySelector<HTMLElement>(".scroll-stack-hold")!
+
+            expect(Number.parseFloat(space.style.height)).toBeCloseTo(
+                950 - 470 + window.innerHeight * 0.5,
+                0,
+            )
+            expect(space).toHaveAttribute("aria-hidden", "true")
+        })
+
+        it("can release the moment it docks", () => {
+            const { container } = stack(0)
+
+            expect(container.querySelector<HTMLElement>(".scroll-stack-hold")!.style.height).toBe(
+                "480px",
+            )
+        })
+
+        it("fully covers the card before it exactly when it docks, with no extra scroll", () => {
+            const onActiveChange = vi.fn()
+            const { container } = render(
+                <ScrollStack
+                    heights={["900px", "500px", "900px", "400px"]}
+                    top={10}
+                    peek={20}
+                    scaleTo={0.8}
+                    onActiveChange={onActiveChange}
+                >
+                    {cards(4)}
+                </ScrollStack>,
+            )
+            const all = container.querySelectorAll<HTMLElement>(".scroll-stack-card")
+            const dock = 900 + 500 + 900 - (10 + 3 * 20)
+
+            scrollTo(dock - 40)
+            frames.advance()
+            expect(all[2].style.transform).not.toContain("scale(0.8000)")
+            expect(all[2].style.transform).toContain("scale(")
+
+            scrollTo(dock)
+            frames.advance()
+            expect(all[2].style.transform).toContain("scale(0.8000)")
+            expect(all[3].style.transform).toBe("")
+            expect(onActiveChange).toHaveBeenLastCalledWith(3)
+        })
+    })
+
     it("removes its scroll listener on unmount", () => {
         const remove = vi.spyOn(window, "removeEventListener")
         const { unmount } = render(<ScrollStack>{cards()}</ScrollStack>)

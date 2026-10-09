@@ -5,12 +5,17 @@ import { useRef, type ButtonHTMLAttributes, type ReactNode } from "react"
 import { cx, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
 import { usePointerFxEnabled } from "../pointer-fx"
 import { constrainDisplacement, type Bounds } from "./collision"
+import "../internal/pixel.css"
 import "./Lodestone.css"
 
 type NativeButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">
 
+export type LodestoneVariant = "soft" | "pixel"
+
 export interface LodestoneProps extends NativeButtonProps {
     children: ReactNode
+    /** `pixel` draws a stepped-corner face with a hard shadow it presses into. */
+    variant?: LodestoneVariant
     radius?: number
     strength?: number
     maxDisplacement?: number
@@ -33,6 +38,7 @@ const SETTLED = 0.08
 
 export function Lodestone({
     children,
+    variant = "soft",
     radius = 130,
     strength = 0.32,
     maxDisplacement = 16,
@@ -180,10 +186,23 @@ export function Lodestone({
             ref={buttonRef}
             type="button"
             className={cx("xp-lodestone", className)}
+            data-variant={variant === "pixel" ? "pixel" : undefined}
             disabled={disabled}
             {...rest}
         >
-            <span className="xp-lodestone-label">{children}</span>
+            {variant === "pixel" ? (
+                <>
+                    <span className="xp-lodestone-cast" aria-hidden="true">
+                        <span className="zg-px-notch" />
+                    </span>
+                    <span className="xp-lodestone-face zg-px-notch">
+                        <span className="xp-lodestone-ring zg-px-ring" aria-hidden="true" />
+                        <span className="xp-lodestone-label">{children}</span>
+                    </span>
+                </>
+            ) : (
+                <span className="xp-lodestone-label">{children}</span>
+            )}
         </button>
     )
 }

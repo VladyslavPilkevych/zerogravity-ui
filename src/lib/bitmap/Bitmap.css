@@ -1,0 +1,177 @@
+.zg-bitmap {
+    display: block;
+    position: relative;
+    line-height: 0;
+}
+
+.zg-bitmap[data-sizing="fixed"] {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.zg-bitmap-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+.zg-bitmap-svg {
+    display: block;
+    overflow: visible;
+}
+
+.zg-bitmap[data-sizing="fluid"] .zg-bitmap-svg {
+    width: 100%;
+    height: auto;
+}
+
+.zg-bitmap[data-effect="sweep"] g {
+    animation: zg-bitmap-sweep var(--zg-bitmap-period) steps(1, end) infinite;
+}
+
+.zg-bitmap[data-effect="wave"] g {
+    animation: zg-bitmap-wave var(--zg-bitmap-period) ease-in-out infinite;
+}
+
+.zg-bitmap[data-effect="cycle"] g {
+    animation: var(--zg-bitmap-period) linear infinite;
+}
+
+.zg-bitmap[data-colors="2"] g {
+    animation-name: zg-bitmap-cycle-2;
+}
+
+.zg-bitmap[data-colors="3"] g {
+    animation-name: zg-bitmap-cycle-3;
+}
+
+.zg-bitmap[data-colors="4"] g {
+    animation-name: zg-bitmap-cycle-4;
+}
+
+.zg-bitmap[data-colors="5"] g {
+    animation-name: zg-bitmap-cycle-5;
+}
+
+.zg-bitmap[data-colors="6"] g {
+    animation-name: zg-bitmap-cycle-6;
+}
+
+.zg-bitmap[data-paused] g {
+    animation-play-state: paused;
+}
+
+@keyframes zg-bitmap-sweep {
+    0%,
+    8% {
+        fill: var(--zg-bitmap-hi);
+        opacity: 1;
+    }
+    14%,
+    100% {
+        fill: var(--zg-bitmap-base);
+        opacity: var(--zg-bitmap-dim);
+    }
+}
+
+@keyframes zg-bitmap-wave {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: var(--zg-bitmap-dim);
+    }
+}
+
+@keyframes zg-bitmap-cycle-2 {
+    0%,
+    100% {
+        fill: var(--zg-bitmap-c0);
+    }
+    50% {
+        fill: var(--zg-bitmap-c1);
+    }
+}
+
+@keyframes zg-bitmap-cycle-3 {
+    0%,
+    100% {
+        fill: var(--zg-bitmap-c0);
+    }
+    33.333% {
+        fill: var(--zg-bitmap-c1);
+    }
+    66.667% {
+        fill: var(--zg-bitmap-c2);
+    }
+}
+
+@keyframes zg-bitmap-cycle-4 {
+    0%,
+    100% {
+        fill: var(--zg-bitmap-c0);
+    }
+    25% {
+        fill: var(--zg-bitmap-c1);
+    }
+    50% {
+        fill: var(--zg-bitmap-c2);
+    }
+    75% {
+        fill: var(--zg-bitmap-c3);
+    }
+}
+
+@keyframes zg-bitmap-cycle-5 {
+    0%,
+    100% {
+        fill: var(--zg-bitmap-c0);
+    }
+    20% {
+        fill: var(--zg-bitmap-c1);
+    }
+    40% {
+        fill: var(--zg-bitmap-c2);
+    }
+    60% {
+        fill: var(--zg-bitmap-c3);
+    }
+    80% {
+        fill: var(--zg-bitmap-c4);
+    }
+}
+
+@keyframes zg-bitmap-cycle-6 {
+    0%,
+    100% {
+        fill: var(--zg-bitmap-c0);
+    }
+    16.667% {
+        fill: var(--zg-bitmap-c1);
+    }
+    33.333% {
+        fill: var(--zg-bitmap-c2);
+    }
+    50% {
+        fill: var(--zg-bitmap-c3);
+    }
+    66.667% {
+        fill: var(--zg-bitmap-c4);
+    }
+    83.333% {
+        fill: var(--zg-bitmap-c5);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-bitmap[data-reduced-motion="respect"] g {
+        animation: none;
+    }
+}

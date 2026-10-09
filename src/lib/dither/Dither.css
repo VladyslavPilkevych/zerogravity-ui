@@ -1,0 +1,162 @@
+.zg-dither {
+    position: relative;
+    isolation: isolate;
+}
+
+.zg-dither-canvas {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    filter: drop-shadow(0 0 calc(var(--zg-dither-glow, 0.5) * 7px) var(--zg-dither-color, #4ee1f2));
+    pointer-events: none;
+    image-rendering: pixelated;
+}
+
+.zg-dither-slot {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    border-radius: inherit;
+    list-style: none;
+    pointer-events: none;
+}
+
+.zg-dither[data-layer="over"] > .zg-dither-canvas,
+.zg-dither[data-layer="over"] > .zg-dither-slot {
+    z-index: 1;
+    mix-blend-mode: screen;
+}
+
+.zg-dither:focus-visible {
+    outline: 2px solid var(--zg-dither-color, #4ee1f2);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-dither-canvas {
+        filter: none;
+    }
+}
+
+/* edge: a CSS-only frame of blocks that steps in from the border */
+
+.zg-dither-edge {
+    --zg-dither-c: var(--zg-dither-cell, 8px);
+    --zg-dither-s: calc(var(--zg-dither-c) - var(--zg-dither-gap, 1px));
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px var(--zg-dither-color, #4ee1f2);
+    filter: drop-shadow(0 0 calc(var(--zg-dither-glow, 0.5) * 6px) var(--zg-dither-color, #4ee1f2));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 80ms steps(1, end) 150ms;
+}
+
+.zg-dither-edge::before,
+.zg-dither-edge::after {
+    --zg-dither-block: conic-gradient(
+        at var(--zg-dither-s) var(--zg-dither-s),
+        transparent 75%,
+        var(--zg-dither-ink) 0
+    );
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+}
+
+/* outer ring of blocks, solid corner blocks on top */
+.zg-dither-edge::before {
+    --zg-dither-ink: color-mix(in srgb, var(--zg-dither-color, #4ee1f2) 30%, transparent);
+    --zg-dither-solid: linear-gradient(
+        var(--zg-dither-color, #4ee1f2),
+        var(--zg-dither-color, #4ee1f2)
+    );
+    background:
+        var(--zg-dither-solid) left 0 top 0 / var(--zg-dither-s) var(--zg-dither-s) no-repeat,
+        var(--zg-dither-solid) right 0 top 0 / var(--zg-dither-s) var(--zg-dither-s) no-repeat,
+        var(--zg-dither-solid) left 0 bottom 0 / var(--zg-dither-s) var(--zg-dither-s) no-repeat,
+        var(--zg-dither-solid) right 0 bottom 0 / var(--zg-dither-s) var(--zg-dither-s) no-repeat,
+        var(--zg-dither-block) left 0 top 0 / var(--zg-dither-c) var(--zg-dither-c) repeat-x,
+        var(--zg-dither-block) left 0 bottom calc(var(--zg-dither-gap, 1px) * -1) /
+            var(--zg-dither-c) var(--zg-dither-c) repeat-x,
+        var(--zg-dither-block) left 0 top 0 / var(--zg-dither-c) var(--zg-dither-c) repeat-y,
+        var(--zg-dither-block) right calc(var(--zg-dither-gap, 1px) * -1) top 0 / var(--zg-dither-c)
+            var(--zg-dither-c) repeat-y;
+    transition: opacity 60ms steps(1, end) 90ms;
+}
+
+/* inner ring, every other block: the dithered falloff */
+.zg-dither-edge::after {
+    --zg-dither-ink: color-mix(in srgb, var(--zg-dither-color, #4ee1f2) 14%, transparent);
+    background:
+        var(--zg-dither-block) left var(--zg-dither-c) top var(--zg-dither-c) /
+            calc(var(--zg-dither-c) * 2) var(--zg-dither-c) repeat-x,
+        var(--zg-dither-block) left 0 bottom calc(var(--zg-dither-c) - var(--zg-dither-gap, 1px)) /
+            calc(var(--zg-dither-c) * 2) var(--zg-dither-c) repeat-x,
+        var(--zg-dither-block) left var(--zg-dither-c) top 0 / var(--zg-dither-c)
+            calc(var(--zg-dither-c) * 2) repeat-y,
+        var(--zg-dither-block) right calc(var(--zg-dither-c) - var(--zg-dither-gap, 1px)) top
+            var(--zg-dither-c) / var(--zg-dither-c) calc(var(--zg-dither-c) * 2) repeat-y;
+    transition: opacity 60ms steps(1, end);
+}
+
+.zg-dither[data-state="on"] > .zg-dither-edge,
+.zg-dither[data-state="on"] > .zg-dither-slot > .zg-dither-edge {
+    opacity: 1;
+    transition: opacity 60ms steps(2, end);
+}
+
+.zg-dither[data-state="on"] > .zg-dither-edge::before,
+.zg-dither[data-state="on"] > .zg-dither-slot > .zg-dither-edge::before {
+    opacity: 1;
+    transition: opacity 60ms steps(1, end) 30ms;
+}
+
+.zg-dither[data-state="on"] > .zg-dither-edge::after,
+.zg-dither[data-state="on"] > .zg-dither-slot > .zg-dither-edge::after {
+    opacity: 1;
+    transition: opacity 60ms steps(1, end) 90ms;
+}
+
+.zg-dither[data-layer="over"] > .zg-dither-edge,
+.zg-dither[data-layer="over"] > .zg-dither-slot > .zg-dither-edge {
+    z-index: 1;
+}
+
+/* the lift and hard shadow carry no specificity, so the host's own styles win */
+:where(.zg-dither[data-variant="edge"]) {
+    transition:
+        transform 120ms steps(2, end),
+        box-shadow 120ms steps(2, end);
+}
+
+:where(.zg-dither[data-variant="edge"][data-state="on"]) {
+    box-shadow: calc(var(--zg-dither-lift, 2px) * 2.5) calc(var(--zg-dither-lift, 2px) * 2.5) 0
+        color-mix(in srgb, var(--zg-dither-color, #4ee1f2) 26%, transparent);
+    transform: translate(
+        calc(var(--zg-dither-lift, 2px) * -1),
+        calc(var(--zg-dither-lift, 2px) * -1)
+    );
+}
+
+.zg-dither[data-still] .zg-dither-edge,
+.zg-dither[data-still] .zg-dither-edge::before,
+.zg-dither[data-still] .zg-dither-edge::after {
+    transition: none !important;
+}
+
+:where(.zg-dither[data-variant="edge"][data-still]) {
+    transition: none;
+}
+
+:where(.zg-dither[data-variant="edge"][data-still][data-state="on"]) {
+    transform: none;
+}

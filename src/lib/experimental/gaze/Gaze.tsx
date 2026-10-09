@@ -4,8 +4,18 @@ import { useEffect, useRef, useState, type CSSProperties } from "react"
 // type-only: erased at build, so nothing here pulls three into a bundle
 import type * as THREE_NS from "three"
 
-import { cx, useLatestRef, useMediaQuery, usePrefersReducedMotion } from "../../internal"
+import {
+    cx,
+    onResize,
+    onVisible,
+    pointerBox,
+    useLatestRef,
+    useMediaQuery,
+    usePrefersReducedMotion,
+    wakeLoop,
+} from "../../internal"
 import { buildStandIn } from "./standIn"
+import { aimAt, eyeAngles, gazeState, headAngles, stepGaze } from "./track"
 import "./Gaze.css"
 
 export interface GazeTracking {
@@ -43,20 +53,17 @@ export interface GazeProps {
 
 type Phase = "loading" | "ready" | "error"
 
-const DEG = Math.PI / 180
-
-function clamp(value: number, low: number, high: number): number {
-    return value < low ? low : value > high ? high : value
-}
+const BLINK_MS = 220
+const ZERO = { x: 0, y: 0 } as const
 
 export function Gaze({
     src,
     tracking,
     sensitivity = 1,
-    maxYaw = 26,
-    maxPitch = 16,
-    damping = 0.12,
-    headDelay = 0.45,
+    maxYaw = 34,
+    maxPitch = 18,
+    damping = 0.1,
+    headDelay = 0.6,
     background = "transparent",
     label = "A model that follows the pointer",
     decorative = false,
@@ -67,6 +74,7 @@ export function Gaze({
 }: GazeProps) {
     const hostRef = useRef<HTMLDivElement>(null)
     const [phase, setPhase] = useState<Phase>("loading")
+    const wakeRef = useRef<(() => void) | null>(null)
 
     const reduced = usePrefersReducedMotion()
     const coarse = useMediaQuery("(pointer: coarse)")
@@ -120,6 +128,7 @@ export function Gaze({
             let head: THREE_NS.Object3D | null = null
             let leftEye: THREE_NS.Object3D | null = null
             let rightEye: THREE_NS.Object3D | null = null
+            let blinker: ((amount: number) => void) | null = null
             const neutral = new Map<THREE_NS.Object3D, THREE_NS.Euler>()
 
             const remember = (node: THREE_NS.Object3D | null) => {
@@ -134,7 +143,9 @@ export function Gaze({
                 const reach = Math.max(size.x, size.y, size.z) || 1
 
                 object.position.sub(centre)
-                root.scale.setScalar(1.9 / reach)
+                // a little short of the frame and lifted, so a caption under it never clips
+                root.scale.setScalar(1.72 / reach)
+                root.position.y = 0.08
                 root.add(object)
             }
 
@@ -157,7 +168,11 @@ export function Gaze({
                 if (src) {
                     const loader = new GLTFLoader()
                     const gltf = await loader.loadAsync(src)
-                    if (disposed) return
+                    if (disposed) {
+                        renderer.dispose()
+                        renderer.domElement.remove()
+                        return
+                    }
                     frameModel(gltf.scene)
                     wire(gltf.scene)
                 } else {
@@ -166,6 +181,7 @@ export function Gaze({
                     head = standIn.head
                     leftEye = standIn.leftEye
                     rightEye = standIn.rightEye
+                    blinker = standIn.blink
                     remember(head)
                     remember(leftEye)
                     remember(rightEye)
@@ -178,99 +194,142 @@ export function Gaze({
                 return
             }
 
-            const aim = { x: 0, y: 0 }
-            const eyeAt = { x: 0, y: 0 }
-            const headAt = { x: 0, y: 0 }
-            let frame = 0
-            let seen = true
+            const state = gazeState()
+            const angle = { x: 0, y: 0 }
+            const eyeAngle = { x: 0, y: 0 }
+            const box = pointerBox(host)
+            let visible = true
+            let blinkFrom = -1
+            let blinkTimer = 0
+            let releaseTimer = 0
 
             const resize = () => {
-                const box = host.getBoundingClientRect()
-                const w = Math.max(1, Math.round(box.width))
-                const h = Math.max(1, Math.round(box.height))
+                box.invalidate()
+                const rect = host.getBoundingClientRect()
+                const w = Math.max(1, Math.round(rect.width))
+                const h = Math.max(1, Math.round(rect.height))
                 renderer.setSize(w, h, false)
                 camera.aspect = w / h
                 camera.updateProjectionMatrix()
             }
             resize()
 
-            const turn = (node: THREE_NS.Object3D | null, x: number, y: number, gain: number) => {
+            const turn = (node: THREE_NS.Object3D | null, pitch: number, yaw: number) => {
                 if (!node) return
                 const rest = neutral.get(node)
                 if (!rest) return
-                const config = settings.current
-                node.rotation.set(
-                    // pointer below the centre means look down, which is a
-                    // positive rotation about X for a model facing +Z
-                    rest.x + y * config.maxPitch * DEG * gain,
-                    rest.y + x * config.maxYaw * DEG * gain,
-                    rest.z,
-                )
+                // pointer below the centre means look down, which is a
+                // positive rotation about X for a model facing +Z
+                node.rotation.set(rest.x + pitch, rest.y + yaw, rest.z)
             }
 
-            const render = () => {
-                frame = requestAnimationFrame(render)
-                if (!seen) return
+            const pose = () => {
+                const { maxYaw: yaw, maxPitch: pitch } = settings.current
+                headAngles(state.head, yaw, pitch, angle)
+                turn(head, angle.y, angle.x)
+                // a lone eye rig (no head found) has nothing to be relative to
+                eyeAngles(state.eye, head ? angle : ZERO, yaw, pitch, eyeAngle)
+                turn(leftEye, eyeAngle.y, eyeAngle.x)
+                turn(rightEye, eyeAngle.y, eyeAngle.x)
+            }
 
+            const loop = wakeLoop((dt, now) => {
+                if (!visible) return false
                 const config = settings.current
-                const ease = clamp(config.damping, 0.02, 1)
+
+                if (config.still) {
+                    state.aim.x = state.aim.y = 0
+                    state.eye.x = state.eye.y = state.head.x = state.head.y = 0
+                }
 
                 // eyes lead, head follows more slowly: that difference is what
                 // reads as a creature noticing you rather than a rig snapping
-                eyeAt.x += (aim.x - eyeAt.x) * ease
-                eyeAt.y += (aim.y - eyeAt.y) * ease
-                const slow = ease * clamp(1 - config.headDelay, 0.05, 1)
-                headAt.x += (aim.x - headAt.x) * slow
-                headAt.y += (aim.y - headAt.y) * slow
+                const settled = stepGaze(state, config.damping, config.headDelay, dt)
+                pose()
 
-                turn(head, headAt.x, headAt.y, 1)
-                turn(leftEye, eyeAt.x, eyeAt.y, 1.5)
-                turn(rightEye, eyeAt.x, eyeAt.y, 1.5)
+                let blinking = false
+                if (blinkFrom >= 0 && blinker) {
+                    if (blinkFrom === 0) blinkFrom = now
+                    const t = (now - blinkFrom) / BLINK_MS
+                    blinking = t < 1
+                    blinker(blinking ? Math.sin(Math.PI * t) : 0)
+                    if (!blinking) blinkFrom = -1
+                }
 
                 renderer.render(scene, camera)
+                return !(settled && !blinking) && !config.still
+            })
+
+            // only the stand-in has lids; a blink every few seconds is the
+            // difference between a model and a creature
+            const scheduleBlink = () => {
+                if (!blinker) return
+                blinkTimer = window.setTimeout(
+                    () => {
+                        if (visible && !settings.current.still) {
+                            blinkFrom = 0
+                            loop.wake()
+                        }
+                        scheduleBlink()
+                    },
+                    2400 + Math.random() * 3600,
+                )
             }
 
-            const onMove = (event: PointerEvent) => {
+            const look = (event: PointerEvent) => {
                 if (settings.current.still) return
-                const box = host.getBoundingClientRect()
-                if (box.width === 0 || box.height === 0) return
-                const gain = settings.current.sensitivity
-                aim.x = clamp(((event.clientX - box.left) / box.width - 0.5) * 2 * gain, -1, 1)
-                aim.y = clamp(((event.clientY - box.top) / box.height - 0.5) * 2 * gain, -1, 1)
+                const at = box.at(event)
+                if (!at) return
+                window.clearTimeout(releaseTimer)
+                aimAt(at.x, at.y, settings.current.sensitivity, state.aim)
+                loop.wake()
             }
 
-            const onLeave = () => {
-                aim.x = 0
-                aim.y = 0
+            const release = (event: PointerEvent) => {
+                window.clearTimeout(releaseTimer)
+                const settle = () => {
+                    state.aim.x = state.aim.y = 0
+                    loop.wake()
+                }
+                // a finger lifts the moment it taps, so hold that look a beat
+                // or the tap would seem to do nothing
+                if (event.pointerType === "touch") releaseTimer = window.setTimeout(settle, 1400)
+                else settle()
             }
 
-            host.addEventListener("pointermove", onMove, { passive: true })
-            host.addEventListener("pointerleave", onLeave)
+            host.addEventListener("pointermove", look, { passive: true })
+            host.addEventListener("pointerdown", look, { passive: true })
+            host.addEventListener("pointerleave", release)
+            host.addEventListener("pointercancel", release)
 
-            const sizer = typeof ResizeObserver === "function" ? new ResizeObserver(resize) : null
-            sizer?.observe(host)
+            const stopResize = onResize(host, () => {
+                resize()
+                if (!loop.running) renderer.render(scene, camera)
+            })
+            const stopVisible = onVisible(host, (seen) => {
+                visible = seen
+                if (seen) loop.wake()
+            })
 
-            const watcher =
-                typeof IntersectionObserver === "function"
-                    ? new IntersectionObserver(([entry]) => {
-                          seen = entry.isIntersecting
-                      })
-                    : null
-            watcher?.observe(host)
+            wakeRef.current = loop.wake
 
-            if (settings.current.still) {
-                // neutral pose, rendered once
-                renderer.render(scene, camera)
-            } else {
-                frame = requestAnimationFrame(render)
-            }
+            // the first frame is always drawn, still or not
+            pose()
+            renderer.render(scene, camera)
+            if (!settings.current.still) scheduleBlink()
 
             cleanup = () => {
-                cancelAnimationFrame(frame)
-                host.removeEventListener("pointermove", onMove)
-                host.removeEventListener("pointerleave", onLeave)
-                sizer?.disconnect()
-                watcher?.disconnect()
+                wakeRef.current = null
+                loop.sleep()
+                window.clearTimeout(blinkTimer)
+                window.clearTimeout(releaseTimer)
+                host.removeEventListener("pointermove", look)
+                host.removeEventListener("pointerdown", look)
+                host.removeEventListener("pointerleave", release)
+                host.removeEventListener("pointercancel", release)
+                stopResize()
+                stopVisible()
+                box.dispose()
 
                 scene.traverse((node) => {
                     const mesh = node as THREE_NS.Mesh
@@ -295,6 +354,11 @@ export function Gaze({
             cleanup?.()
         }
     }, [src, settings])
+
+    // turning still mid-flight walks the model back to neutral once
+    useEffect(() => {
+        wakeRef.current?.()
+    }, [still])
 
     return (
         <div

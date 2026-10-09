@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { COMPONENTS, REPOSITORY_URL } from "../registry"
-import { PixelWord } from "./PixelWord"
+import { Wordmark } from "./Wordmark"
 
 const PACKAGE_URL = "https://www.npmjs.com/package/zerogravity"
 
@@ -20,7 +20,7 @@ export function SiteFooter() {
         <footer className="pz-footer" data-signed={signed ? "true" : undefined}>
             {signed ? (
                 <div className="pz-signature">
-                    <PixelWord text="ZEROGRAVITY" label="ZeroGravity" glow />
+                    <Wordmark />
                 </div>
             ) : null}
 

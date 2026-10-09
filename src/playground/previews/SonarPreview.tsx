@@ -1,6 +1,6 @@
 "use client"
 
-import { Sonar } from "@/lib/experimental"
+import { Sonar } from "@/lib/sonar"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"
@@ -12,7 +12,7 @@ export function SonarPreview({ config }: PreviewApi) {
         speed: number
         band: number
         color: string
-        onHover: boolean
+        pulseOnHover: boolean
     }
 
     return (
@@ -22,7 +22,7 @@ export function SonarPreview({ config }: PreviewApi) {
             speed={c.speed}
             band={c.band}
             color={c.color}
-            onHover={c.onHover}
+            pulseOnHover={c.pulseOnHover}
             className="xpg-sonar"
         >
             <div className="xpg-sonar-face">

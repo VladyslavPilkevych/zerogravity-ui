@@ -40,6 +40,7 @@ export const COMPONENT_SLUGS = [
     "split-flap",
     "kern",
     "overprint",
+    "bitmap",
     "grid-trail",
     "trailing-cursor",
     "lodestone",
@@ -50,5 +51,10 @@ export const COMPONENT_SLUGS = [
     "meadow",
     "tessera",
     "ricochet",
+    "dither",
+    "keycap",
+    "bezel",
+    "seam",
+    "tag",
     "loaders",
 ] as const

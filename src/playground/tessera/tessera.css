@@ -1,0 +1,92 @@
+/* docs demo for Tessera: a pixel mock router */
+
+.tsd-page {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 440px;
+    padding: 32px 16px;
+    background-color: var(--tsd-tint);
+    background-image:
+        linear-gradient(transparent 0 27px, rgba(255, 255, 255, 0.035) 0),
+        linear-gradient(90deg, transparent 0 27px, rgba(255, 255, 255, 0.035) 0);
+    background-size: 28px 28px;
+    color: #eef1ff;
+}
+
+.tsd-copy {
+    gap: 20px;
+}
+
+.tsd-copy h2 {
+    margin: 0;
+    font-size: clamp(30px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.tsd-crumb,
+.tsd-phases {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.tsd-crumb {
+    padding: 3px 8px 2px;
+    background: var(--tsd-accent);
+    color: #06080d;
+    font-variant-numeric: tabular-nums;
+}
+
+.tsd-routes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 14px;
+    justify-content: center;
+    /* room for the keycaps' cast shadow */
+    padding: 0 4px 4px 0;
+}
+
+/* the lifecycle as a row of segments, the live one lit */
+.tsd-phases {
+    display: flex;
+    gap: 3px;
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tsd-phases li {
+    padding: 5px 9px 4px;
+    background: rgba(238, 241, 255, 0.06);
+    box-shadow: inset 0 0 0 1px rgba(238, 241, 255, 0.12);
+    color: rgba(238, 241, 255, 0.45);
+    transition:
+        background-color 120ms steps(2, end),
+        color 120ms steps(2, end);
+}
+
+.tsd-phases li[data-on] {
+    background: var(--tsd-accent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--tsd-accent) 55%, transparent);
+    color: #06080d;
+}
+
+@media (max-width: 420px) {
+    .tsd-phases {
+        font-size: 10px;
+        letter-spacing: 0.1em;
+    }
+
+    .tsd-phases li {
+        padding-inline: 7px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tsd-phases li {
+        transition: none;
+    }
+}

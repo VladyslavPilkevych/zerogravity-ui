@@ -4,6 +4,7 @@ export interface ScrollStackDemoConfig {
     height: string
     top: number
     peek: number
+    hold: number
     scaleTo: number
     dim: number
     dimColor: string
@@ -35,6 +36,7 @@ export const SCROLL_STACK_DEFAULTS: ScrollStackDemoConfig = {
     height: "44cqh",
     top: 30,
     peek: 16,
+    hold: 0.3,
     scaleTo: 0.9,
     dim: 0.45,
     dimColor: "#05050a",
@@ -87,6 +89,14 @@ export const SCROLL_STACK_CONTROLS: ControlGroup[] = [
                 max: 80,
                 step: 2,
                 unit: "px",
+            },
+            {
+                kind: "number",
+                path: "hold",
+                label: "Hold at the end (viewports)",
+                min: 0,
+                max: 1.5,
+                step: 0.05,
             },
             {
                 kind: "number",

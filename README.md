@@ -100,33 +100,98 @@ export default function Page() {
 
 ## Components
 
-| Component                                           | Description                                                                    |
-| --------------------------------------------------- | ------------------------------------------------------------------------------ |
-| [Antigravity](src/lib/antigravity/README.md)        | A particle field that flows around the cursor and settles into formations      |
-| [Aperture](src/lib/aperture/README.md)              | A full-bleed panel that closes into a framed card as you scroll, or opens      |
-| [Diorama](src/lib/diorama/README.md)                | Depth layers that part as the pointer moves, letting you see past the front    |
-| [Elemental](src/lib/elemental/README.md)            | An animated edge that wraps any content in electricity or fire                 |
-| [GridTrail](src/lib/grid-trail/README.md)           | A pointer trail that lights cells on an invisible grid, then stops the loop    |
-| [Kern](src/lib/kern/README.md)                      | Glyphs that open up, lift and gain weight as the pointer passes them           |
-| [Lodestone](src/lib/lodestone/README.md)            | Magnetic buttons that lean toward the pointer but never overlap each other     |
-| [Meadow](src/lib/meadow/README.md)                  | A living pastel hero scene that drifts and flutters around your content        |
-| [Overprint](src/lib/overprint/README.md)            | Colour separations that misregister on scroll and converge back into register  |
-| [Reel](src/lib/reel/README.md)                      | A roulette-style carousel you can drag, flick, scroll sideways or step         |
-| [Ricochet](src/lib/ricochet/README.md)              | Destructible pixel text with breakout or shooter play                          |
-| [ScrollStack](src/lib/scroll-stack/README.md)       | Sections that slide over each other on scroll, and unstack back                |
-| [SplitFlap](src/lib/split-flap/README.md)           | An airport board that flips one character at a time: text, clock or countdown  |
-| [Stencil](src/lib/stencil/README.md)                | Display type filled with stripes, checks, gradients, an image or video         |
-| [Tessera](src/lib/tessera/README.md)                | A tiled route transition: tiles cover the viewport, the route swaps, they lift |
-| [TrailingCursor](src/lib/trailing-cursor/README.md) | A dot pinned to the pointer and a ring that lags, grows and recolours          |
-| [Vellum](src/lib/vellum/README.md)                  | A sheet that leans toward the pointer, with an optional dent and sheen         |
-| [pointer-fx](src/lib/pointer-fx/README.md)          | Shared colour resolution and the reduced-motion / pointer-type gate            |
+Grouped as in the docs. Every component has its own entry point, shown in the
+last column, as well as a named export from the root.
+
+### Backgrounds
+
+| Component                                    | What it is          | Import                    |
+| -------------------------------------------- | ------------------- | ------------------------- |
+| [Antigravity](src/lib/antigravity/README.md) | Particle field      | `zerogravity/antigravity` |
+| [Lattice](src/lib/lattice/README.md)         | Elastic line mesh   | `zerogravity/lattice`     |
+| [Meadow](src/lib/meadow/README.md)           | Animated hero scene | `zerogravity/meadow`      |
+| [Sonar](src/lib/sonar/README.md)             | Shockwave dot field | `zerogravity/sonar`       |
+| [Wake](src/lib/wake/README.md)               | Water ripple        | `zerogravity/wake`        |
+
+### Surfaces
+
+| Component                                | What it is                | Import                  |
+| ---------------------------------------- | ------------------------- | ----------------------- |
+| [Diorama](src/lib/diorama/README.md)     | Layered parallax          | `zerogravity/diorama`   |
+| [Elemental](src/lib/elemental/README.md) | Electric and fire border  | `zerogravity/elemental` |
+| [Gnomon](src/lib/gnomon/README.md)       | Pointer light and shadows | `zerogravity/gnomon`    |
+| [Tide](src/lib/tide/README.md)           | Wavy edge                 | `zerogravity/tide`      |
+| [Vellum](src/lib/vellum/README.md)       | Flexible tilt card        | `zerogravity/vellum`    |
+| [Wash](src/lib/wash/README.md)           | Click colour bloom        | `zerogravity/wash`      |
+
+### Cursor
+
+| Component                                           | What it is          | Import                        |
+| --------------------------------------------------- | ------------------- | ----------------------------- |
+| [Chroma](src/lib/chroma/README.md)                  | Colour cursor trail | `zerogravity/chroma`          |
+| [GridTrail](src/lib/grid-trail/README.md)           | Grid cell trail     | `zerogravity/grid-trail`      |
+| [Lodestone](src/lib/lodestone/README.md)            | Magnetic buttons    | `zerogravity/lodestone`       |
+| [TrailingCursor](src/lib/trailing-cursor/README.md) | Custom cursor ring  | `zerogravity/trailing-cursor` |
+
+### Scroll
+
+| Component                                     | What it is             | Import                     |
+| --------------------------------------------- | ---------------------- | -------------------------- |
+| [Aperture](src/lib/aperture/README.md)        | Scroll-framed reveal   | `zerogravity/aperture`     |
+| [Eclipse](src/lib/eclipse/README.md)          | Covering sections      | `zerogravity/eclipse`      |
+| [Gantry](src/lib/gantry/README.md)            | Horizontal scroll rail | `zerogravity/gantry`       |
+| [Louvre](src/lib/louvre/README.md)            | Rotating blinds reveal | `zerogravity/louvre`       |
+| [Peel](src/lib/peel/README.md)                | Page peel reveal       | `zerogravity/peel`         |
+| [ScrollStack](src/lib/scroll-stack/README.md) | Stacking sections      | `zerogravity/scroll-stack` |
+
+### Typography
+
+| Component                                  | What it is                | Import                   |
+| ------------------------------------------ | ------------------------- | ------------------------ |
+| [Bitmap](src/lib/bitmap/README.md)         | Pixel text                | `zerogravity/bitmap`     |
+| [Kern](src/lib/kern/README.md)             | Variable font hover       | `zerogravity/kern`       |
+| [Overprint](src/lib/overprint/README.md)   | Misregistered print text  | `zerogravity/overprint`  |
+| [Palimpsest](src/lib/palimpsest/README.md) | Layered draft text        | `zerogravity/palimpsest` |
+| [Phosphor](src/lib/phosphor/README.md)     | CRT text                  | `zerogravity/phosphor`   |
+| [Ricochet](src/lib/ricochet/README.md)     | Breakable pixel text game | `zerogravity/ricochet`   |
+| [SplitFlap](src/lib/split-flap/README.md)  | Flip board text           | `zerogravity/split-flap` |
+| [Stencil](src/lib/stencil/README.md)       | Pattern-filled text       | `zerogravity/stencil`    |
+
+### Media
+
+| Component                                  | What it is          | Import                   |
+| ------------------------------------------ | ------------------- | ------------------------ |
+| [Lenticular](src/lib/lenticular/README.md) | Two-image lens flip | `zerogravity/lenticular` |
+| [Reel](src/lib/reel/README.md)             | Carousel            | `zerogravity/reel`       |
+
+### Interface
+
+| Component                          | What it is            | Import               |
+| ---------------------------------- | --------------------- | -------------------- |
+| [Bezel](src/lib/bezel/README.md)   | Pixel frame           | `zerogravity/bezel`  |
+| [Dither](src/lib/dither/README.md) | Pixel hover highlight | `zerogravity/dither` |
+| [Keycap](src/lib/keycap/README.md) | Pixel button          | `zerogravity/keycap` |
+| [Seam](src/lib/seam/README.md)     | Pixel divider         | `zerogravity/seam`   |
+| [Tag](src/lib/tag/README.md)       | Status tag            | `zerogravity/tag`    |
+
+### Loading & transitions
+
+| Component                            | What it is       | Import                |
+| ------------------------------------ | ---------------- | --------------------- |
+| [Tessera](src/lib/tessera/README.md) | Route transition | `zerogravity/tessera` |
+
+### Utilities
+
+| Component                                  | What it is                                                          | Import                   |
+| ------------------------------------------ | ------------------------------------------------------------------- | ------------------------ |
+| [pointer-fx](src/lib/pointer-fx/README.md) | Shared colour resolution and the reduced-motion / pointer-type gate | `zerogravity/pointer-fx` |
 
 Each component README carries the full prop table, accessibility notes and
 performance characteristics.
 
-A few prototypes — Facet, Louvre, Raster, Wash and the pixel loaders — live in
-`src/lib/experimental` and have documentation pages, but they are **not part of
-the published package** and cannot be imported from `zerogravity`.
+17 prototypes — Anaglyph, Concertina, Contact, Drench, Emulsion, Facet, Gaze, Ink, Meniscus, Nimbus, Perseid, Pixel loaders, Prism, Quartz, Quiver, Raster and Undertow — live in
+`src/lib/experimental` and have documentation pages marked _exp_, but they are
+**not part of the published package** and cannot be imported from `zerogravity`.
 
 ## Requirements
 

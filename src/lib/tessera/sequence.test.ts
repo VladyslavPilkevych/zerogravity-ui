@@ -71,6 +71,89 @@ describe("delayFactors", () => {
     })
 })
 
+describe("the diagonal and spiral sequences", () => {
+    const GRIDS: [number, number][] = [
+        [1, 1],
+        [1, 5],
+        [5, 1],
+        [2, 2],
+        [3, 3],
+        [4, 6],
+        [5, 4],
+        [12, 12],
+    ]
+
+    it("sweeps from the top-left corner to the bottom-right one, a whole diagonal at a time", () => {
+        // 2x3:  0 1 2
+        //       1 2 3
+        const factors = delayFactors(2, 3, "diagonal")
+
+        expect(factors.map((factor) => factor * 3)).toEqual([0, 1, 2, 1, 2, 3])
+    })
+
+    it("never starts a tile before the one above it or to its left on the diagonal", () => {
+        const factors = delayFactors(4, 6, "diagonal")
+
+        for (let index = 0; index < 24; index += 1) {
+            if (index % 6 > 0) expect(factors[index]).toBeGreaterThan(factors[index - 1])
+            if (index >= 6) expect(factors[index]).toBeGreaterThan(factors[index - 6])
+        }
+    })
+
+    it("walks the spiral clockwise from the top-left corner and ends in the middle", () => {
+        // 3x3:  0 1 2
+        //       7 8 3
+        //       6 5 4
+        const ranks = delayFactors(3, 3, "spiral").map((factor) => Math.round(factor * 8))
+
+        expect(ranks).toEqual([0, 1, 2, 7, 8, 3, 6, 5, 4])
+    })
+
+    it("gives every tile exactly one place in the spiral, on any grid", () => {
+        for (const [rows, columns] of GRIDS) {
+            const count = rows * columns
+            const ranks = delayFactors(rows, columns, "spiral").map((factor) =>
+                Math.round(factor * Math.max(1, count - 1)),
+            )
+
+            expect(ranks).toHaveLength(count)
+            expect([...ranks].sort((a, b) => a - b)).toEqual(
+                Array.from({ length: count }, (_, rank) => rank),
+            )
+        }
+    })
+
+    it("keeps every delay within 0 to 1, starting at 0 and ending at 1", () => {
+        for (const sequence of ["diagonal", "spiral"] as const) {
+            for (const [rows, columns] of GRIDS) {
+                const factors = delayFactors(rows, columns, sequence)
+
+                expect(factors).toHaveLength(rows * columns)
+                expect(factors.every((factor) => factor >= 0 && factor <= 1)).toBe(true)
+                expect(Math.min(...factors)).toBe(0)
+                expect(Math.max(...factors)).toBe(rows * columns > 1 ? 1 : 0)
+            }
+        }
+    })
+
+    it("is the same on every navigation, whatever the seed", () => {
+        for (const sequence of ["diagonal", "spiral"] as const) {
+            expect(delayFactors(4, 6, sequence, 1)).toEqual(delayFactors(4, 6, sequence, 9))
+        }
+    })
+
+    it("differs from every existing sequence", () => {
+        const existing = (["row", "column", "reverse", "center", "random"] as const).map(
+            (sequence) => delayFactors(4, 6, sequence, 3),
+        )
+
+        for (const sequence of ["diagonal", "spiral"] as const) {
+            for (const other of existing) expect(delayFactors(4, 6, sequence)).not.toEqual(other)
+        }
+        expect(delayFactors(4, 6, "diagonal")).not.toEqual(delayFactors(4, 6, "spiral"))
+    })
+})
+
 describe("buildTiles", () => {
     it("produces one tile per grid cell", () => {
         expect(buildTiles(4, 6, "row", "row")).toHaveLength(24)

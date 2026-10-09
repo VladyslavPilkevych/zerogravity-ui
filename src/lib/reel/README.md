@@ -93,12 +93,16 @@ in agreement.
 
 ## Input details
 
-- **Drag** follows the pointer one-to-one. Releasing projects the current
-  velocity forward, so a flick can travel up to three slides; a slow release
-  snaps to the nearest. Outside `loop` mode the ends have rubber-band
-  resistance.
+- **Drag** follows the pointer one-to-one. Releasing projects the pointer's
+  speed over the last ~60 ms forward, so a flick can travel up to three slides,
+  while a slow release — or one after holding still — snaps to the nearest.
+  Outside `loop` mode the ends have rubber-band resistance. If the browser takes
+  the pointer away (`pointercancel`, lost pointer capture) the drag ends and the
+  reel settles without a flick; a second finger never takes over a running drag.
 - **Wheel** only reacts to horizontal deltas and shift+wheel, so vertical page
-  scrolling is never hijacked.
+  scrolling is never hijacked. One trackpad swipe moves one slide: its momentum
+  tail is treated as the same gesture, and stray deltas from separate gestures
+  never add up into a step. Each mouse-wheel notch still steps.
 - **Keyboard**: `←` `→` step, `Home` and `End` jump to the ends. The viewport is
   focusable and shows a focus ring.
 - **Click** on any neighbour glides it to the centre through the same spring as
@@ -111,8 +115,14 @@ in agreement.
 
 ## Performance
 
-- **The rAF loop only runs while something is moving.** Once the spring settles
-  within 0.0005 of the target the loop stops, so an idle carousel costs nothing.
+- **Frames only while something is moving.** Reel subscribes to the library's
+  shared frame clock, so several animated components on one page still cost one
+  `requestAnimationFrame` callback. Once the spring settles within 0.0005 of the
+  target it unsubscribes, and a drag only asks for a frame when the pointer
+  actually moves — holding a card still costs nothing.
+- **Only changed styles are written.** Each slide's last `transform`, `opacity`
+  and `zIndex` are cached, so a frame writes just what changed and never reads
+  inline styles back. A frame whose position did not move writes nothing.
 - **No React re-render per frame.** The animation writes `transform`, `opacity`
   and `zIndex` straight to the DOM nodes through refs; React only re-renders
   when the integer index changes.

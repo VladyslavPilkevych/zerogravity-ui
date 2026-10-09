@@ -43,6 +43,7 @@ export function ScrollStackPreview({ config }: PreviewApi) {
                         heights={heights}
                         top={c.top}
                         peek={c.peek}
+                        hold={c.hold}
                         scaleTo={c.scaleTo}
                         dim={c.dim}
                         dimColor={c.dimColor}

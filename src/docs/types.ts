@@ -1,14 +1,25 @@
 import type { ControlGroup } from "@/playground/panel/types"
 
-export type DocCategory = "Motion" | "Pointer" | "Typography" | "Media" | "Scenes" | "Feedback"
+export type DocCategory =
+    | "Backgrounds"
+    | "Surfaces"
+    | "Cursor"
+    | "Scroll"
+    | "Typography"
+    | "Media"
+    | "Interface"
+    | "Loading & transitions"
 
+/** Sidebar order: ambient and decorative first, practical UI last. */
 export const DOC_CATEGORIES: readonly DocCategory[] = [
-    "Motion",
-    "Pointer",
+    "Backgrounds",
+    "Surfaces",
+    "Cursor",
+    "Scroll",
     "Typography",
     "Media",
-    "Scenes",
-    "Feedback",
+    "Interface",
+    "Loading & transitions",
 ]
 
 export interface DocPreset {
@@ -44,6 +55,8 @@ export interface PreviewOptions {
 export interface DocEntry {
     slug: string
     name: string
+    /** what it is in plain words, shown under the brand name */
+    label: string
     /** the JSX tag, when it differs from the display name */
     tag?: string
     description: string
@@ -57,9 +70,15 @@ export interface DocEntry {
     presets?: DocPreset[]
     /** demo-only knobs: never generated into code, never listed as props */
     omit?: string[]
+    /** props the component cannot render without, printed even at their default */
+    required?: string[]
     /** props with no control, such as children and callbacks */
     extraProps?: PropRow[]
     /** example children for wrapper components */
     children?: string
+    /** JSX props with no control that the component cannot compile without, always printed */
+    fixedProps?: string[]
+    /** JSX props with no control, picked by a config value such as the active example */
+    exampleProps?: { key: string; props: Record<string, string[]> }
     preview?: PreviewOptions
 }

@@ -1,6 +1,7 @@
 "use client"
 
-import { Lenticular, UNDERTOW_DEMO_BACK, UNDERTOW_DEMO_FRONT } from "@/lib/experimental"
+import { Lenticular } from "@/lib"
+import { UNDERTOW_DEMO_BACK, UNDERTOW_DEMO_FRONT } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"

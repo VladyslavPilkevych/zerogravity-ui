@@ -1,0 +1,26 @@
+.xp-tide {
+    --tide-stroke-width: 2px;
+    position: relative;
+    display: grid;
+}
+
+.xp-tide > :focus-visible {
+    outline-offset: calc(-1 * var(--tide-band) - 4px);
+}
+
+.xp-tide-line {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+/* the clip cuts the outer half of the line away, so it is drawn twice as wide */
+.xp-tide-line path {
+    fill: none;
+    stroke-width: calc(var(--tide-stroke-width) * 2);
+    stroke-linejoin: round;
+}

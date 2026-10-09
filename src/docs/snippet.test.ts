@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest"
 
+import manifest from "../../package.json"
+
 import { COMPONENTS, findComponent } from "./registry"
 import { snippetFor } from "./snippet"
 
@@ -23,11 +25,55 @@ describe("snippetFor", () => {
     it("adds an import line for published components", () => {
         const code = snippetFor(reel, { ...reel.defaults, radius: 40 })
 
-        expect(code.startsWith('import { Reel } from "zerogravity"')).toBe(true)
+        expect(code.startsWith('import { Reel } from "zerogravity/reel"')).toBe(true)
+    })
+
+    it("imports every published component from an entry point that exists", () => {
+        const exported = Object.keys(manifest.exports)
+
+        for (const entry of COMPONENTS.filter((item) => item.status === "stable")) {
+            const from = snippetFor(entry, entry.defaults).match(/from "([^"]+)"/)?.[1]
+            expect(from, entry.slug).toBe(`zerogravity/${entry.slug}`)
+            expect(exported, entry.slug).toContain(`./${entry.slug}`)
+        }
+    })
+
+    it("prints the props a component cannot compile without", () => {
+        const lenticular = findComponent("lenticular")!
+        const peel = findComponent("peel")!
+
+        expect(snippetFor(lenticular, lenticular.defaults)).toMatch(
+            /frontSrc=.*\n.*backSrc=.*\n.*alt=/,
+        )
+        expect(snippetFor(peel, peel.defaults)).toContain("front={<Cover />}")
+    })
+
+    it("never generates a bare tag for a component with required props", () => {
+        const needs: Record<string, string[]> = {
+            louvre: ["front=", "back="],
+            palimpsest: ["text="],
+            phosphor: ["text="],
+            kern: ["text="],
+            stencil: ["text="],
+            overprint: ["text="],
+            bitmap: ["text="],
+            diorama: ["background="],
+        }
+        for (const [slug, props] of Object.entries(needs)) {
+            const entry = findComponent(slug)!
+            const code = snippetFor(entry, entry.defaults)
+            for (const prop of props) expect(code, slug).toContain(prop)
+        }
     })
 
     it("leaves the import out of experimental components", () => {
         expect(snippetFor(raster, raster.defaults)).not.toContain("import")
+    })
+
+    it("keeps a required prop even when it matches the default", () => {
+        const kern = findComponent("kern")!
+
+        expect(snippetFor(kern, kern.defaults)).toContain('text="TYPESET"')
     })
 
     it("never emits a demo-only prop", () => {
@@ -73,7 +119,7 @@ describe("snippetFor", () => {
 
     it("keeps the children even with no changed props", () => {
         expect(snippetFor(meadow, meadow.defaults)).toBe(
-            'import { Meadow } from "zerogravity"\n\n<Meadow>\n    <div>Hero copy</div>\n</Meadow>',
+            'import { Meadow } from "zerogravity/meadow"\n\n<Meadow>\n    <div>Hero copy</div>\n</Meadow>',
         )
     })
 
@@ -83,7 +129,7 @@ describe("snippetFor", () => {
         // experimental components have no entry point to import them from
         expect(snippetFor(raster, raster.defaults)).not.toContain("import")
         expect(snippetFor(meadow, meadow.defaults)).toContain(
-            'import { Meadow } from "zerogravity"',
+            'import { Meadow } from "zerogravity/meadow"',
         )
     })
 
@@ -106,6 +152,17 @@ describe("snippetFor", () => {
         const code = snippetFor(antigravity, config)
 
         expect(code).toContain('formation={{ shape: "heart" }}')
+    })
+
+    it("prints the slot props of the active example", () => {
+        const diorama = findComponent("diorama")!
+        const poster = diorama.presets?.find((preset) => preset.id === "poster")
+
+        const code = snippetFor(diorama, { ...diorama.defaults, ...poster?.values })
+
+        expect(code).toContain("background={<SkyAndTitle />}")
+        expect(code).toContain("{ content: <NearHills />, depth: 1 },")
+        expect(code).not.toContain("example")
     })
 
     it("produces balanced JSX for every component at its defaults", () => {

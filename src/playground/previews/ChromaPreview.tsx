@@ -1,17 +1,17 @@
 "use client"
 
-import { Chroma } from "@/lib/experimental"
+import { Chroma } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"
 
 export function ChromaPreview({ config }: PreviewApi) {
-    const c = config as unknown as { split: number; width: number; linger: number }
+    const c = config as unknown as { width: number; blur: number; decay: number }
 
     return (
-        <Chroma split={c.split} width={c.width} linger={c.linger} className="xpg-chroma">
+        <Chroma width={c.width} blur={c.blur} decay={c.decay} className="xpg-chroma">
             <div className="xpg-chroma-face">
-                <Hint>Drag across the surface</Hint>
+                <Hint>Move the pointer across the surface</Hint>
             </div>
         </Chroma>
     )

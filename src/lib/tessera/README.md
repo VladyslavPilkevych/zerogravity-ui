@@ -149,19 +149,19 @@ this repository — treat them as documented patterns, not verified integrations
 
 ## Configuration
 
-| Prop                   | Default            | Notes                                          |
-| ---------------------- | ------------------ | ---------------------------------------------- |
-| `color`                | `#0b0c11`          | Tile colour, one for the whole transition      |
-| `rows`                 | `4`                | Grid rows, clamped to 1–12                     |
-| `columns`              | `6`                | Grid columns, clamped to 1–12                  |
-| `duration`             | `420`              | One tile's animation, ms                       |
-| `stagger`              | `380`              | Total spread between first and last tile       |
-| `easing`               | ease-out           | Timing function for both directions            |
-| `sequence`             | `"random"`         | `random`, `row`, `column`, `reverse`, `center` |
-| `revealSequence`       | same as `sequence` | Order the tiles vanish in                      |
-| `zIndex`               | `9000`             | Stacking layer for the overlay                 |
-| `timeout`              | `4000`             | Readiness failsafe, `0` disables it            |
-| `respectReducedMotion` | `true`             | Honour `prefers-reduced-motion`                |
+| Prop                   | Default            | Notes                                     |
+| ---------------------- | ------------------ | ----------------------------------------- |
+| `color`                | `#0b0c11`          | Tile colour, one for the whole transition |
+| `rows`                 | `4`                | Grid rows, clamped to 1–12                |
+| `columns`              | `6`                | Grid columns, clamped to 1–12             |
+| `duration`             | `420`              | One tile's animation, ms                  |
+| `stagger`              | `380`              | Total spread between first and last tile  |
+| `easing`               | ease-out           | Timing function for both directions       |
+| `sequence`             | `"random"`         | Order the tiles land in; see below        |
+| `revealSequence`       | same as `sequence` | Order the tiles vanish in                 |
+| `zIndex`               | `9000`             | Stacking layer for the overlay            |
+| `timeout`              | `4000`             | Readiness failsafe, `0` disables it       |
+| `respectReducedMotion` | `true`             | Honour `prefers-reduced-motion`           |
 
 `stagger` is the spread across the whole grid, not a per-tile increment, so
 raising `rows`/`columns` does not lengthen the transition.
@@ -170,6 +170,22 @@ Each tile scales up from its own centre and fades in, so the surface reads as
 separate blocks landing in scattered spots rather than bands wiping across the
 screen. `revealSequence` reuses the cover order by default, so the blocks leave
 in the order they arrived.
+
+### Sequences
+
+| Sequence   | Order                                                                   |
+| ---------- | ----------------------------------------------------------------------- |
+| `random`   | A seeded scatter, fresh on every navigation                             |
+| `row`      | Left to right, a row at a time, top to bottom                           |
+| `column`   | Top to bottom, a column at a time, left to right                        |
+| `reverse`  | `row` backwards, from the bottom-right corner                           |
+| `center`   | Rings out from the middle, the corners last                             |
+| `diagonal` | A front of whole diagonals from the top-left corner to the bottom-right |
+| `spiral`   | One tile at a time, clockwise from the top-left corner inwards          |
+
+A spiral reveal (the default when `sequence="spiral"`) lifts the outer ring
+first, so the page opens from the edges towards the middle; pair it with
+`revealSequence="center"` to open it from the middle instead.
 
 `random` is a seeded scramble, not `Math.random`. The seed is the transition
 counter, so every navigation gets a fresh scatter while each individual scatter

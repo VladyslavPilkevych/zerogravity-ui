@@ -18,6 +18,23 @@ function movePointerTo(x: number, y: number) {
 }
 
 describe("Lodestone", () => {
+    it("keeps the soft markup by default and adds the pixel face only on request", () => {
+        const { getByRole, rerender } = render(<Lodestone>Go</Lodestone>)
+        const button = getByRole("button", { name: "Go" })
+
+        expect(button).not.toHaveAttribute("data-variant")
+        expect(button.querySelector(".xp-lodestone-face")).toBeNull()
+
+        rerender(<Lodestone variant="pixel">Go</Lodestone>)
+
+        expect(button).toHaveAttribute("data-variant", "pixel")
+        expect(button.querySelector(".xp-lodestone-face .xp-lodestone-label")?.textContent).toBe(
+            "Go",
+        )
+        expect(button.querySelector(".xp-lodestone-cast")).toHaveAttribute("aria-hidden", "true")
+        expect(getByRole("button", { name: "Go" })).toBe(button)
+    })
+
     it("renders a real button that stays clickable", async () => {
         const onClick = vi.fn()
         const { getByRole } = render(<Lodestone onClick={onClick}>Get started</Lodestone>)

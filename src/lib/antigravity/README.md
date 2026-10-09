@@ -38,7 +38,7 @@ is optional.
 | `shapes.ts`       | Geometry of a single particle                     |
 | `math.ts`         | LUT trigonometry, hashes, waveforms               |
 | `color.ts`        | Colour parsing and palette ramp                   |
-| `presets.ts`      | Twelve ready-made looks                           |
+| `presets.ts`      | Seventeen ready-made looks                        |
 
 The engine knows nothing about React: the component mounts a canvas and pushes
 plain config objects into it. The engine class itself is internal and not part
@@ -242,9 +242,16 @@ import { Antigravity, getAntigravityPreset } from "@/lib/antigravity"
 ;<Antigravity {...getAntigravityPreset("blackhole")!.options} />
 ```
 
-`nebula` (default) · `neon` · `heartbeat` · `matrix` · `starfield` · `galaxy` ·
-`ripples` · `blackhole` · `planet` · `rings` · `sunflower` · `nova` · `repel` ·
-`minimal`.
+`pixel` · `nebula` (default) · `neon` · `heartbeat` · `matrix` · `starfield` ·
+`galaxy` · `ripples` · `blackhole` · `planet` · `rings` · `sunflower` · `nova` ·
+`repel` · `orbit` · `helix` · `minimal`.
+
+`pixel` is the dense square-pixel grid used as the docs hero: depth palette,
+radial pulse, cursor repel and glow. Spread it and override what you need:
+
+```tsx
+<Antigravity {...getAntigravityPreset("pixel")!.options} seed={2049} />
+```
 
 ## Performance
 

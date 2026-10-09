@@ -8,18 +8,31 @@ control never chases the cursor.
 <Lodestone onClick={submit}>Get started</Lodestone>
 ```
 
-| Prop              | Default | Notes                                              |
-| ----------------- | ------- | -------------------------------------------------- |
-| `radius`          | `130`   | Influence radius around the button, px             |
-| `strength`        | `0.32`  | Fraction of the pointer offset applied as pull     |
-| `maxDisplacement` | `16`    | Hard clamp on displacement, px                     |
-| `minGap`          | `12`    | Space always kept between neighbouring buttons, px |
-| `release`         | `0.16`  | Spring rate back to rest                           |
-| `lift`            | `0.04`  | Scale added at full displacement                   |
-| `disabled`        | `false` | Native disabled state; also stops the magnet       |
+| Prop              | Default  | Notes                                              |
+| ----------------- | -------- | -------------------------------------------------- |
+| `variant`         | `"soft"` | `"pixel"` draws the stepped pixel face (below)     |
+| `radius`          | `130`    | Influence radius around the button, px             |
+| `strength`        | `0.32`   | Fraction of the pointer offset applied as pull     |
+| `maxDisplacement` | `16`     | Hard clamp on displacement, px                     |
+| `minGap`          | `12`     | Space always kept between neighbouring buttons, px |
+| `release`         | `0.16`   | Spring rate back to rest                           |
+| `lift`            | `0.04`   | Scale added at full displacement                   |
+| `disabled`        | `false`  | Native disabled state; also stops the magnet       |
 
 Every other prop is forwarded to the underlying `<button>`, so `onClick`,
 `type`, `aria-*`, `form` and the rest behave normally.
+
+**Pixel variant.** `variant="pixel"` swaps the pill for a stepped-corner face
+with a 2px ring, a hard offset shadow and a 2px edge highlight. Hover lifts the
+face one pixel, `:active` presses it into the shadow in two steps, and
+`:focus-visible` adds a square outline. The magnet still moves the whole button;
+the press happens on the face inside it, so the two never fight. Theme it with
+`--lodestone-accent`, `--lodestone-bg`, `--lodestone-border` (and their `-hover`
+pairs) and `--lodestone-pad`.
+
+```tsx
+<Lodestone variant="pixel">Get started</Lodestone>
+```
 
 **Interaction.** A window-level `pointermove` listener measures distance to the
 button centre. Outside `radius` nothing happens and no frames are scheduled.

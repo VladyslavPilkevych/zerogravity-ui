@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { CSSProperties } from "react"
 
 import { Lodestone } from "./Lodestone"
 
@@ -38,6 +39,22 @@ export const TightSpacing: Story = {
             </Lodestone>
             <Lodestone strength={0.8} maxDisplacement={48} minGap={10}>
                 Three
+            </Lodestone>
+        </div>
+    ),
+}
+
+/** Pixel faces at rest: no pointer nearby, so the frame is static. */
+export const PixelButtons: Story = {
+    render: () => (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
+            <Lodestone variant="pixel">Get started</Lodestone>
+            <Lodestone variant="pixel">Docs</Lodestone>
+            <Lodestone variant="pixel" style={{ "--lodestone-accent": "#c6f24e" } as CSSProperties}>
+                GitHub
+            </Lodestone>
+            <Lodestone variant="pixel" disabled>
+                Unavailable
             </Lodestone>
         </div>
     ),

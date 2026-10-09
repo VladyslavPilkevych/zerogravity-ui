@@ -1,9 +1,8 @@
 # liquid
 
-The wave engine behind [Undertow](../undertow) and [Wake](../wake). It is not a
-component: it is a small, pure, time-driven ripple field with no DOM and no
-canvas, so both surfaces disturb in the same language without either one owning
-the simulation.
+The wave engine behind [Undertow](../undertow). It is not a component: it is a
+small, pure, time-driven ripple field with no DOM and no canvas. [Wake](../wake)
+used to share it and now runs a height-field simulation of its own.
 
 ```ts
 const field = createField()

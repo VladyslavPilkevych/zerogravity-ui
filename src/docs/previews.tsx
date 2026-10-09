@@ -13,6 +13,9 @@ export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
     anaglyph: dynamic(() =>
         import("@/playground/previews/AnaglyphPreview").then((m) => m.AnaglyphPreview),
     ),
+    bitmap: dynamic(() =>
+        import("@/playground/previews/BitmapPreview").then((m) => m.BitmapPreview),
+    ),
     chroma: dynamic(() =>
         import("@/playground/previews/ChromaPreview").then((m) => m.ChromaPreview),
     ),
@@ -131,5 +134,14 @@ export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
     vellum: dynamic(() =>
         import("@/playground/previews/VellumPreview").then((m) => m.VellumPreview),
     ),
+    bezel: dynamic(() => import("@/playground/previews/BezelPreview").then((m) => m.BezelPreview)),
+    dither: dynamic(() =>
+        import("@/playground/previews/DitherPreview").then((m) => m.DitherPreview),
+    ),
+    keycap: dynamic(() =>
+        import("@/playground/previews/KeycapPreview").then((m) => m.KeycapPreview),
+    ),
+    tag: dynamic(() => import("@/playground/previews/TagPreview").then((m) => m.TagPreview)),
+    seam: dynamic(() => import("@/playground/previews/SeamPreview").then((m) => m.SeamPreview)),
     wash: dynamic(() => import("@/playground/previews/WashPreview").then((m) => m.WashPreview)),
 }

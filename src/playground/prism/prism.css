@@ -1,0 +1,67 @@
+/* a dark room and a hard-edged card: white type on black is where a channel split shows best */
+.pg-prism-stage {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 28px;
+    width: 100%;
+    min-height: inherit;
+    padding: 56px 16px 40px;
+    border-radius: inherit;
+    background: radial-gradient(60% 50% at 50% 40%, #12131c, transparent 70%), #050508;
+    overflow: hidden;
+}
+
+.pg-prism-card {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    width: min(520px, 82cqw);
+    padding: 34px 38px 38px;
+    border-radius: inherit;
+    background: #0b0c12;
+    color: #ffffff;
+}
+
+.pg-prism-kicker {
+    font-family: var(--zg-font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.pg-prism-card h3 {
+    margin: 0;
+    font-size: clamp(38px, 9cqw, 64px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+}
+
+.pg-prism-bars {
+    display: flex;
+    gap: 8px;
+}
+
+.pg-prism-bars i {
+    width: 44px;
+    height: 10px;
+    background: #ffffff;
+}
+
+.pg-prism-bars i:nth-child(2) {
+    width: 24px;
+}
+
+.pg-prism-bars i:nth-child(3) {
+    width: 10px;
+}
+
+.pg-prism-card p {
+    margin: 0;
+    max-width: 34ch;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 14px;
+    line-height: 1.5;
+}

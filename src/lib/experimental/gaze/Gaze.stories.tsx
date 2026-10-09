@@ -25,7 +25,7 @@ export const Neutral: Story = {
     args: { disabled: true },
 }
 
-/** The same head, held after the pointer has been carried to the right edge. */
+/** The owl, held after the pointer has been carried to the right edge. */
 export const LookingRight: Story = {
     play: async ({ canvasElement }) => {
         const host = canvasElement.querySelector(".xp-gaze") as HTMLElement

@@ -198,6 +198,27 @@ describe("Tessera", () => {
         expect(phases).toEqual(["idle", "covering", "covered", "revealing", "idle"])
     })
 
+    it("keeps the same lifecycle for the diagonal and spiral sequences", async () => {
+        for (const sequence of ["diagonal", "spiral"] as const) {
+            const phases: TesseraPhase[] = []
+            const order: string[] = []
+            const { tessera, unmount } = setup(
+                { sequence },
+                <PhaseLog onPhase={(phase) => phases.push(phase)} />,
+            )
+
+            await act(async () => {
+                await tessera().run(() => {
+                    order.push(`navigate during ${phases[phases.length - 1]}`)
+                })
+            })
+
+            expect(phases).toEqual(["idle", "covering", "covered", "revealing", "idle"])
+            expect(order).toEqual(["navigate during covered"])
+            unmount()
+        }
+    })
+
     it("ignores a second navigation while a transition is already running", async () => {
         const { tessera, container } = setup()
         const first = vi.fn(() => new Promise<void>((resolve) => setTimeout(resolve, 40)))

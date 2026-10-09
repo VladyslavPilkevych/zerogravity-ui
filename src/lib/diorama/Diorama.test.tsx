@@ -41,6 +41,24 @@ describe("Diorama", () => {
         expect(plane?.style.getPropertyValue("--depth")).toBe("0.25")
     })
 
+    it("gives a plane its own blur in pixels only when one is set", () => {
+        const { container } = render(
+            <Diorama
+                background={<p>Far</p>}
+                planes={[
+                    { content: <span>A</span>, depth: 0.5, blur: 3 },
+                    { content: <span>B</span>, depth: 1 },
+                ]}
+            />,
+        )
+        const [own, derived] = Array.from(
+            container.querySelectorAll<HTMLElement>(".xp-diorama-near"),
+        )
+
+        expect(own.style.getPropertyValue("--plane-blur")).toBe("3px")
+        expect(derived.style.getPropertyValue("--plane-blur")).toBe("")
+    })
+
     it("publishes parallax and blur budgets as custom properties", () => {
         const { container } = render(
             <Diorama background={<p>Far</p>} planes={planes} parallax={60} blur={12} />,

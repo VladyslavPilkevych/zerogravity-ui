@@ -64,11 +64,26 @@ describe("searchComponents", () => {
     it("ranks a tag match above a description-only match", () => {
         const hits = searchComponents(COMPONENTS, "pointer").map((entry) => entry.slug)
 
-        expect(hits.indexOf("kern")).toBeLessThan(hits.indexOf("antigravity"))
+        expect(hits.indexOf("kern")).toBeGreaterThan(-1)
+        expect(hits.indexOf("kern")).toBeLessThan(hits.indexOf("vellum"))
+    })
+
+    it("finds branded components by what they do", () => {
+        const slugs = (query: string) => searchComponents(COMPONENTS, query).map((hit) => hit.slug)
+
+        expect(slugs("water")).toContain("wake")
+        expect(slugs("water ripple")[0]).toBe("wake")
+        expect(slugs("route transition")[0]).toBe("tessera")
+        expect(slugs("eyes")).toContain("gaze")
+        expect(slugs("badge")).toContain("tag")
+    })
+
+    it("needs every word of a multi-word query to match", () => {
+        expect(searchComponents(COMPONENTS, "water carousel")).toHaveLength(0)
     })
 
     it("keeps registry order between equally scored hits", () => {
-        const hits = searchComponents(COMPONENTS, "scenes")
+        const hits = searchComponents(COMPONENTS, "backgrounds")
         const order = hits.map((entry) => COMPONENTS.indexOf(entry))
 
         expect(order.length).toBeGreaterThan(1)

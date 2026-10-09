@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { useState } from "react"
+import { useState, type CSSProperties } from "react"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 
 import { TesseraProvider } from "./TesseraProvider"
 import { useTessera, useTesseraPhase } from "./context"
+import { delayFactors, type TesseraSequence } from "./sequence"
 
 const PAGES = [
     {
@@ -193,5 +194,80 @@ export const RapidNavigation: Story = {
         await waitFor(() => expect(canvasElement.querySelector(".xp-tessera")).toBeNull(), {
             timeout: 4000,
         })
+    },
+}
+
+export const Diagonal: Story = {
+    args: { sequence: "diagonal" },
+}
+
+export const Spiral: Story = {
+    args: { sequence: "spiral" },
+}
+
+const FROZEN = { rows: 4, columns: 6, duration: 420, stagger: 380 }
+
+/**
+ * The real overlay styles with every tile's cover animation paused at the same
+ * moment, so a sequence's front can be looked at (and snapshotted) mid-cover.
+ */
+function FrozenCover({ sequence, at }: { sequence: TesseraSequence; at: number }) {
+    const { rows, columns, duration, stagger } = FROZEN
+    const factors = delayFactors(rows, columns, sequence)
+
+    return (
+        <div
+            // a transform makes this box the containing block for the fixed overlay
+            style={{
+                position: "relative",
+                height: 460,
+                transform: "translateZ(0)",
+                background: PAGES[0].tint,
+            }}
+        >
+            <div
+                className="xp-tessera"
+                data-phase="covering"
+                aria-hidden="true"
+                style={
+                    {
+                        "--tessera-layer": 1,
+                        "--tessera-color": "#0b0c11",
+                        "--tessera-columns": columns,
+                        "--tessera-rows": rows,
+                        "--tessera-duration": `${duration}ms`,
+                        "--tessera-stagger": `${stagger}ms`,
+                        "--tessera-ease": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+                    } as CSSProperties
+                }
+            >
+                <div className="xp-tessera-grid">
+                    {factors.map((factor, index) => (
+                        <div
+                            key={index}
+                            className="xp-tessera-tile"
+                            style={{
+                                animationDelay: `${Math.round(factor * stagger - at)}ms`,
+                                animationPlayState: "paused",
+                            }}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export const DiagonalMidCover: Story = {
+    render: () => <FrozenCover sequence="diagonal" at={400} />,
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelectorAll(".xp-tessera-tile")).toHaveLength(24)
+    },
+}
+
+export const SpiralMidCover: Story = {
+    render: () => <FrozenCover sequence="spiral" at={400} />,
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelectorAll(".xp-tessera-tile")).toHaveLength(24)
     },
 }

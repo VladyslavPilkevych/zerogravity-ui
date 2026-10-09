@@ -19,17 +19,26 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Fully soaked and held, which is also the reduced-motion state. */
-export const Soaked: Story = { args: { disabled: true } }
+/** Long past drying: the settled state, which is also what reduced motion shows. */
+export const Soaked: Story = { args: { time: 30 } }
 
-export const LongWord: Story = { args: { disabled: true, text: "Diffusion" } }
+/** Held 1.2 s in: the stroke still wet and the bleed still running. */
+export const MidSpread: Story = { args: { time: 1.2 } }
 
-export const HeavyBleed: Story = { args: { disabled: true, bleed: 1, feather: 1 } }
+export const LongWord: Story = { args: { time: 30, text: "Diffusion" } }
 
-export const NoBleed: Story = { args: { disabled: true, bleed: 0, feather: 0 } }
+export const HeavyBleed: Story = { args: { time: 30, bleed: 1, feather: 1 } }
 
-export const RedInk: Story = { args: { disabled: true, color: "#7a1020" } }
+export const SizedPaper: Story = { args: { time: 30, bleed: 0.1, feather: 0, rim: 0.3 } }
 
-export const OtherSeed: Story = { args: { disabled: true, seed: 31 } }
+export const RedInk: Story = { args: { time: 30, color: "#7a1020", paper: "#f6efe4" } }
+
+export const OtherSeed: Story = { args: { time: 30, seed: 31 } }
 
 export const Soaking: Story = { parameters: { chromatic: { disableSnapshot: true } } }
+
+/** Drag to write; a nib held still pools. */
+export const Drawing: Story = {
+    args: { repeat: 0, nib: 8 },
+    parameters: { chromatic: { disableSnapshot: true } },
+}

@@ -144,6 +144,7 @@ export function Aperture({
         }
 
         const port = scrollPort(scrollContainer?.current)
+        if (scrollContainer) onResize()
         port.target.addEventListener("scroll", schedule, { passive: true })
         window.addEventListener("resize", onResize)
         const observer = typeof ResizeObserver === "function" ? new ResizeObserver(onResize) : null

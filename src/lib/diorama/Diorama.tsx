@@ -135,7 +135,8 @@ export function Diorama({
                         className="xp-diorama-near"
                         style={{
                             ["--depth" as string]: depth,
-                            ["--plane-blur" as string]: plane.blur ?? "",
+                            ["--plane-blur" as string]:
+                                plane.blur === undefined ? undefined : `${plane.blur}px`,
                             opacity: plane.opacity,
                             zIndex: index + 1,
                         }}

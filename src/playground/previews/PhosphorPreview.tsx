@@ -1,6 +1,6 @@
 "use client"
 
-import { Phosphor } from "@/lib/experimental"
+import { Phosphor } from "@/lib/phosphor"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function PhosphorPreview({ config }: PreviewApi) {

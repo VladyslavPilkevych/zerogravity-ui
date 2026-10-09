@@ -2,8 +2,9 @@ import Link from "next/link"
 
 import { CodeBlock } from "@/docs/components/CodeBlock"
 import { HomeField } from "@/docs/components/HomeField"
-import { PixelWord } from "@/docs/components/PixelWord"
-import { COMPONENTS, REPOSITORY_URL, groupByCategory } from "@/docs/registry"
+import { Wordmark } from "@/docs/components/Wordmark"
+import { categoryId, COMPONENTS, REPOSITORY_URL, groupByCategory } from "@/docs/registry"
+import { Dither } from "@/lib/dither"
 
 const FEATURED = ["antigravity", "scroll-stack", "reel", "meadow", "ricochet", "elemental"]
 
@@ -21,7 +22,7 @@ const TRAITS = [
         body: "Canvas, SVG and CSS. Nothing follows the import into your bundle.",
     },
     {
-        key: "48",
+        key: String(COMPONENTS.length),
         label: "components",
         body: "Scroll transitions, pointer fields, display type, media effects and scenes.",
     },
@@ -58,12 +59,7 @@ export default function Home() {
                     </p>
 
                     <h1 className="pz-hero-title">
-                        <PixelWord
-                            text="ZEROGRAVITY"
-                            label="ZeroGravity"
-                            glow
-                            className="pz-hero-mark"
-                        />
+                        <Wordmark className="pz-hero-mark" />
                         <span className="pz-hero-claim">Motion you can import.</span>
                     </h1>
 
@@ -106,7 +102,12 @@ export default function Home() {
 
                 <div className="pz-cards">
                     {featured.map((entry) => (
-                        <Link className="pz-card" href={`/docs/${entry.slug}`} key={entry.slug}>
+                        <Dither
+                            as={Link}
+                            className="pz-card"
+                            href={`/docs/${entry.slug}`}
+                            key={entry.slug}
+                        >
                             <span className="pz-card-top">
                                 <strong>{entry.name}</strong>
                                 <span className="pz-tag">{entry.category}</span>
@@ -115,7 +116,7 @@ export default function Home() {
                             <span className="pz-card-go" aria-hidden="true">
                                 OPEN
                             </span>
-                        </Link>
+                        </Dither>
                     ))}
                 </div>
             </section>
@@ -153,7 +154,7 @@ export default function Home() {
                     {groups.map((group) => (
                         <Link
                             className="pz-cat"
-                            href={`/docs#${group.category.toLowerCase()}`}
+                            href={`/docs#${categoryId(group.category)}`}
                             key={group.category}
                         >
                             <b>{group.category}</b>

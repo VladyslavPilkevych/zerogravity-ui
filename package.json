@@ -25,7 +25,7 @@
     "bugs": {
         "url": "https://github.com/VladyslavPilkevych/zerogravity-ui/issues"
     },
-    "homepage": "https://github.com/VladyslavPilkevych/zerogravity-ui#readme",
+    "homepage": "https://ui.vladyslavpilkevych.com",
     "type": "module",
     "types": "./dist/index.d.ts",
     "exports": {
@@ -41,13 +41,41 @@
             "types": "./dist/aperture/index.d.ts",
             "import": "./dist/aperture/index.js"
         },
+        "./bezel": {
+            "types": "./dist/bezel/index.d.ts",
+            "import": "./dist/bezel/index.js"
+        },
+        "./bitmap": {
+            "types": "./dist/bitmap/index.d.ts",
+            "import": "./dist/bitmap/index.js"
+        },
+        "./chroma": {
+            "types": "./dist/chroma/index.d.ts",
+            "import": "./dist/chroma/index.js"
+        },
         "./diorama": {
             "types": "./dist/diorama/index.d.ts",
             "import": "./dist/diorama/index.js"
         },
+        "./dither": {
+            "types": "./dist/dither/index.d.ts",
+            "import": "./dist/dither/index.js"
+        },
+        "./eclipse": {
+            "types": "./dist/eclipse/index.d.ts",
+            "import": "./dist/eclipse/index.js"
+        },
         "./elemental": {
             "types": "./dist/elemental/index.d.ts",
             "import": "./dist/elemental/index.js"
+        },
+        "./gantry": {
+            "types": "./dist/gantry/index.d.ts",
+            "import": "./dist/gantry/index.js"
+        },
+        "./gnomon": {
+            "types": "./dist/gnomon/index.d.ts",
+            "import": "./dist/gnomon/index.js"
         },
         "./grid-trail": {
             "types": "./dist/grid-trail/index.d.ts",
@@ -57,9 +85,25 @@
             "types": "./dist/kern/index.d.ts",
             "import": "./dist/kern/index.js"
         },
+        "./keycap": {
+            "types": "./dist/keycap/index.d.ts",
+            "import": "./dist/keycap/index.js"
+        },
+        "./lattice": {
+            "types": "./dist/lattice/index.d.ts",
+            "import": "./dist/lattice/index.js"
+        },
+        "./lenticular": {
+            "types": "./dist/lenticular/index.d.ts",
+            "import": "./dist/lenticular/index.js"
+        },
         "./lodestone": {
             "types": "./dist/lodestone/index.d.ts",
             "import": "./dist/lodestone/index.js"
+        },
+        "./louvre": {
+            "types": "./dist/louvre/index.d.ts",
+            "import": "./dist/louvre/index.js"
         },
         "./meadow": {
             "types": "./dist/meadow/index.d.ts",
@@ -68,6 +112,18 @@
         "./overprint": {
             "types": "./dist/overprint/index.d.ts",
             "import": "./dist/overprint/index.js"
+        },
+        "./palimpsest": {
+            "types": "./dist/palimpsest/index.d.ts",
+            "import": "./dist/palimpsest/index.js"
+        },
+        "./peel": {
+            "types": "./dist/peel/index.d.ts",
+            "import": "./dist/peel/index.js"
+        },
+        "./phosphor": {
+            "types": "./dist/phosphor/index.d.ts",
+            "import": "./dist/phosphor/index.js"
         },
         "./pointer-fx": {
             "types": "./dist/pointer-fx/index.d.ts",
@@ -85,6 +141,14 @@
             "types": "./dist/scroll-stack/index.d.ts",
             "import": "./dist/scroll-stack/index.js"
         },
+        "./seam": {
+            "types": "./dist/seam/index.d.ts",
+            "import": "./dist/seam/index.js"
+        },
+        "./sonar": {
+            "types": "./dist/sonar/index.d.ts",
+            "import": "./dist/sonar/index.js"
+        },
         "./split-flap": {
             "types": "./dist/split-flap/index.d.ts",
             "import": "./dist/split-flap/index.js"
@@ -93,9 +157,17 @@
             "types": "./dist/stencil/index.d.ts",
             "import": "./dist/stencil/index.js"
         },
+        "./tag": {
+            "types": "./dist/tag/index.d.ts",
+            "import": "./dist/tag/index.js"
+        },
         "./tessera": {
             "types": "./dist/tessera/index.d.ts",
             "import": "./dist/tessera/index.js"
+        },
+        "./tide": {
+            "types": "./dist/tide/index.d.ts",
+            "import": "./dist/tide/index.js"
         },
         "./trailing-cursor": {
             "types": "./dist/trailing-cursor/index.d.ts",
@@ -104,6 +176,14 @@
         "./vellum": {
             "types": "./dist/vellum/index.d.ts",
             "import": "./dist/vellum/index.js"
+        },
+        "./wake": {
+            "types": "./dist/wake/index.d.ts",
+            "import": "./dist/wake/index.js"
+        },
+        "./wash": {
+            "types": "./dist/wash/index.d.ts",
+            "import": "./dist/wash/index.js"
         },
         "./package.json": "./package.json"
     },
@@ -174,7 +254,7 @@
         "eslint-plugin-react-hooks": "^6.1.1",
         "jsdom": "^30.0.1",
         "lefthook": "^2.1.10",
-        "next": "^15.5.23",
+        "next": "^15.5.27",
         "playwright": "^1.62.1",
         "prettier": "^3.9.6",
         "publint": "^0.3.23",
@@ -197,8 +277,13 @@
         "overrides": {
             "postcss@<8.5.23": ">=8.5.23",
             "nanoid@<3.3.18": ">=3.3.18",
-            "sharp@<0.35.0": ">=0.35.0",
-            "esbuild@<0.28.1": ">=0.28.1"
+            "esbuild@<0.28.1": ">=0.28.1",
+            "sharp@<0.35.5": ">=0.35.5",
+            "js-yaml@>=4 <4.3.2": "^4.3.2",
+            "undici@>=8 <8.10.2": "^8.10.2",
+            "brace-expansion@<1.1.20": "^1.1.20",
+            "brace-expansion@>=5 <5.0.11": "^5.0.11",
+            "source-map-js@<1.2.2": "^1.2.2"
         }
     }
 }

@@ -5,7 +5,7 @@ other way. The frame is animated with `clip-path`, so the content itself is
 never rescaled and stays sharp.
 
 ```tsx
-import { Aperture } from "@/lib/aperture"
+import { Aperture } from "zerogravity"
 
 export function Showcase() {
     return (

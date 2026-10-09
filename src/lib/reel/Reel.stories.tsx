@@ -91,6 +91,48 @@ export const SelectsNeighbourOnClick: Story = {
     },
 }
 
+// Drag a third of a slide, hold still, let go: the reel must settle back, not fling.
+export const ReleaseAfterHold: Story = {
+    args: { radius: 24 },
+    play: async ({ canvasElement }) => {
+        const viewport = canvasElement.querySelector<HTMLElement>(".reel-viewport")
+        if (!viewport) throw new Error("missing viewport")
+        const box = viewport.getBoundingClientRect()
+        const y = box.top + box.height / 2
+        const x = box.left + box.width / 2
+        const fire = (type: string, clientX: number) =>
+            viewport.dispatchEvent(
+                new PointerEvent(type, {
+                    bubbles: true,
+                    pointerId: 1,
+                    isPrimary: true,
+                    pointerType: "mouse",
+                    button: 0,
+                    buttons: type === "pointerup" ? 0 : 1,
+                    clientX,
+                    clientY: y,
+                }),
+            )
+        const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+
+        fire("pointerdown", x)
+        for (const dx of [30, 60, 90]) {
+            await frame()
+            fire("pointermove", x - dx)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 300))
+        fire("pointerup", x - 90)
+
+        await waitFor(() => {
+            const active = canvasElement.querySelector('.reel-item[data-active="true"]')
+            expect(active?.textContent).toBe("1")
+            const first = canvasElement.querySelector<HTMLElement>(".reel-item")
+            const x = /translate3d\((-?[\d.]+)px/.exec(first?.style.transform ?? "")?.[1]
+            expect(Math.abs(Number(x))).toBeLessThan(0.5)
+        })
+    },
+}
+
 export const SingleItem: Story = {
     args: { radius: 24, children: slides(1) },
 }

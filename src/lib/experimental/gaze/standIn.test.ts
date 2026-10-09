@@ -20,13 +20,37 @@ describe("buildStandIn", () => {
         expect(object.getObjectByName("rightEye")).toBe(rightEye)
     })
 
-    it("sets the eyes apart and in front, where the visor cannot swallow them", () => {
+    it("sets the eyes apart and in front of the face", () => {
         const { leftEye, rightEye } = buildStandIn(THREE)
 
         expect(leftEye.position.x).toBeLessThan(0)
         expect(rightEye.position.x).toBeGreaterThan(0)
-        expect(leftEye.position.z).toBeGreaterThan(0.8)
+        expect(leftEye.position.z).toBeGreaterThan(0.6)
         expect(rightEye.position.z).toBeCloseTo(leftEye.position.z)
+    })
+
+    it("keeps the body out of the head, so only the head turns", () => {
+        const { object, head } = buildStandIn(THREE)
+        const body = object.getObjectByName("body")!
+
+        expect(body).toBeTruthy()
+        expect(body.parent).toBe(object)
+        expect(head.getObjectByName("body")).toBeUndefined()
+    })
+
+    it("blinks by closing lids over the eyes, and hides them when open", () => {
+        const { head, blink } = buildStandIn(THREE)
+
+        blink(0)
+        const lids = head.children.filter((child) => child.visible === false)
+        expect(lids).toHaveLength(2)
+        lids.forEach((lid) => expect(lid.scale.y).toBeLessThan(0.01))
+
+        blink(1)
+        lids.forEach((lid) => {
+            expect(lid.visible).toBe(true)
+            expect(lid.scale.y).toBe(1)
+        })
     })
 
     it("has nothing named for a rig it does not know, which is what makes Gaze fall back", () => {

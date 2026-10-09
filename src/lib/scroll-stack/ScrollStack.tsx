@@ -10,7 +10,17 @@ import {
     type RefObject,
 } from "react"
 
-import { cx, scrollPort, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
+import {
+    cx,
+    driveScroll,
+    finite,
+    scrollPort,
+    smoothstep,
+    useIsomorphicLayoutEffect,
+    useLatestRef,
+    type ScrollDriver,
+} from "../internal"
+import { coverProgress, releaseSpace } from "./stack"
 import "./ScrollStack.css"
 
 export type StackEasing = "linear" | "smooth"
@@ -23,6 +33,8 @@ export interface ScrollStackProps {
     heights?: (string | undefined)[]
     top?: number
     peek?: number
+    /** how long the finished stack stays pinned before it scrolls away, in viewports */
+    hold?: number
     scaleTo?: number
     dim?: number
     dimColor?: string
@@ -40,14 +52,11 @@ export interface ScrollStackProps {
 
 interface Metrics {
     offsets: number[]
+    heights: number[]
     viewport: number
 }
 
 const EPSILON = 0.0005
-
-function clamp01(value: number): number {
-    return value < 0 ? 0 : value > 1 ? 1 : value
-}
 
 export function ScrollStack({
     children,
@@ -56,6 +65,7 @@ export function ScrollStack({
     heights,
     top = 0,
     peek = 0,
+    hold = 0.3,
     scaleTo = 0.92,
     dim = 0.5,
     dimColor = "#05050a",
@@ -71,12 +81,13 @@ export function ScrollStack({
     onActiveChange,
 }: ScrollStackProps) {
     const containerRef = useRef<HTMLDivElement>(null)
+    const holdRef = useRef<HTMLDivElement>(null)
+    const driverRef = useRef<ScrollDriver | null>(null)
     const cardsRef = useRef<(HTMLDivElement | null)[]>([])
     const veilsRef = useRef<(HTMLDivElement | null)[]>([])
     const metricsRef = useRef<Metrics | null>(null)
     const progressRef = useRef<number[]>([])
     const activeRef = useRef(-1)
-    const frameRef = useRef(0)
 
     const items = Children.toArray(children)
     const count = items.length
@@ -93,6 +104,7 @@ export function ScrollStack({
         disabled,
     })
     const activeHandlerRef = useLatestRef(onActiveChange)
+    const holdShare = Math.max(0, finite(hold, 0.3))
 
     const measure = useCallback(() => {
         const container = containerRef.current
@@ -103,17 +115,29 @@ export function ScrollStack({
         }
 
         const port = scrollPort(scrollContainer?.current)
+        const viewport = port.height()
         let cursor = port.top(container) + port.scroll()
         const offsets: number[] = []
+        const heights: number[] = []
 
         for (const card of cards) {
+            const height = card ? card.offsetHeight : 0
             offsets.push(cursor)
-            cursor += card ? card.getBoundingClientRect().height : 0
+            heights.push(height)
+            cursor += height
         }
         offsets.push(cursor)
 
-        metricsRef.current = { offsets, viewport: port.height() }
-    }, [scrollContainer])
+        const { top: stickyTop, peek: step } = settingsRef.current
+        const space = releaseSpace(
+            heights.map((_, i) => stickyTop + i * step),
+            heights,
+            holdShare * viewport,
+        )
+        if (holdRef.current) holdRef.current.style.height = `${space.toFixed(1)}px`
+
+        metricsRef.current = { offsets, heights, viewport }
+    }, [scrollContainer, settingsRef, holdShare])
 
     const paint = useCallback(() => {
         const metrics = metricsRef.current
@@ -143,10 +167,14 @@ export function ScrollStack({
                 const nextSticky = settings.top + (i + 1) * settings.peek
                 const nextStatic = metrics.offsets[i + 1] - scrollY
                 const nextTop = nextStatic < nextSticky ? nextSticky : nextStatic
-                const travel = viewport - nextSticky
-                progress = travel > 0 ? clamp01((viewport - nextTop) / travel) : 0
-                if (settings.easing === "smooth")
-                    progress = progress * progress * (3 - 2 * progress)
+                progress = coverProgress(
+                    nextTop,
+                    stickyTop,
+                    metrics.heights[i],
+                    nextSticky,
+                    viewport,
+                )
+                if (settings.easing === "smooth") progress = smoothstep(progress)
             }
 
             if (Math.abs(progress - (progressRef.current[i] ?? -1)) < EPSILON) continue
@@ -177,13 +205,7 @@ export function ScrollStack({
         }
     }, [settingsRef, activeHandlerRef, scrollContainer])
 
-    const schedule = useCallback(() => {
-        if (frameRef.current !== 0) return
-        frameRef.current = requestAnimationFrame(() => {
-            frameRef.current = 0
-            paint()
-        })
-    }, [paint])
+    const schedule = useCallback(() => driverRef.current?.wake(), [])
 
     useIsomorphicLayoutEffect(() => {
         cardsRef.current.length = count
@@ -191,7 +213,7 @@ export function ScrollStack({
         progressRef.current = new Array(count).fill(-1)
         measure()
         paint()
-    }, [count, height, heights?.join("|"), top, peek, measure, paint])
+    }, [count, height, heights?.join("|"), top, peek, holdShare, measure, paint])
 
     useEffect(() => {
         progressRef.current.fill(-1)
@@ -208,21 +230,23 @@ export function ScrollStack({
             schedule()
         }
 
-        const port = scrollPort(scrollContainer?.current)
-        port.target.addEventListener("scroll", schedule, { passive: true })
+        const driver = driveScroll(scrollPort(scrollContainer?.current), () => {
+            paint()
+            return false
+        })
+        driverRef.current = driver
         window.addEventListener("resize", onResize)
 
         const observer = typeof ResizeObserver === "function" ? new ResizeObserver(onResize) : null
         observer?.observe(container)
 
         return () => {
-            port.target.removeEventListener("scroll", schedule)
+            driver.dispose()
+            driverRef.current = null
             window.removeEventListener("resize", onResize)
             observer?.disconnect()
-            if (frameRef.current !== 0) cancelAnimationFrame(frameRef.current)
-            frameRef.current = 0
         }
-    }, [measure, schedule, scrollContainer])
+    }, [measure, paint, schedule, scrollContainer])
 
     return (
         <div ref={containerRef} className={cx("scroll-stack", className)} style={style}>
@@ -253,6 +277,12 @@ export function ScrollStack({
                     />
                 </div>
             ))}
+            <div
+                ref={holdRef}
+                className="scroll-stack-hold"
+                aria-hidden="true"
+                style={{ height: `${holdShare * 100}vh` }}
+            />
         </div>
     )
 }

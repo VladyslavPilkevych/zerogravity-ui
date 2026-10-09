@@ -27,7 +27,7 @@
         calc(var(--diorama-y) * var(--diorama-parallax) * var(--depth) * 1px),
         0
     );
-    filter: blur(calc(var(--depth) * var(--depth) * var(--diorama-blur) * 1px));
+    filter: blur(var(--plane-blur, calc(var(--depth) * var(--depth) * var(--diorama-blur) * 1px)));
     will-change: transform;
 }
 

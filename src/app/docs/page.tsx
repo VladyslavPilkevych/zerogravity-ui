@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
-import { COMPONENTS, groupByCategory } from "@/docs/registry"
+import { categoryId, COMPONENTS, groupByCategory } from "@/docs/registry"
 
 export const metadata: Metadata = {
     title: "Docs",
@@ -47,7 +47,7 @@ export default function DocsOverview() {
                 <section
                     className="dz-section"
                     key={group.category}
-                    id={group.category.toLowerCase()}
+                    id={categoryId(group.category)}
                 >
                     <h2>{group.category}</h2>
                     <div className="dz-grid">

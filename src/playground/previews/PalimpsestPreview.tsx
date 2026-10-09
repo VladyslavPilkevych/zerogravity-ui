@@ -1,7 +1,7 @@
 "use client"
 
-import { Palimpsest } from "@/lib/experimental"
-import type { PalimpsestTrigger } from "@/lib/experimental"
+import { Palimpsest } from "@/lib/palimpsest"
+import type { PalimpsestTrigger } from "@/lib/palimpsest"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"
