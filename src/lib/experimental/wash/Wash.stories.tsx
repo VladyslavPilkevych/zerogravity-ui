@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { expect, fireEvent } from "storybook/test"
 
 import { Wash } from "./Wash"
 
@@ -59,4 +60,21 @@ export const SoftEdge: Story = {
 
 export const StaticFallback: Story = {
     args: { disabled: true },
+}
+
+export const PixelBurstFrozen: Story = {
+    name: "Wash pixel burst frozen state",
+    args: { mode: "click", burst: true, seed: 7, freezeAt: 0.3 },
+    play: async ({ canvasElement }) => {
+        const root = canvasElement.querySelector(".xp-wash") as HTMLElement
+        const box = root.getBoundingClientRect()
+
+        fireEvent.pointerDown(root, {
+            clientX: box.left + box.width * 0.62,
+            clientY: box.top + box.height * 0.42,
+        })
+
+        await expect(root.querySelector(".xp-wash-pour")).not.toBeNull()
+        await expect(root.querySelector("canvas")).toHaveAttribute("aria-hidden", "true")
+    },
 }

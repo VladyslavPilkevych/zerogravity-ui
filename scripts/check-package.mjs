@@ -136,9 +136,11 @@ step("the package declares no runtime dependencies", () => {
 step("package size stays within the tracked baseline", () => {
     const bytes = statSync(tarball).size
     const kb = bytes / 1024
-    // Raised from 250 kB when nine prototypes were promoted, roughly doubling
-    // the component count. Headroom for polish, not for a second doubling.
-    if (kb > 320) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 320 kB)`)
+    // Raised from 250 kB when nine prototypes were promoted, then from 320 kB
+    // when six more graduated and six Interface components landed: 17 to 29
+    // entry points took the tarball from 276 kB to 340 kB, over half of it
+    // source maps. Headroom for polish, not for more components.
+    if (kb > 350) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 350 kB)`)
     return `${kb.toFixed(0)} kB tarball`
 })
 

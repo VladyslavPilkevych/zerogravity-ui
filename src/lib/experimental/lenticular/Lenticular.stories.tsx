@@ -18,8 +18,14 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** The pointer at the far left: only the first picture, no seams from the second. */
+export const Left: Story = { args: { position: 0.03 } }
+
 /** Head-on: half of each picture, interlaced under the lens. */
-export const HeadOn: Story = { args: { disabled: true } }
+export const HeadOn: Story = { args: { position: 0.5 } }
+
+/** The pointer at the far right: only the second picture. */
+export const Right: Story = { args: { position: 0.97 } }
 
 export const FineLens: Story = { args: { disabled: true, strips: 110 } }
 

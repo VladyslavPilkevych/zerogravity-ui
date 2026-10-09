@@ -1,6 +1,7 @@
 "use client"
 
 import { Gantry } from "@/lib/experimental"
+import type { GantryEasing } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint, ScrollPort } from "./parts"
@@ -12,6 +13,9 @@ export function GantryPreview({ config }: PreviewApi) {
         itemWidth: string
         gap: string
         pace: number
+        transition: number
+        hold: number
+        easing: GantryEasing
         lean: number
     }
 
@@ -29,6 +33,9 @@ export function GantryPreview({ config }: PreviewApi) {
                         itemWidth={c.itemWidth}
                         gap={c.gap}
                         pace={c.pace}
+                        transition={c.transition}
+                        hold={c.hold}
+                        easing={c.easing}
                         lean={c.lean}
                         className="xpg-gantry"
                     >

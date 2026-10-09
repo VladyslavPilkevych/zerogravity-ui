@@ -1,2 +1,2 @@
 export { Gantry } from "./Gantry"
-export type { GantryProps } from "./Gantry"
+export type { GantryEasing, GantryProps } from "./Gantry"

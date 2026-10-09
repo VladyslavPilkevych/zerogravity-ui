@@ -1,31 +1,35 @@
 "use client"
 
 import { Wake } from "@/lib/experimental"
-import type { WakeMode } from "@/lib/experimental"
+import type { WakeSurface } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"
 
 export function WakePreview({ config }: PreviewApi) {
     const c = config as unknown as {
-        mode: WakeMode
-        radius: number
+        surface: WakeSurface
         strength: number
-        speed: number
-        color: string
+        radius: number
+        decay: number
+        refraction: number
+        light: number
+        pixelated: boolean
     }
 
     return (
         <Wake
-            mode={c.mode}
-            radius={c.radius}
+            surface={c.surface}
             strength={c.strength}
-            speed={c.speed}
-            color={c.color}
+            radius={c.radius}
+            decay={c.decay}
+            refraction={c.refraction}
+            light={c.light}
+            pixelated={c.pixelated}
             className="xpg-wake"
         >
             <div className="xpg-wake-face">
-                <Hint>Move cursor</Hint>
+                <Hint>Drag through the water</Hint>
             </div>
         </Wake>
     )

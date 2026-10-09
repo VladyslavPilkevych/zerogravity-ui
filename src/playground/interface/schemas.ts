@@ -1,0 +1,175 @@
+import type { ControlGroup } from "../panel/types"
+
+export const DITHER_DEFAULTS = {
+    cell: 8,
+    density: 0.3,
+    glow: 0.5,
+    duration: 420,
+    origin: "pointer",
+    layer: "under",
+    color: "#4ee1f2",
+    active: false,
+}
+
+export const DITHER_CONTROLS: ControlGroup[] = [
+    {
+        id: "pixels",
+        title: "Pixels",
+        hint: "block size, resting texture and glow",
+        open: true,
+        controls: [
+            { kind: "number", path: "cell", label: "Cell", min: 4, max: 24, step: 1, unit: "px" },
+            { kind: "number", path: "density", label: "Rest density", min: 0, max: 1, step: 0.02 },
+            { kind: "number", path: "glow", label: "Glow", min: 0, max: 1.5, step: 0.05 },
+            { kind: "color", path: "color", label: "Colour" },
+        ],
+    },
+    {
+        id: "sweep",
+        title: "Sweep",
+        hint: "where the fill starts and how long it takes",
+        open: true,
+        controls: [
+            {
+                kind: "number",
+                path: "duration",
+                label: "Duration",
+                min: 120,
+                max: 1400,
+                step: 20,
+                unit: "ms",
+            },
+            {
+                kind: "select",
+                path: "origin",
+                label: "Origin",
+                options: ["pointer", "center", "left", "right", "top", "bottom"],
+            },
+            { kind: "select", path: "layer", label: "Layer", options: ["under", "over"] },
+            { kind: "boolean", path: "active", label: "Force active" },
+        ],
+    },
+]
+
+export const KEYCAP_DEFAULTS = {
+    size: "md",
+    tone: "#4ee1f2",
+    depth: 4,
+    notch: 3,
+    disabled: false,
+}
+
+export const KEYCAP_CONTROLS: ControlGroup[] = [
+    {
+        id: "cap",
+        title: "Cap",
+        hint: "size, accent and press geometry",
+        open: true,
+        controls: [
+            { kind: "select", path: "size", label: "Size", options: ["sm", "md", "lg"] },
+            { kind: "color", path: "tone", label: "Tone" },
+            { kind: "number", path: "depth", label: "Depth", min: 0, max: 10, step: 1, unit: "px" },
+            { kind: "number", path: "notch", label: "Notch", min: 0, max: 6, step: 1, unit: "px" },
+            { kind: "boolean", path: "disabled", label: "Disabled" },
+        ],
+    },
+]
+
+export const BEZEL_DEFAULTS = {
+    label: "",
+    tone: "#4ee1f2",
+    grid: false,
+    ticks: true,
+    scan: true,
+    notch: 4,
+}
+
+export const BEZEL_CONTROLS: ControlGroup[] = [
+    {
+        id: "frame",
+        title: "Frame",
+        hint: "corners, label tab and hover lock-on",
+        open: true,
+        controls: [
+            { kind: "text", path: "label", label: "Label", maxLength: 24 },
+            { kind: "color", path: "tone", label: "Tone" },
+            { kind: "number", path: "notch", label: "Notch", min: 0, max: 8, step: 1, unit: "px" },
+            { kind: "boolean", path: "grid", label: "Grid" },
+            { kind: "boolean", path: "ticks", label: "Corner ticks" },
+            { kind: "boolean", path: "scan", label: "Hover scan" },
+        ],
+    },
+]
+
+export const SEAM_DEFAULTS = {
+    cell: 4,
+    tone: null as string | null,
+    animated: false,
+    speed: 3.2,
+}
+
+export const SEAM_CONTROLS: ControlGroup[] = [
+    {
+        id: "seam",
+        title: "Seam",
+        hint: "block size, colour and the travelling pulse",
+        open: true,
+        controls: [
+            { kind: "number", path: "cell", label: "Cell", min: 2, max: 10, step: 1, unit: "px" },
+            { kind: "colorNullable", path: "tone", label: "Tone" },
+            { kind: "boolean", path: "animated", label: "Animated" },
+            {
+                kind: "number",
+                path: "speed",
+                label: "Speed",
+                min: 0.8,
+                max: 8,
+                step: 0.2,
+                unit: "s",
+            },
+        ],
+    },
+]
+
+export const PIP_DEFAULTS = {
+    variant: "outline",
+}
+
+export const PIP_CONTROLS: ControlGroup[] = [
+    {
+        id: "pip",
+        title: "Pip",
+        hint: "outline or filled",
+        open: true,
+        controls: [
+            { kind: "select", path: "variant", label: "Variant", options: ["outline", "solid"] },
+        ],
+    },
+]
+
+export const BEZEL_PRESETS = [
+    {
+        id: "labelled",
+        label: "Labelled",
+        hint: "lime tab and ticks",
+        values: { label: "Package", tone: "#c6f24e" },
+    },
+    {
+        id: "grid",
+        label: "Grid",
+        hint: "violet frame on a 1px grid",
+        values: { label: "Grid", tone: "#9d7bff", grid: true },
+    },
+    { id: "plain", label: "Plain", hint: "no label, cyan accent", values: {} },
+]
+
+export const SEAM_PRESETS = [
+    { id: "violet", label: "Violet", hint: "violet blocks", values: { tone: "#9d7bff" } },
+    {
+        id: "pulse",
+        label: "Pulse",
+        hint: "every pattern carries the pulse",
+        values: { tone: "#4ee1f2", animated: true },
+    },
+    { id: "inherit", label: "Inherit", hint: "blocks take the text colour", values: {} },
+]

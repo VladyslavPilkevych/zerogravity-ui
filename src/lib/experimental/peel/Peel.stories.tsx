@@ -1,5 +1,6 @@
 import { useRef } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { expect, waitFor } from "storybook/test"
 
 import { Peel } from "./Peel"
 
@@ -73,7 +74,7 @@ export const Closed: Story = { render: (args) => <Port {...args} /> }
 
 export const HalfLifted: Story = { render: (args) => <Port {...args} scrollTo={0.45} /> }
 
-export const NearlyOff: Story = { render: (args) => <Port {...args} scrollTo={0.85} /> }
+export const NearlyOff: Story = { render: (args) => <Port {...args} scrollTo={0.6} /> }
 
 export const FromTopLeft: Story = {
     render: (args) => <Port {...args} scrollTo={0.45} corner="top-left" />,
@@ -86,3 +87,16 @@ export const FromBottomRight: Story = {
 export const NoCurl: Story = { render: (args) => <Port {...args} scrollTo={0.45} curl={0} /> }
 
 export const Disabled: Story = { render: (args) => <Port {...args} disabled /> }
+
+export const Midpoint: Story = {
+    render: (args) => <Port {...args} progress={0.5} />,
+    play: async ({ canvasElement }) => {
+        const track = canvasElement.querySelector<HTMLElement>(".xp-peel")!
+        const sheet = canvasElement.querySelector<HTMLElement>(".xp-peel-sheet")!
+
+        await waitFor(() => {
+            expect(track.dataset.phase).toBe("moving")
+            expect(sheet.style.getPropertyValue("--pe-lift")).toBe("0.5000")
+        })
+    },
+}

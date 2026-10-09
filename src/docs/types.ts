@@ -1,6 +1,7 @@
 import type { ControlGroup } from "@/playground/panel/types"
 
-export type DocCategory = "Motion" | "Pointer" | "Typography" | "Media" | "Scenes" | "Feedback"
+export type DocCategory =
+    "Motion" | "Pointer" | "Typography" | "Media" | "Scenes" | "Interface" | "Feedback"
 
 export const DOC_CATEGORIES: readonly DocCategory[] = [
     "Motion",
@@ -8,6 +9,7 @@ export const DOC_CATEGORIES: readonly DocCategory[] = [
     "Typography",
     "Media",
     "Scenes",
+    "Interface",
     "Feedback",
 ]
 
@@ -57,9 +59,13 @@ export interface DocEntry {
     presets?: DocPreset[]
     /** demo-only knobs: never generated into code, never listed as props */
     omit?: string[]
+    /** props the component cannot render without, printed even at their default */
+    required?: string[]
     /** props with no control, such as children and callbacks */
     extraProps?: PropRow[]
     /** example children for wrapper components */
     children?: string
+    /** JSX props with no control, picked by a config value such as the active example */
+    exampleProps?: { key: string; props: Record<string, string[]> }
     preview?: PreviewOptions
 }

@@ -1,7 +1,7 @@
 "use client"
 
-import { Eclipse, EclipseSection } from "@/lib/experimental"
-import type { EclipseFrom } from "@/lib/experimental"
+import { Eclipse, EclipseSection } from "@/lib/eclipse"
+import type { EclipseFrom } from "@/lib/eclipse"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint, ScrollPort } from "./parts"

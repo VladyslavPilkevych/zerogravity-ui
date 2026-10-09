@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
+import { expect, waitFor } from "storybook/test"
+
 import { Gnomon } from "./Gnomon"
 
 const tile = (label: string) => (
@@ -26,15 +28,17 @@ const meta = {
     parameters: { surface: { padding: 56 } },
     args: {
         children: ["Alpha", "Beta", "Gamma"].map(tile),
-        style: { display: "flex", gap: 34, justifyContent: "center" },
+        // the root is the whole lit room, so the lamp answers between the tiles too
+        style: {
+            display: "flex",
+            gap: 34,
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 320,
+            padding: 40,
+            background: "linear-gradient(165deg, #f2f4fa, #dde2ee)",
+        },
     },
-    decorators: [
-        (Story) => (
-            <div style={{ padding: 40, background: "linear-gradient(165deg, #f2f4fa, #dde2ee)" }}>
-                <Story />
-            </div>
-        ),
-    ],
 } satisfies Meta<typeof Gnomon>
 
 export default meta
@@ -52,3 +56,25 @@ export const NoLift: Story = { args: { disabled: true, lift: false } }
 export const WarmShadow: Story = { args: { disabled: true, color: "#43206b" } }
 
 export const Live: Story = { parameters: { chromatic: { disableSnapshot: true } } }
+
+/** A pointer in the empty corner of the root, away from every tile, still moves the light. */
+export const LitFromEmptySpace: Story = {
+    parameters: { chromatic: { disableSnapshot: true } },
+    play: async ({ canvasElement }) => {
+        const host = canvasElement.querySelector(".xp-gnomon") as HTMLElement
+        const tile = host.firstElementChild as HTMLElement
+        const box = host.getBoundingClientRect()
+        const before = tile.style.getPropertyValue("--gn-dy")
+
+        host.dispatchEvent(
+            new PointerEvent("pointermove", {
+                bubbles: true,
+                clientX: box.left + 8,
+                clientY: box.bottom - 8,
+            }),
+        )
+
+        await waitFor(() => expect(tile.style.getPropertyValue("--gn-dy")).not.toBe(before))
+        await waitFor(() => expect(Number(tile.style.getPropertyValue("--gn-dy"))).toBeLessThan(0))
+    },
+}

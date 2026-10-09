@@ -4,7 +4,6 @@ import { Wash } from "@/lib/experimental"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { PALETTES } from "../experimental/schemas"
-import { Hint } from "./parts"
 
 export function WashPreview({ config }: PreviewApi) {
     const c = config as {
@@ -13,6 +12,7 @@ export function WashPreview({ config }: PreviewApi) {
         interval: number
         duration: number
         softness: number
+        burst: boolean
     }
 
     return (
@@ -22,9 +22,13 @@ export function WashPreview({ config }: PreviewApi) {
             interval={c.interval}
             duration={c.duration}
             softness={c.softness}
-            className="xpg-hero"
+            burst={c.burst}
+            className="xpg-hero xpg-wash"
         >
-            <Hint>Click</Hint>
+            <span className="xpg-wash-hint" aria-hidden="true">
+                <i />
+                Click anywhere
+            </span>
         </Wash>
     )
 }

@@ -10,7 +10,12 @@ const PACKAGE = "zerogravity"
  */
 export function snippetFor(entry: DocEntry, config: Record<string, unknown>): string {
     const tag = entry.tag ?? entry.name
-    const lines = propLines(entry.defaults, config, entry.omit)
+    const example = entry.exampleProps
+    const extra = example ? (example.props[String(config[example.key])] ?? []) : []
+    const lines = [
+        ...extra.map((line) => `    ${line}`),
+        ...propLines(entry.defaults, config, entry.omit, "    ", entry.required),
+    ]
 
     const open =
         lines.length === 0

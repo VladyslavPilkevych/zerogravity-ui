@@ -1,5 +1,6 @@
 import { useRef } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { expect, waitFor } from "storybook/test"
 
 import { Gantry } from "./Gantry"
 
@@ -74,3 +75,16 @@ export const NoGap: Story = { render: (args) => <Port {...args} scrollTo={0.5} g
 export const NoLean: Story = { render: (args) => <Port {...args} scrollTo={0.5} lean={0} /> }
 
 export const Disabled: Story = { render: (args) => <Port {...args} disabled /> }
+
+export const Midpoint: Story = {
+    render: (args) => <Port {...args} progress={0.5} />,
+    play: async ({ canvasElement }) => {
+        const track = canvasElement.querySelector<HTMLElement>(".xp-gantry")!
+        const rail = canvasElement.querySelector<HTMLElement>(".xp-gantry-rail")!
+
+        await waitFor(() => {
+            expect(track.dataset.phase).toBe("moving")
+            expect(rail.style.transform).toMatch(/translate3d\(-\d/)
+        })
+    },
+}

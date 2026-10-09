@@ -8,6 +8,8 @@ test("every docs page renders under prefers-reduced-motion", async ({
     page,
     browserLog: guard,
 }) => {
+    test.setTimeout(DOCS_ROUTES.length * 2_000)
+
     for (const route of DOCS_ROUTES) {
         await page.goto(route.path)
         await expect(page.locator(".dz-preview")).toBeVisible()

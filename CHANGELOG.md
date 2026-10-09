@@ -7,7 +7,54 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `Bitmap` — pixel text on a 5x7 grid for any string, with a `sweep`, `wave` or
+  `cycle` effect, a single `color` or a `colors` palette, `animated`, `speed`,
+  `pixelSize` and `gap`. Pure SVG and CSS, no animation loop, server-renderable,
+  and the real text stays in the DOM for screen readers.
+- `Dither` — a pixel sweep that fills any card, link, button or navigation block
+  on hover and on keyboard focus, then retracts. Renders as any element or
+  component through `as`.
+- `Keycap` (a native button with notched pixel corners and press depth), `Bezel`
+  (a stepped-corner frame with an optional label and grid), `Seam` (a pixel
+  divider) and `Pip` (a status badge with a glyph per state). They appear under
+  a new **Interface** category in the docs.
+- Promoted from the prototypes after review, each with its own subpath export:
+  `Eclipse` / `EclipseSection`, `Lattice`, `Louvre`, `Palimpsest`
+  (+ `PALIMPSEST_COLORS`), `Phosphor` and `Sonar`. During review their animation
+  loops were made to go idle, and Louvre gained `respectReducedMotion`, Lattice
+  `enableOnTouch`, and Sonar's hover flag became `pulseOnHover`.
+- `Vellum`: `surface="pixel"` draws the sheet as a tile grid with stepped light
+  and a dithered dent, `pixel` sets the tile size, and `pointer` pins the dent.
+  The default output is unchanged.
+- `ScrollStack`: `hold`, how long the finished stack stays pinned, in viewports.
+
+### Changed
+
+- `ScrollStack` now leaves room after the last card so it docks and rests like
+  every other card before the stack releases. This adds `hold` (default `0.3`)
+  viewports of scroll after the stack; pass `hold={0}` for the old release
+  point. Cards recede only once the next card actually overlaps them.
+- `Reel` runs on the shared frame clock, stops requesting frames while a drag is
+  held still, and only writes styles that changed — roughly half the style
+  writes per step and none while settled.
+- README rewritten for someone arriving from npm: what the project is, the
+  package name, install, a working example, subpath imports, and the component
+  table, before any repository detail.
+- `description` and `keywords` in `package.json` reworded for the npm listing.
+
 ### Fixed
+
+- `ScrollStack`: the last card no longer slides over the stack and scrolls away
+  without docking, earlier cards taller than the last are no longer pushed out
+  before it arrives, and a resize while scrolled no longer skews the offsets.
+- `Aperture`: with a `scrollContainer` ref on an ancestor, the first measurement
+  used the window instead of the container.
+- `Diorama`: the per-plane `blur` option was silently ignored. Planes that set it
+  now get that blur instead of the depth-based default.
+- `Vellum`: the animation loop now stops when the sheet settles, and resizing the
+  element no longer leaves a stale pointer box.
 
 - The README shipped with `0.1.0` still called the package `zerogravity-ui` and
   told readers to run `pnpm add zerogravity-ui`, which installs an unrelated
@@ -15,13 +62,6 @@ this project adheres to [Semantic Versioning](https://semver.org/).
   usage snippet now uses `zerogravity`. Worth a patch release on its own: the
   npm page is the first thing a reader sees, and it currently points at the
   wrong package.
-
-### Changed
-
-- README rewritten for someone arriving from npm: what the project is, the
-  package name, install, a working example, subpath imports, and the component
-  table, before any repository detail.
-- `description` and `keywords` in `package.json` reworded for the npm listing.
 
 ## [0.1.0]
 

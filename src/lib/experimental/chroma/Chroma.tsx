@@ -8,45 +8,51 @@ import {
     cx,
     finite,
     fitCanvas,
-    onFrame,
     onResize,
     onVisible,
     pointerBox,
     useLatestRef,
-    useMediaQuery,
     usePrefersReducedMotion,
+    wakeLoop,
 } from "../../internal"
+import { toRgb, type Rgb } from "./tone"
+import { createTrail, traceCapacity, traceTrail } from "./trail"
 import "./Chroma.css"
 
 export interface ChromaProps {
     children?: ReactNode
-    /** how far the channels separate at speed, in px */
-    split?: number
-    /** how wide the smear is, in px */
+    /** how wide the trail is at the pointer, in px */
     width?: number
-    /** how long a trail survives, in seconds */
-    linger?: number
-    /** the three channels, drawn additively */
+    /** how soft its edges are, in px */
+    blur?: number
+    /** how long a point of the trail takes to fade, in seconds */
+    decay?: number
+    /** the trail's colour when fresh, halfway and nearly gone */
     colors?: readonly [string, string, string]
-    enableOnTouch?: boolean
+    /** time advances one frame per pointer sample and never on its own */
+    paused?: boolean
     disabled?: boolean
     respectReducedMotion?: boolean
     className?: string
     style?: CSSProperties
 }
 
-/** The trail is a ring buffer, so a pointer held down for an hour costs this. */
-const SAMPLES = 90
+/** The history is a ring of this many samples, however long the pointer moves. */
+export const CHROMA_SAMPLES = 64
 
-export const CHROMA_COLORS: readonly [string, string, string] = ["#ff2f6d", "#41ff9e", "#3aa0ff"]
+export const CHROMA_COLORS: readonly [string, string, string] = ["#ff3d7f", "#8f5bff", "#22d3ff"]
+
+const SHADES = 48
+const MIN_SPACING = 4
+const PAUSED_STEP = 1 / 60
 
 export function Chroma({
     children,
-    split = 16,
-    width = 26,
-    linger = 0.7,
+    width = 24,
+    blur = 12,
+    decay = 0.6,
     colors = CHROMA_COLORS,
-    enableOnTouch = true,
+    paused = false,
     disabled = false,
     respectReducedMotion = true,
     className,
@@ -55,17 +61,15 @@ export function Chroma({
     const hostRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
-    const reduced = usePrefersReducedMotion()
-    const fine = useMediaQuery("(pointer: fine)")
-    const still = disabled || (respectReducedMotion && reduced)
-    const live = !still && (fine || enableOnTouch)
-
+    const prefersReduced = usePrefersReducedMotion()
+    const reduced = respectReducedMotion && prefersReduced
+    const [fresh, middle, faded] = colors
     const settings = useLatestRef({
-        split: clamp(finite(split, 16), 0, 80),
-        width: clamp(finite(width, 26), 2, 160),
-        linger: clamp(finite(linger, 0.7), 0.1, 6),
-        colors,
-        live,
+        width: clamp(finite(width, 24), 2, 120),
+        decay: clamp(finite(decay, 0.6), 0.08, 3),
+        reduced,
+        paused,
+        disabled,
     })
 
     useEffect(() => {
@@ -77,162 +81,231 @@ export function Chroma({
         if (!context) return
 
         const box = pointerBox(host)
-        const px = new Float32Array(SAMPLES)
-        const py = new Float32Array(SAMPLES)
-        const born = new Float32Array(SAMPLES)
-        const speed = new Float32Array(SAMPLES)
-        let head = 0
-        let filled = 0
-        let clock = 0
-        let last: { x: number; y: number } | null = null
+        const trail = createTrail(CHROMA_SAMPLES)
+        const points = new Float32Array(traceCapacity(trail) * 3)
+        const tones = [fresh, middle, faded].map((value, index) =>
+            toRgb(value, TONE_FALLBACKS[index], host),
+        ) as Tones
+        const shades = shadeTable(tones, 0)
+        const cores = shadeTable(tones, 0.55)
         let size = fitCanvas(canvas, host)
+        let clock = 0
+        let cut = true
         let visible = true
 
-        const push = (x: number, y: number) => {
-            const pace = last ? Math.hypot(x - last.x, y - last.y) : 0
-            last = { x, y }
-
-            px[head] = x
-            py[head] = y
-            born[head] = clock
-            speed[head] = pace
-            head = (head + 1) % SAMPLES
-            filled = Math.min(filled + 1, SAMPLES)
+        const clear = () => {
+            context.setTransform(1, 0, 0, 1, 0, 0)
+            context.clearRect(0, 0, size.width, size.height)
         }
 
         const paint = () => {
-            const config = settings.current
-
-            context.setTransform(1, 0, 0, 1, 0, 0)
-            context.clearRect(0, 0, size.width, size.height)
-            if (filled < 2) return
-
+            clear()
+            const count = traceTrail(trail, clock, settings.current.decay, points)
+            if (count === 0) return
+            const half = (settings.current.width * size.dpr) / 2
+            paintRibbon(context, points, count, half, shades)
             context.globalCompositeOperation = "lighter"
-            context.lineCap = "round"
-            context.lineJoin = "round"
+            paintRibbon(context, points, count, half * 0.38, cores)
+            context.globalCompositeOperation = "source-over"
+        }
 
-            // one continuous ribbon per channel, each pushed sideways off the
-            // path and read a couple of samples behind the others, so the three
-            // separate whichever way the pointer is travelling
-            const jump = Math.min(size.width, size.height) * 0.5
+        const paintDot = (x: number, y: number) => {
+            clear()
+            const radius = settings.current.width * size.dpr
+            const glow = context.createRadialGradient(x, y, 0, x, y, radius)
+            glow.addColorStop(0, shades[SHADES - 1])
+            glow.addColorStop(1, shades[0])
+            context.fillStyle = glow
+            context.beginPath()
+            context.arc(x, y, radius, 0, Math.PI * 2)
+            context.fill()
+        }
 
-            for (let channel = 0; channel < 3; channel += 1) {
-                const side = channel - 1
-                // every channel reads behind the head, never ahead of it, or
-                // the slots it wants have not been written yet
-                const lag = channel * 2
+        // runs only while some of the trail is still fading
+        const loop = wakeLoop((dt) => {
+            clock += dt
+            const left = trail.prune(clock, settings.current.decay)
+            if (left === 0 || !visible) {
+                trail.clear()
+                clear()
+                return false
+            }
+            paint()
+            return true
+        })
 
-                context.beginPath()
-                let started = false
-                let headX = 0
-                let headY = 0
-                let tailX = 0
-                let tailY = 0
+        const onMove = (event: PointerEvent) => {
+            const config = settings.current
+            if (config.disabled) return
+            const point = box.px(event)
+            if (!point) return
+            const x = point.x * size.dpr
+            const y = point.y * size.dpr
 
-                for (let step = 0; step < filled - 3; step += 1) {
-                    const index = (head - 1 - step - lag + SAMPLES * 3) % SAMPLES
-                    const life = (clock - born[index]) / config.linger
-                    if (life >= 1 || life < 0) break
-
-                    // the neighbour one step further back, never one step
-                    // ahead: ahead of the head is the slot about to be reused
-                    const older = (index - 1 + SAMPLES) % SAMPLES
-                    const dx = px[index] - px[older]
-                    const dy = py[index] - py[older]
-                    const length = Math.hypot(dx, dy)
-                    // a pointer that re-enters the box leaves one enormous gap;
-                    // that is a jump, not a stroke
-                    if (length > jump) break
-
-                    const pace = Math.min(1, speed[index] / (26 * size.dpr))
-                    const push = side * config.split * size.dpr * (0.3 + pace * 0.7)
-                    const offX = length > 0.001 ? (-dy / length) * push : 0
-                    const offY = length > 0.001 ? (dx / length) * push : 0
-                    const x = px[index] + offX
-                    const y = py[index] + offY
-
-                    if (!started) {
-                        context.moveTo(x, y)
-                        headX = x
-                        headY = y
-                        started = true
-                    } else {
-                        context.lineTo(x, y)
-                    }
-                    tailX = x
-                    tailY = y
-                }
-
-                if (!started) continue
-
-                const smear = context.createLinearGradient(headX, headY, tailX, tailY)
-                const tint = config.colors[channel] ?? CHROMA_COLORS[channel]
-                smear.addColorStop(0, tint)
-                smear.addColorStop(1, "rgba(0,0,0,0)")
-                context.strokeStyle = smear
-                context.globalAlpha = 0.9
-                context.lineWidth = config.width * size.dpr
-                context.stroke()
+            if (config.reduced) {
+                paintDot(x, y)
+                return
             }
 
-            context.globalAlpha = 1
-            context.globalCompositeOperation = "source-over"
+            if (config.paused) clock += PAUSED_STEP
+
+            const count = trail.size
+            const previous = count > 1 ? trail.slot(count - 2) : -1
+            const near =
+                !cut &&
+                previous !== -1 &&
+                Math.hypot(x - trail.xs[previous], y - trail.ys[previous]) < MIN_SPACING * size.dpr
+            if (near) trail.nudge(x, y, clock)
+            else trail.push(x, y, clock, cut)
+            cut = false
+
+            if (config.paused) paint()
+            else loop.wake()
+        }
+
+        const onLeave = () => {
+            cut = true
+            if (settings.current.reduced) clear()
         }
 
         const stopResize = onResize(host, () => {
             size = fitCanvas(canvas, host)
             box.invalidate()
-            filled = 0
-            last = null
-            paint()
+            trail.clear()
+            cut = true
+            clear()
         })
         const stopVisible = onVisible(host, (seen) => {
             visible = seen
         })
 
-        const stopFrame = onFrame((dt) => {
-            if (!visible) return
-            clock += dt
-            if (filled === 0) return
-            paint()
-            // once every sample has expired the canvas is already clear
-            const oldest = (head - filled + SAMPLES) % SAMPLES
-            if (clock - born[oldest] > settings.current.linger) filled = Math.max(0, filled - 1)
-        })
-
-        const onMove = (event: PointerEvent) => {
-            if (!settings.current.live) return
-            const point = box.px(event)
-            if (!point) return
-            push(point.x * size.dpr, point.y * size.dpr)
-        }
-
-        const onLeave = () => {
-            last = null
-        }
-
         host.addEventListener("pointermove", onMove, { passive: true })
         host.addEventListener("pointerleave", onLeave)
 
         return () => {
-            stopFrame()
+            loop.sleep()
             stopResize()
             stopVisible()
             host.removeEventListener("pointermove", onMove)
             host.removeEventListener("pointerleave", onLeave)
             box.dispose()
         }
-    }, [settings])
+    }, [settings, fresh, middle, faded])
 
     return (
         <div
             ref={hostRef}
             className={cx("xp-chroma", className)}
-            data-still={still ? "true" : undefined}
-            style={style}
+            data-still={disabled ? "true" : undefined}
+            style={
+                {
+                    ...style,
+                    "--ch-blur": `${clamp(finite(blur, 12), 0, 60)}px`,
+                } as CSSProperties
+            }
         >
             {children ? <div className="xp-chroma-content">{children}</div> : null}
             <canvas ref={canvasRef} className="xp-chroma-trail" aria-hidden="true" />
         </div>
     )
+}
+
+/**
+ * The ribbon is one quad per pair of neighbouring points, sharing edges so it
+ * never breaks, tapering and fading with each point's age. Colour and alpha
+ * come from a precomputed table, so a frame builds no strings.
+ */
+function paintRibbon(
+    context: CanvasRenderingContext2D,
+    points: Float32Array,
+    count: number,
+    half: number,
+    shades: readonly string[],
+): void {
+    let lx = NaN
+    let ly = NaN
+    let rx = NaN
+    let ry = NaN
+
+    for (let i = 0; i < count; i += 1) {
+        const x = points[i * 3]
+        const y = points[i * 3 + 1]
+        const life = points[i * 3 + 2]
+        if (Number.isNaN(x)) {
+            lx = NaN
+            continue
+        }
+
+        const prev = i > 0 && !Number.isNaN(points[(i - 1) * 3]) ? i - 1 : i
+        const next = i + 1 < count && !Number.isNaN(points[(i + 1) * 3]) ? i + 1 : i
+        let nx = -(points[next * 3 + 1] - points[prev * 3 + 1])
+        let ny = points[next * 3] - points[prev * 3]
+        const length = Math.hypot(nx, ny)
+        if (length < 1e-3) {
+            nx = 0
+            ny = 0
+        } else {
+            nx /= length
+            ny /= length
+        }
+
+        const eased = life * life * (3 - 2 * life)
+        const reach = half * (0.18 + 0.82 * eased)
+        const ax = x + nx * reach
+        const ay = y + ny * reach
+        const bx = x - nx * reach
+        const by = y - ny * reach
+
+        if (!Number.isNaN(lx)) {
+            context.fillStyle = shades[Math.min(SHADES - 1, Math.round(eased * (SHADES - 1)))]
+            context.beginPath()
+            context.moveTo(lx, ly)
+            context.lineTo(ax, ay)
+            context.lineTo(bx, by)
+            context.lineTo(rx, ry)
+            context.closePath()
+            context.fill()
+        }
+
+        lx = ax
+        ly = ay
+        rx = bx
+        ry = by
+
+        const ends = next === i
+        if (ends && life > 0.02) {
+            context.fillStyle = shades[Math.min(SHADES - 1, Math.round(eased * (SHADES - 1)))]
+            context.beginPath()
+            context.arc(x, y, reach, 0, Math.PI * 2)
+            context.fill()
+        }
+    }
+}
+
+type Tones = [Rgb, Rgb, Rgb]
+
+const TONE_FALLBACKS: Tones = [
+    [255, 61, 127],
+    [143, 91, 255],
+    [34, 211, 255],
+]
+
+/** fresh → middle → faded, with alpha falling to nothing as the point ages */
+function shadeTable([a, b, c]: Tones, white: number): string[] {
+    const table: string[] = []
+
+    for (let i = 0; i < SHADES; i += 1) {
+        const life = i / (SHADES - 1)
+        const from = life > 0.5 ? b : c
+        const to = life > 0.5 ? a : b
+        const t = life > 0.5 ? (life - 0.5) * 2 : life * 2
+        const tint = (k: number) => {
+            const base = from[k] + (to[k] - from[k]) * t
+            return Math.round(base + (255 - base) * white)
+        }
+        const alpha = ((white > 0 ? 0.55 : 0.95) * Math.pow(life, 0.7)).toFixed(3)
+        table.push(`rgba(${tint(0)},${tint(1)},${tint(2)},${alpha})`)
+    }
+
+    return table
 }

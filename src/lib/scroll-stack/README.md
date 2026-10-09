@@ -31,6 +31,7 @@ lift, blur — of the card being covered.
 | `heights`                             | (string \| undefined)[]   |             | Per-section overrides; `undefined` falls back to `height`     |
 | `top`                                 | number                    | `0`         | Where a card sticks, px from the top                          |
 | `peek`                                | number                    | `0`         | Extra sticky offset per card, so previous edges stay visible  |
+| `hold`                                | number                    | `0.3`       | How long the finished stack stays pinned, in viewports        |
 | `scaleTo`                             | number                    | `0.92`      | Scale a fully covered card shrinks to                         |
 | `dim`                                 | number                    | `0.5`       | Opacity of the dark veil over a covered card                  |
 | `dimColor`                            | string                    | `"#05050a"` | Colour of that veil                                           |
@@ -42,6 +43,21 @@ lift, blur — of the card being covered.
 | `disabled`                            | boolean                   | `false`     | Plain sticky stacking with no motion                          |
 | `className`, `cardClassName`, `style` |                           |             | Escape hatches for styling                                    |
 | `onActiveChange`                      | `(index: number) => void` |             | Fires when the top card changes                               |
+
+### The last card and the release
+
+Every card stays pinned until the last one has docked, and the finished stack
+is then held for `hold` viewports of scrolling before it leaves together. Set
+`hold={0}` to let it go the moment the last card arrives.
+
+Sticky elements only stay pinned while their container reaches past them, so
+the stack ends in an invisible spacer that provides that reach. It also covers
+the case where an earlier card is taller than the last one, which would
+otherwise be pushed out before the last card had docked.
+
+A card starts to recede when the next one first overlaps it, or enters the
+viewport if the card is taller than the viewport, and is fully covered exactly
+when the next card docks.
 
 ### `dim` versus `opacityTo`
 
@@ -80,10 +96,12 @@ falls back to `height`.
 
 - **No layout reads while scrolling.** The cumulative card offsets and the
   viewport height are measured once on mount and again on resize
-  (`ResizeObserver` + `resize`). Every frame after that only reads
-  `window.scrollY`, which never forces layout.
-- **One rAF per scroll burst.** Scroll events are coalesced into a single
-  animation frame; a burst of twenty events still paints once.
+  (`ResizeObserver` + `resize`), from layout sizes rather than transformed
+  boxes, so a resize mid-scroll measures the same deck. Every frame after that
+  only reads `window.scrollY`, which never forces layout.
+- **One frame per scroll burst.** Scroll events are coalesced into a single
+  frame of the shared frame clock; a burst of twenty events still paints once,
+  and nothing runs between bursts.
 - **Only `transform` and `opacity` are written**, both compositor properties,
   so scrolling does not repaint the card contents.
 - **Nothing is written twice.** A card whose progress moved less than 0.0005 is

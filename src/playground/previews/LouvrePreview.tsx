@@ -1,6 +1,6 @@
 "use client"
 
-import { Louvre } from "@/lib/experimental"
+import { Louvre } from "@/lib/louvre"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint, ScrollPort } from "./parts"
@@ -13,7 +13,7 @@ export function LouvrePreview({ config }: PreviewApi) {
         perspective: number
         gap: number
         shade: number
-        scrollLength: number
+        scrollLength: string
     }
 
     return (
@@ -32,7 +32,7 @@ export function LouvrePreview({ config }: PreviewApi) {
                         perspective={c.perspective}
                         gap={c.gap}
                         shade={c.shade}
-                        scrollLength={`${c.scrollLength}cqh`}
+                        scrollLength={c.scrollLength}
                         front={
                             <div className="xpg-blind xpg-blind-a">
                                 <span>Section A</span>

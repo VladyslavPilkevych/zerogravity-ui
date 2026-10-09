@@ -1,33 +1,31 @@
 .xp-wake {
+    --wake-deep: #0a2a42;
+    --wake-shallow: #1b7a8c;
+    --wake-line: #a8e8f0;
     position: relative;
     display: block;
     width: 100%;
     overflow: hidden;
+    isolation: isolate;
+    background: var(--wake-deep);
 }
 
-.xp-wake-skin {
-    position: relative;
-    z-index: 1;
-}
-
-/* Light sits over the surface and never intercepts anything. */
-.xp-wake-light {
+/* The water never intercepts anything: the root listens, the content receives. */
+.xp-wake-water {
     position: absolute;
     inset: 0;
-    z-index: 2;
+    z-index: 0;
     display: block;
     width: 100%;
     height: 100%;
     pointer-events: none;
 }
 
-.xp-wake-defs {
-    position: absolute;
-    width: 0;
-    height: 0;
-    pointer-events: none;
+.xp-wake[data-pixelated="true"] .xp-wake-water {
+    image-rendering: pixelated;
 }
 
-.xp-wake[data-still="true"] .xp-wake-light {
-    display: none;
+.xp-wake-content {
+    position: relative;
+    z-index: 1;
 }

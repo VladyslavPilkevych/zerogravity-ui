@@ -9,29 +9,41 @@ over, strip by strip, exactly as a lenticular print does when you walk past it.
 
 ## How it works
 
-Both plates are stacked; the front one is cut into strips by a repeating mask
-whose _duty cycle_ answers to the pointer. Wide open on one side of the card,
-closed on the other, interlaced in between — so it is a striped handover rather
-than a crossfade, and at either extreme you see one whole picture.
+Both plates are stacked; the front one is cut into strips by a repeating mask.
+The pointer's position across the card maps to a lens mix:
 
-The lens ribbing and the sheen are two more gradients over the top. No canvas,
-no filter, no JavaScript per strip.
+| Pointer   | What you see                                     |
+| --------- | ------------------------------------------------ |
+| 0 – 20%   | The first picture alone, no seams from the other |
+| 20 – 80%  | The two interlaced, eased with a smoothstep      |
+| 80 – 100% | The second picture alone                         |
+
+Inside the middle band the strips' duty cycle follows the mix, so the handover
+is striped rather than a crossfade. Toward either edge the gaps are filled in
+and the front plate fades out entirely, so neither extreme keeps a trace of the
+other picture. The mapping lives in `lens.ts` as a pure function.
+
+The lens ribbing is strongest mid-swap and only a faint texture at the edges.
+The print keeps whichever side the pointer left it on, and the frame loop stops
+once it has settled. On touch screens a horizontal drag or a tap scrubs the
+print and vertical scrolling still works.
 
 ## Props
 
-| Prop                   | Default     | Notes                                         |
-| ---------------------- | ----------- | --------------------------------------------- |
-| `frontSrc`             | —           | The image seen from the left                  |
-| `backSrc`              | —           | The image seen from the right                 |
-| `alt`                  | —           | Describes the pair; one card, one description |
-| `strips`               | `46`        | How many lens strips run across the card      |
-| `tilt`                 | `7`         | How far the card leans, in degrees            |
-| `sheen`                | `0.5`       | How bright the lens sheen is                  |
-| `aspect`               | `"4 / 3"`   | Locks the card to a ratio                     |
-| `objectPosition`       | `"50% 50%"` | Where both plates sit when cropped            |
-| `radius`               | `16`        | Corner radius                                 |
-| `disabled`             | `false`     | Hold the print head-on                        |
-| `respectReducedMotion` | `true`      | Honour `prefers-reduced-motion`               |
+| Prop                   | Default     | Notes                                          |
+| ---------------------- | ----------- | ---------------------------------------------- |
+| `frontSrc`             | —           | The image seen from the left                   |
+| `backSrc`              | —           | The image seen from the right                  |
+| `alt`                  | —           | Describes the pair; one card, one description  |
+| `strips`               | `46`        | How many lens strips run across the card       |
+| `tilt`                 | `7`         | How far the card leans, in degrees             |
+| `sheen`                | `0.5`       | How bright the lens sheen is                   |
+| `aspect`               | `"4 / 3"`   | Locks the card to a ratio                      |
+| `objectPosition`       | `"50% 50%"` | Where both plates sit when cropped             |
+| `radius`               | `16`        | Corner radius                                  |
+| `position`             | —           | Holds the print at 0–1 and ignores the pointer |
+| `disabled`             | `false`     | Hold the print head-on                         |
+| `respectReducedMotion` | `true`      | Honour `prefers-reduced-motion`                |
 
 ## Accessibility
 

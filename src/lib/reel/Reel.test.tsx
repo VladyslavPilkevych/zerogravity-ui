@@ -2,6 +2,7 @@ import { act, fireEvent, render } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { installFrameHarness, type FrameHarness } from "../../test/frames"
+import { frameCount } from "../internal"
 import { Reel } from "./Reel"
 
 function slides(count = 4) {
@@ -132,5 +133,51 @@ describe("Reel", () => {
 
         unmount()
         expect(frames.pending()).toBe(0)
+    })
+
+    it("goes idle while a drag is held still", () => {
+        const { container } = render(<Reel>{slides()}</Reel>)
+        const viewport = container.querySelector(".reel-viewport") as HTMLElement
+        viewport.setPointerCapture = () => {}
+        viewport.hasPointerCapture = () => false
+
+        fireEvent.pointerDown(viewport, { button: 0, pointerId: 1, clientX: 300 })
+        fireEvent.pointerMove(viewport, { pointerId: 1, clientX: 260 })
+        expect(frameCount()).toBe(1)
+
+        act(() => frames.advance(1))
+        expect(frames.pending()).toBe(0)
+
+        act(() => frames.advance(30))
+        expect(frames.pending()).toBe(0)
+
+        fireEvent.pointerMove(viewport, { pointerId: 1, clientX: 240 })
+        expect(frames.pending()).toBe(1)
+    })
+
+    it("only writes a slide's style when it actually changes", () => {
+        const { container } = render(<Reel>{slides()}</Reel>)
+        const first = container.querySelector(".reel-item") as HTMLElement
+        const writes = vi.fn()
+        const style = first.style
+        const transform = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(style), "transform")
+        Object.defineProperty(style, "transform", {
+            configurable: true,
+            get: () => transform?.get?.call(style),
+            set: (value: string) => {
+                writes(value)
+                transform?.set?.call(style, value)
+            },
+        })
+
+        fireEvent.click(container.querySelector(".reel-arrow-next") as HTMLElement)
+        act(() => frames.advance(200, 16))
+        const values = writes.mock.calls.map(([value]) => value as string)
+        expect(values.length).toBeGreaterThan(0)
+        expect(values.some((value, i) => i > 0 && value === values[i - 1])).toBe(false)
+
+        writes.mockClear()
+        act(() => frames.advance(30, 16))
+        expect(writes).not.toHaveBeenCalled()
     })
 })

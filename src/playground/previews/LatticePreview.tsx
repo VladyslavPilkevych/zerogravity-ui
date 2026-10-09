@@ -1,6 +1,6 @@
 "use client"
 
-import { Lattice } from "@/lib/experimental"
+import { Lattice } from "@/lib/lattice"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"

@@ -1,4 +1,5 @@
 import { act, render } from "@testing-library/react"
+import { useRef } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { installFrameHarness, type FrameHarness } from "../../test/frames"
@@ -113,5 +114,42 @@ describe("Aperture", () => {
 
         expect(remove.mock.calls.some(([type]) => type === "scroll")).toBe(true)
         expect(frames.pending()).toBe(0)
+    })
+
+    it("measures against a scroll container that mounts around it", () => {
+        const onProgress = vi.fn()
+
+        function Scroller() {
+            const port = useRef<HTMLDivElement>(null)
+            return (
+                <div ref={port} data-testid="port">
+                    <Aperture scrollContainer={port} easing="linear" onProgress={onProgress}>
+                        content
+                    </Aperture>
+                </div>
+            )
+        }
+
+        const rect = vi
+            .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+            .mockReturnValue({ top: 0, height: 1500 } as DOMRect)
+        const height = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(500)
+
+        const { getByTestId } = render(<Scroller />)
+        const port = getByTestId("port")
+        Object.defineProperty(port, "scrollTop", { value: 0, writable: true, configurable: true })
+        act(() => {
+            frames.advance()
+        })
+
+        port.scrollTop = 500
+        act(() => {
+            port.dispatchEvent(new Event("scroll"))
+            frames.advance()
+        })
+
+        expect(onProgress).toHaveBeenLastCalledWith(0.5)
+        rect.mockRestore()
+        height.mockRestore()
     })
 })

@@ -1,0 +1,129 @@
+.zg-seam {
+    --zg-c: var(--zg-seam-cell, 4px);
+    display: flex;
+    gap: calc(var(--zg-c) * 3);
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+}
+
+.zg-seam-line {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    height: var(--zg-c);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--zg-seam-tone, currentColor) 40%, transparent);
+    mask: repeating-linear-gradient(
+        90deg,
+        #000 0 calc(var(--zg-c) * 3),
+        transparent 0 calc(var(--zg-c) * 4)
+    );
+}
+
+.zg-seam-line[data-flip] {
+    transform: scaleX(-1);
+}
+
+.zg-seam[data-pattern="pulse"] .zg-seam-line {
+    mask: repeating-linear-gradient(90deg, #000 0 var(--zg-c), transparent 0 calc(var(--zg-c) * 2));
+}
+
+.zg-seam[data-pattern="stair"] .zg-seam-line {
+    height: calc(var(--zg-c) * 3);
+    mask:
+        linear-gradient(
+                90deg,
+                transparent 0 calc(var(--zg-c) * 2),
+                #000 0 calc(var(--zg-c) * 4),
+                transparent 0
+            )
+            0 0 / calc(var(--zg-c) * 6) var(--zg-c) repeat-x,
+        linear-gradient(
+                90deg,
+                transparent 0 var(--zg-c),
+                #000 0 calc(var(--zg-c) * 2),
+                transparent 0 calc(var(--zg-c) * 4),
+                #000 0 calc(var(--zg-c) * 5),
+                transparent 0
+            )
+            0 var(--zg-c) / calc(var(--zg-c) * 6) var(--zg-c) repeat-x,
+        linear-gradient(90deg, #000 0 var(--zg-c), transparent 0 calc(var(--zg-c) * 5), #000 0) 0
+            calc(var(--zg-c) * 2) / calc(var(--zg-c) * 6) var(--zg-c) repeat-x;
+}
+
+.zg-seam[data-pattern="dither"] .zg-seam-line {
+    height: calc(var(--zg-c) * 2);
+    mask:
+        conic-gradient(#000 25%, transparent 0 50%, #000 0 75%, transparent 0) 0 0 /
+            calc(var(--zg-c) * 2) calc(var(--zg-c) * 2),
+        linear-gradient(
+            90deg,
+            transparent 0 4%,
+            rgb(0 0 0 / 0.3) 0 14%,
+            rgb(0 0 0 / 0.62) 0 26%,
+            #000 0 74%,
+            rgb(0 0 0 / 0.62) 0 86%,
+            rgb(0 0 0 / 0.3) 0 96%,
+            transparent 0
+        );
+    mask-composite: intersect;
+}
+
+.zg-seam[data-pattern="dither"]:has(.zg-seam-label) .zg-seam-line {
+    mask:
+        conic-gradient(#000 25%, transparent 0 50%, #000 0 75%, transparent 0) 0 0 /
+            calc(var(--zg-c) * 2) calc(var(--zg-c) * 2),
+        linear-gradient(
+            90deg,
+            transparent 0 8%,
+            rgb(0 0 0 / 0.3) 0 26%,
+            rgb(0 0 0 / 0.62) 0 50%,
+            #000 0
+        );
+    mask-composite: intersect;
+}
+
+.zg-seam-line::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(var(--zg-seam-tone, currentColor) 0 0) no-repeat;
+    background-size: 22% 100%;
+    opacity: 0;
+    content: "";
+}
+
+.zg-seam[data-animated] .zg-seam-line::after {
+    opacity: 1;
+    animation: zg-seam-run var(--zg-seam-speed, 3.2s) steps(28, end) infinite;
+}
+
+@keyframes zg-seam-run {
+    from {
+        background-position: -30% 0;
+    }
+    to {
+        background-position: 130% 0;
+    }
+}
+
+.zg-seam-label {
+    flex: none;
+    max-width: 60%;
+    overflow: hidden;
+    color: var(--zg-seam-ink, inherit);
+    font-family: var(--zg-font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-seam[data-animated] .zg-seam-line::after {
+        opacity: 0;
+        animation: none;
+    }
+}

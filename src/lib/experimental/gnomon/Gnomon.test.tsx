@@ -40,32 +40,68 @@ describe("Gnomon", () => {
         expect(getByTestId("b")).toHaveTextContent("B")
     })
 
-    it("gives every child its own direction, not one shared shadow", () => {
-        const { getByTestId, host } = lit()
+    it("lights every child from a pointer anywhere in the root, not only over a child", () => {
+        const rects: Record<string, Partial<DOMRect>> = {
+            host: { left: 0, top: 0, width: 400, height: 200 },
+            a: { left: 40, top: 50, width: 100, height: 100 },
+            b: { left: 260, top: 50, width: 100, height: 100 },
+        }
+        const spy = vi
+            .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+            .mockImplementation(function (this: HTMLElement) {
+                const key = this.dataset.testid ?? "host"
+                return { right: 0, bottom: 0, x: 0, y: 0, ...rects[key] } as DOMRect
+            })
+
+        const { getByTestId, container } = render(
+            <Gnomon>
+                <div data-testid="a">A</div>
+                <div data-testid="b">B</div>
+            </Gnomon>,
+        )
+        const host = container.querySelector(".xp-gnomon") as HTMLElement
         const a = getByTestId("a")
         const b = getByTestId("b")
+        const dx = (node: HTMLElement) => Number(node.style.getPropertyValue("--gn-dx"))
+        const dy = (node: HTMLElement) => Number(node.style.getPropertyValue("--gn-dy"))
 
-        vi.spyOn(a, "getBoundingClientRect").mockReturnValue({
-            left: 0,
-            top: 0,
-            width: 100,
-            height: 100,
-        } as DOMRect)
-        vi.spyOn(b, "getBoundingClientRect").mockReturnValue({
-            left: 300,
-            top: 0,
-            width: 100,
-            height: 100,
-        } as DOMRect)
-
+        // the gap between the two cards, on the root itself
         fireEvent.pointerMove(host, { clientX: 200, clientY: 100 })
-        window.dispatchEvent(new Event("resize"))
-        frames.advance(30)
+        frames.advance(60)
+        expect(dx(a)).toBeLessThan(-0.5)
+        expect(dx(b)).toBeGreaterThan(0.5)
 
-        const left = Number(a.style.getPropertyValue("--gn-dx"))
-        const right = Number(b.style.getPropertyValue("--gn-dx"))
-        expect(Number.isFinite(left)).toBe(true)
-        expect(Number.isFinite(right)).toBe(true)
+        // the empty strip under both cards: now both shadows fall upward
+        fireEvent.pointerMove(host, { clientX: 200, clientY: 198 })
+        frames.advance(60)
+        expect(dy(a)).toBeLessThan(0)
+        expect(dy(b)).toBeLessThan(0)
+        expect(parseFloat(host.style.getPropertyValue("--gn-ly"))).toBeGreaterThan(95)
+
+        spy.mockRestore()
+    })
+
+    it("listens on the root alone and lets go of it on unmount", () => {
+        const add = vi.spyOn(HTMLElement.prototype, "addEventListener")
+        const remove = vi.spyOn(HTMLElement.prototype, "removeEventListener")
+        const { unmount, getByTestId, host } = lit()
+
+        // React binds its own delegated listeners on the container above
+        const listened = add.mock.contexts.filter(
+            (node, i) =>
+                host.contains(node as Node) && String(add.mock.calls[i][0]).startsWith("pointer"),
+        )
+        expect(listened).toEqual([host, host])
+        expect(add.mock.contexts).not.toContain(getByTestId("a"))
+
+        unmount()
+        const released = remove.mock.calls.filter(
+            ([type], i) => remove.mock.contexts[i] === host && String(type).startsWith("pointer"),
+        )
+        expect(released.map(([type]) => type).sort()).toEqual(["pointerleave", "pointermove"])
+
+        add.mockRestore()
+        remove.mockRestore()
     })
 
     it("clamps the shadow it writes into CSS", () => {
@@ -92,9 +128,16 @@ describe("Gnomon", () => {
         expect((container.querySelector(".xp-gnomon") as HTMLElement).dataset.still).toBe("true")
     })
 
-    it("gives its frame back on unmount", () => {
-        const { unmount } = lit()
+    it("holds no frame at rest, and gives a running one back on unmount", () => {
+        const { unmount, host } = lit()
+        expect(frames.pending()).toBe(0)
 
+        fireEvent.pointerMove(host, { clientX: 200, clientY: 100 })
+        expect(frames.pending()).toBe(1)
+        frames.advance(240)
+        expect(frames.pending()).toBe(0)
+
+        fireEvent.pointerMove(host, { clientX: 20, clientY: 20 })
         expect(frames.pending()).toBe(1)
         unmount()
         expect(frames.pending()).toBe(0)

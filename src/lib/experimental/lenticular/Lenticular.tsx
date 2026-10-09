@@ -7,12 +7,13 @@ import {
     cx,
     damp,
     finite,
-    onFrame,
     pointerBox,
     useLatestRef,
     useMediaQuery,
     usePrefersReducedMotion,
+    wakeLoop,
 } from "../../internal"
+import { lensState } from "./lens"
 import "./Lenticular.css"
 
 export interface LenticularProps {
@@ -31,6 +32,8 @@ export interface LenticularProps {
     aspect?: string
     objectPosition?: string
     radius?: number
+    /** holds the print at this position, 0 (first picture) to 1 (second); the pointer is ignored */
+    position?: number
     disabled?: boolean
     respectReducedMotion?: boolean
     className?: string
@@ -47,12 +50,14 @@ export function Lenticular({
     aspect = "4 / 3",
     objectPosition = "50% 50%",
     radius = 16,
+    position,
     disabled = false,
     respectReducedMotion = true,
     className,
     style,
 }: LenticularProps) {
     const hostRef = useRef<HTMLDivElement>(null)
+    const holdRef = useRef<(at: number) => void>(() => {})
     const [failed, setFailed] = useState(false)
     const [lastPair, setLastPair] = useState(`${frontSrc}|${backSrc}`)
 
@@ -67,45 +72,59 @@ export function Lenticular({
     const fine = useMediaQuery("(pointer: fine)")
     const still = disabled || (respectReducedMotion && reduced)
 
-    const settings = useLatestRef({ still })
+    const held = position === undefined ? undefined : clamp(finite(position, 0.5), 0, 1)
+    const settings = useLatestRef({ still, held })
 
     useEffect(() => {
         const host = hostRef.current
         if (!host) return
 
         const box = pointerBox(host)
-        let aim = 0.5
-        let at = 0.5
+        let aim = settings.current.held ?? 0.5
+        let at = aim
+        const write = () => writeLens(host.style, at)
 
-        const write = () => host.style.setProperty("--le-at", at.toFixed(4))
-        write()
-
-        const stop = onFrame((dt) => {
-            if (settings.current.still || Math.abs(aim - at) < 0.0008) return
+        const loop = wakeLoop((dt) => {
             at = damp(at, aim, 12, dt)
+            const settled = Math.abs(aim - at) < 0.0008
+            if (settled) at = aim
             write()
+            return !settled
         })
 
-        const onMove = (event: PointerEvent) => {
-            if (settings.current.still) return
+        holdRef.current = (next) => {
+            aim = next
+            at = next
+            loop.sleep()
+            write()
+        }
+
+        // the print keeps whichever side the pointer left it on, like a
+        // lenticular card you have walked past
+        const follow = (event: PointerEvent) => {
+            const config = settings.current
+            if (config.still || config.held !== undefined) return
             const point = box.at(event)
-            if (point) aim = clamp(point.x, 0, 1)
+            if (!point) return
+            aim = clamp(point.x, 0, 1)
+            loop.wake()
         }
 
-        const onLeave = () => {
-            aim = 0.5
-        }
-
-        host.addEventListener("pointermove", onMove, { passive: true })
-        host.addEventListener("pointerleave", onLeave)
+        host.addEventListener("pointermove", follow, { passive: true })
+        host.addEventListener("pointerdown", follow, { passive: true })
 
         return () => {
-            stop()
-            host.removeEventListener("pointermove", onMove)
-            host.removeEventListener("pointerleave", onLeave)
+            holdRef.current = () => {}
+            loop.sleep()
+            host.removeEventListener("pointermove", follow)
+            host.removeEventListener("pointerdown", follow)
             box.dispose()
         }
     }, [settings])
+
+    useEffect(() => {
+        if (held !== undefined) holdRef.current(held)
+    }, [held])
 
     const pitch = Math.round(clamp(finite(strips, 46), 6, 200))
 
@@ -127,6 +146,7 @@ export function Lenticular({
                     "--le-sheen": clamp(finite(sheen, 0.5), 0, 1),
                     "--le-radius": `${clamp(finite(radius, 16), 0, 96)}px`,
                     "--le-plate-at": objectPosition,
+                    ...lensStyle(held ?? 0.5),
                 } as CSSProperties
             }
         >
@@ -150,4 +170,24 @@ export function Lenticular({
             </div>
         </div>
     )
+}
+
+function lensStyle(at: number): Record<string, string> {
+    const lens = lensState(at)
+    return {
+        "--le-at": at.toFixed(4),
+        "--le-mix": lens.mix.toFixed(4),
+        "--le-hold": lens.hold.toFixed(4),
+        "--le-front": lens.front.toFixed(4),
+        "--le-ribs": lens.ribs.toFixed(4),
+    }
+}
+
+function writeLens(style: CSSStyleDeclaration, at: number): void {
+    const lens = lensState(at)
+    style.setProperty("--le-at", at.toFixed(4))
+    style.setProperty("--le-mix", lens.mix.toFixed(4))
+    style.setProperty("--le-hold", lens.hold.toFixed(4))
+    style.setProperty("--le-front", lens.front.toFixed(4))
+    style.setProperty("--le-ribs", lens.ribs.toFixed(4))
 }

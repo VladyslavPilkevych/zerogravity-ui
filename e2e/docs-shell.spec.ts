@@ -177,8 +177,10 @@ test("the home page shows the brand, the claim and a way in", async ({
 }) => {
     await page.goto("/")
 
-    await expect(page.getByRole("img", { name: "ZeroGravity" }).first()).toBeVisible()
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Motion you can import.")
+    const title = page.getByRole("heading", { level: 1 })
+    await expect(title).toContainText("ZeroGravity")
+    await expect(title).toContainText("Motion you can import.")
+    await expect(title.locator("svg").first()).toHaveAttribute("aria-hidden", "true")
     await expect(page.getByRole("link", { name: "Browse components" })).toBeVisible()
 
     // the hero field is decoration and says nothing

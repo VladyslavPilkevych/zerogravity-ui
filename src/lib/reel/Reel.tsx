@@ -13,7 +13,7 @@ import {
     type ReactNode,
 } from "react"
 
-import { cx, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
+import { cx, onFrame, useIsomorphicLayoutEffect, useLatestRef } from "../internal"
 import "./Reel.css"
 
 export interface ReelHandle {
@@ -103,12 +103,19 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
     const viewportRef = useRef<HTMLDivElement>(null)
     const itemRefs = useRef<(HTMLDivElement | null)[]>([])
 
+    const bindersRef = useRef<((node: HTMLDivElement | null) => void)[]>([])
+
     const positionRef = useRef(defaultIndex)
     const targetRef = useRef(defaultIndex)
     const activePaintedRef = useRef(-1)
-    const frameRef = useRef(0)
-    const lastTimeRef = useRef(0)
-    const runningRef = useRef(false)
+    const stopRef = useRef<(() => void) | null>(null)
+    const paintedRef = useRef({
+        position: Number.NaN,
+        transform: [] as string[],
+        opacity: [] as string[],
+        layer: [] as string[],
+        hidden: [] as boolean[],
+    })
 
     const dragStateRef = useRef({
         active: false,
@@ -146,26 +153,33 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         if (total === 0) return
 
         const position = positionRef.current
+        const painted = paintedRef.current
+        if (position === painted.position) return
+        painted.position = position
+
         const active = wrap(Math.round(position), total)
 
         for (let i = 0; i < total; i += 1) {
             const node = itemRefs.current[i]
             if (!node) continue
+            const style = node.style
 
             const offset = config.loop ? shortest(i - position, total) : i - position
             const distance = Math.abs(offset)
 
             if (distance > config.visible + 1) {
-                if (node.style.visibility !== "hidden") {
-                    node.style.visibility = "hidden"
-                    node.style.pointerEvents = "none"
+                if (painted.hidden[i] !== true) {
+                    painted.hidden[i] = true
+                    style.visibility = "hidden"
+                    style.pointerEvents = "none"
                 }
                 continue
             }
 
-            if (node.style.visibility === "hidden") {
-                node.style.visibility = ""
-                node.style.pointerEvents = ""
+            if (painted.hidden[i] !== false) {
+                painted.hidden[i] = false
+                style.visibility = ""
+                style.pointerEvents = ""
             }
 
             const ramp = distance > 1 ? 1 : distance
@@ -174,13 +188,26 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
             const spin = -config.rotate * clamp(offset, -1, 1)
             const push = -config.depth * ramp
 
-            node.style.transform = `translate(-50%, -50%) translate3d(${(
+            const transform = `translate(-50%, -50%) translate3d(${(
                 offset * config.spacing
             ).toFixed(
                 2,
             )}px, 0, ${push.toFixed(2)}px) rotateY(${spin.toFixed(2)}deg) scale(${itemScale.toFixed(4)})`
-            node.style.opacity = itemOpacity.toFixed(3)
-            node.style.zIndex = String(1000 - Math.round(distance * 10))
+            const opacity = itemOpacity.toFixed(3)
+            const layer = String(1000 - Math.round(distance * 10))
+
+            if (painted.transform[i] !== transform) {
+                painted.transform[i] = transform
+                style.transform = transform
+            }
+            if (painted.opacity[i] !== opacity) {
+                painted.opacity[i] = opacity
+                style.opacity = opacity
+            }
+            if (painted.layer[i] !== layer) {
+                painted.layer[i] = layer
+                style.zIndex = layer
+            }
         }
 
         if (active !== activePaintedRef.current) {
@@ -192,36 +219,44 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         }
     }, [settings])
 
-    const tickRef = useRef<(now: number) => void>(() => {})
+    const repaint = useCallback(() => {
+        const painted = paintedRef.current
+        painted.position = Number.NaN
+        painted.transform.length = 0
+        painted.opacity.length = 0
+        painted.layer.length = 0
+        painted.hidden.length = 0
+        activePaintedRef.current = -1
+        paint()
+    }, [paint])
+
+    const halt = useCallback(() => {
+        stopRef.current?.()
+        stopRef.current = null
+    }, [])
+
+    const tickRef = useRef<(dt: number) => void>(() => {})
 
     const tick = useCallback(
-        (now: number) => {
-            const dt =
-                lastTimeRef.current === 0
-                    ? 1 / 60
-                    : Math.min((now - lastTimeRef.current) / 1000, 1 / 15)
-            lastTimeRef.current = now
-
-            if (!dragStateRef.current.active) {
-                const diff = targetRef.current - positionRef.current
-                if (Math.abs(diff) < SETTLED) {
-                    positionRef.current = targetRef.current
-                    runningRef.current = false
-                } else {
-                    positionRef.current += diff * (1 - Math.exp(-settings.current.stiffness * dt))
-                }
+        (dt: number) => {
+            if (dragStateRef.current.active) {
+                paint()
+                halt()
+                return
             }
 
+            const diff = targetRef.current - positionRef.current
+            if (Math.abs(diff) < SETTLED) {
+                positionRef.current = targetRef.current
+                paint()
+                halt()
+                return
+            }
+
+            positionRef.current += diff * (1 - Math.exp(-settings.current.stiffness * dt))
             paint()
-
-            if (runningRef.current || dragStateRef.current.active) {
-                frameRef.current = requestAnimationFrame((next) => tickRef.current(next))
-            } else {
-                frameRef.current = 0
-                lastTimeRef.current = 0
-            }
         },
-        [paint, settings],
+        [paint, halt, settings],
     )
 
     useIsomorphicLayoutEffect(() => {
@@ -229,11 +264,9 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
     }, [tick])
 
     const start = useCallback(() => {
-        if (frameRef.current !== 0) return
-        runningRef.current = true
-        lastTimeRef.current = 0
-        frameRef.current = requestAnimationFrame(tick)
-    }, [tick])
+        if (stopRef.current) return
+        stopRef.current = onFrame((dt) => tickRef.current(dt))
+    }, [])
 
     const commit = useCallback(
         (next: number) => {
@@ -267,9 +300,20 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
 
     useIsomorphicLayoutEffect(() => {
         itemRefs.current.length = count
-        activePaintedRef.current = -1
-        paint()
-    }, [count, itemWidth, itemHeight, spacing, scale, opacity, rotate, depth, visible, paint])
+        repaint()
+    }, [
+        count,
+        itemWidth,
+        itemHeight,
+        spacing,
+        scale,
+        opacity,
+        rotate,
+        depth,
+        visible,
+        loop,
+        repaint,
+    ])
 
     useEffect(() => {
         const total = count
@@ -323,12 +367,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         return () => viewport.removeEventListener("wheel", onWheel)
     }, [wheel, step])
 
-    useEffect(() => {
-        return () => {
-            if (frameRef.current !== 0) cancelAnimationFrame(frameRef.current)
-            frameRef.current = 0
-        }
-    }, [])
+    useEffect(() => halt, [halt])
 
     const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
         if (count === 0 || event.button !== 0) return
@@ -348,7 +387,6 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         state.lastTime = performance.now()
         state.velocity = 0
         event.currentTarget.setPointerCapture(event.pointerId)
-        start()
     }
 
     const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -375,6 +413,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         }
 
         positionRef.current = next
+        start()
     }
 
     const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -422,6 +461,17 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         }
     }
 
+    const bindItem = (i: number) => {
+        let bind = bindersRef.current[i]
+        if (!bind) {
+            bind = (node) => {
+                itemRefs.current[i] = node
+            }
+            bindersRef.current[i] = bind
+        }
+        return bind
+    }
+
     const atStart = !loop && current === 0
     const atEnd = !loop && current === count - 1
 
@@ -447,9 +497,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
                 {items.map((item, i) => (
                     <div
                         key={i}
-                        ref={(node) => {
-                            itemRefs.current[i] = node
-                        }}
+                        ref={bindItem(i)}
                         className={clickToSelect ? "reel-item reel-item-clickable" : "reel-item"}
                         style={{ width: itemWidth, height: itemHeight }}
                         data-index={i}

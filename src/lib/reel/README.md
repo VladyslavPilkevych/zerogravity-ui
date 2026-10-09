@@ -111,8 +111,14 @@ in agreement.
 
 ## Performance
 
-- **The rAF loop only runs while something is moving.** Once the spring settles
-  within 0.0005 of the target the loop stops, so an idle carousel costs nothing.
+- **Frames only while something is moving.** Reel subscribes to the library's
+  shared frame clock, so several animated components on one page still cost one
+  `requestAnimationFrame` callback. Once the spring settles within 0.0005 of the
+  target it unsubscribes, and a drag only asks for a frame when the pointer
+  actually moves — holding a card still costs nothing.
+- **Only changed styles are written.** Each slide's last `transform`, `opacity`
+  and `zIndex` are cached, so a frame writes just what changed and never reads
+  inline styles back. A frame whose position did not move writes nothing.
 - **No React re-render per frame.** The animation writes `transform`, `opacity`
   and `zIndex` straight to the DOM nodes through refs; React only re-renders
   when the integer index changes.

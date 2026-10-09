@@ -46,9 +46,70 @@ describe("Lenticular", () => {
         } as DOMRect)
 
         fireEvent.pointerMove(host, { clientX: 290, clientY: 100 })
-        frames.advance(30)
+        frames.advance(60)
 
-        expect(Number(host.style.getPropertyValue("--le-at"))).toBeGreaterThan(0.8)
+        expect(Number(host.style.getPropertyValue("--le-at"))).toBeGreaterThan(0.95)
+        expect(Number(host.style.getPropertyValue("--le-mix"))).toBe(1)
+        expect(Number(host.style.getPropertyValue("--le-front"))).toBe(0)
+
+        fireEvent.pointerMove(host, { clientX: 9, clientY: 100 })
+        frames.advance(60)
+        expect(Number(host.style.getPropertyValue("--le-mix"))).toBe(0)
+        expect(Number(host.style.getPropertyValue("--le-hold"))).toBe(1)
+    })
+
+    it("keeps the side the pointer left it on and goes idle", () => {
+        const { container } = render(<Lenticular {...pair} />)
+        const host = container.querySelector(".xp-lenticular") as HTMLElement
+        vi.spyOn(host, "getBoundingClientRect").mockReturnValue({
+            left: 0,
+            top: 0,
+            width: 300,
+            height: 200,
+        } as DOMRect)
+
+        expect(frames.pending()).toBe(0)
+        fireEvent.pointerMove(host, { clientX: 295, clientY: 100 })
+        expect(frames.pending()).toBe(1)
+        fireEvent.pointerLeave(host)
+        frames.advance(120)
+
+        expect(Number(host.style.getPropertyValue("--le-mix"))).toBe(1)
+        expect(frames.pending()).toBe(0)
+    })
+
+    it("holds a controlled position and ignores the pointer", () => {
+        const { container, rerender } = render(<Lenticular {...pair} position={0.03} />)
+        const host = container.querySelector(".xp-lenticular") as HTMLElement
+
+        expect(Number(host.style.getPropertyValue("--le-mix"))).toBe(0)
+        fireEvent.pointerMove(host, { clientX: 290, clientY: 100 })
+        expect(frames.pending()).toBe(0)
+
+        rerender(<Lenticular {...pair} position={0.97} />)
+        expect(Number(host.style.getPropertyValue("--le-mix"))).toBe(1)
+    })
+
+    it("lets go of the pointer and the frame on unmount", () => {
+        const { container, unmount } = render(<Lenticular {...pair} />)
+        const host = container.querySelector(".xp-lenticular") as HTMLElement
+        vi.spyOn(host, "getBoundingClientRect").mockReturnValue({
+            left: 0,
+            top: 0,
+            width: 300,
+            height: 200,
+        } as DOMRect)
+        const remove = vi.spyOn(host, "removeEventListener")
+
+        fireEvent.pointerMove(host, { clientX: 10, clientY: 100 })
+        expect(frames.pending()).toBe(1)
+        unmount()
+
+        expect(frames.pending()).toBe(0)
+        expect(remove.mock.calls.map(([type]) => type).sort()).toEqual([
+            "pointerdown",
+            "pointermove",
+        ])
     })
 
     it("marks a broken source instead of showing nothing", () => {

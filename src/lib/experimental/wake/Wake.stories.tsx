@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { expect, userEvent, within } from "storybook/test"
 
 import { Wake } from "./Wake"
 
@@ -7,15 +8,23 @@ const face = (
         style={{
             display: "grid",
             placeItems: "center",
-            minHeight: 260,
+            minHeight: 300,
             padding: 40,
-            background: "linear-gradient(160deg, #0b1220, #14243d)",
-            color: "#dbeafe",
-            font: "600 28px/1.3 system-ui, sans-serif",
-            textAlign: "center",
         }}
     >
-        Move across the surface
+        <button
+            type="button"
+            style={{
+                padding: "10px 18px",
+                border: 0,
+                borderRadius: 999,
+                background: "rgba(4, 22, 34, 0.78)",
+                color: "#e6faff",
+                font: "600 15px/1 system-ui, sans-serif",
+            }}
+        >
+            Dive in
+        </button>
     </div>
 )
 
@@ -29,41 +38,39 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Nothing has touched the surface yet, so the frame is deterministic. */
-export const AtRest: Story = {
+/** Fixed drops run through a fixed number of steps, so the frame is deterministic. */
+export const StillTiles: Story = {
     args: { disabled: true },
 }
 
-export const ContentStaysReadable: Story = {
-    args: { disabled: true, mode: "distortion" },
+export const StillGrid: Story = {
+    args: { disabled: true, surface: "grid" },
 }
 
-export const Highlight: Story = {
-    args: { mode: "highlight" },
+export const StillChecker: Story = {
+    args: { disabled: true, surface: "checker", refraction: 1.6 },
+}
+
+export const StillPixelated: Story = {
+    args: { disabled: true, pixelated: true },
+}
+
+/** Content above the water stays a real, reachable control. */
+export const ContentStaysInteractive: Story = {
+    args: { disabled: true },
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole("button", { name: "Dive in" })
+        await userEvent.click(button)
+        await expect(button).toBeVisible()
+        await expect(canvasElement.querySelector("canvas")).toHaveAttribute("aria-hidden", "true")
+    },
+}
+
+export const Live: Story = {
     parameters: { chromatic: { disableSnapshot: true } },
 }
 
-export const Distortion: Story = {
-    args: { mode: "distortion" },
-    parameters: { chromatic: { disableSnapshot: true } },
-}
-
-export const WarmLight: Story = {
-    args: { color: "#ffd8a8" },
-    parameters: { chromatic: { disableSnapshot: true } },
-}
-
-export const WideRipples: Story = {
-    args: { radius: 0.5, strength: 0.85 },
-    parameters: { chromatic: { disableSnapshot: true } },
-}
-
-export const Slow: Story = {
-    args: { speed: 0.4 },
-    parameters: { chromatic: { disableSnapshot: true } },
-}
-
-export const PointerOnly: Story = {
-    args: { enableOnTouch: false },
+export const Heavy: Story = {
+    args: { strength: 1, radius: 24, decay: 4, refraction: 1.6 },
     parameters: { chromatic: { disableSnapshot: true } },
 }

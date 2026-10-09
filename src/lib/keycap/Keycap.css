@@ -1,0 +1,155 @@
+.zg-keycap {
+    --zg-keycap-edge: var(--zg-keycap-accent, #4ee1f2);
+    --zg-keycap-surface: var(--zg-keycap-accent, #4ee1f2);
+    --zg-keycap-text: var(--zg-keycap-ink, #04161a);
+    --zg-keycap-sweep: rgba(255, 255, 255, 0.4);
+    --zg-keycap-cast: color-mix(in srgb, var(--zg-keycap-accent, #4ee1f2) 34%, transparent);
+    position: relative;
+    display: inline-grid;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--zg-keycap-text);
+    font: inherit;
+    font-family: var(--zg-font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.zg-keycap[data-variant="outline"] {
+    --zg-keycap-surface: color-mix(in srgb, var(--zg-keycap-accent, #4ee1f2) 7%, transparent);
+    --zg-keycap-edge: color-mix(in srgb, var(--zg-keycap-accent, #4ee1f2) 60%, currentColor);
+    --zg-keycap-text: inherit;
+    --zg-keycap-sweep: color-mix(in srgb, var(--zg-keycap-accent, #4ee1f2) 24%, transparent);
+    color: inherit;
+}
+
+.zg-keycap[data-variant="ghost"] {
+    --zg-keycap-edge: transparent;
+    --zg-keycap-surface: transparent;
+    --zg-keycap-sweep: color-mix(in srgb, var(--zg-keycap-accent, #4ee1f2) 26%, transparent);
+    --zg-keycap-cast: transparent;
+    color: inherit;
+}
+
+.zg-keycap-shadow,
+.zg-keycap-face {
+    grid-area: 1 / 1;
+}
+
+.zg-keycap-shadow {
+    display: grid;
+    clip-path: polygon(
+        calc(100% - var(--zg-keycap-depth)) 0,
+        100% 0,
+        100% 100%,
+        0 100%,
+        0 calc(100% - var(--zg-keycap-depth)),
+        calc(100% - var(--zg-keycap-depth)) calc(100% - var(--zg-keycap-depth))
+    );
+    transform: translate(var(--zg-keycap-depth), var(--zg-keycap-depth));
+}
+
+.zg-keycap-shadow > span {
+    background: var(--zg-keycap-cast);
+}
+
+.zg-keycap-face {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 18px;
+    background: var(--zg-keycap-surface);
+    transition: transform 90ms steps(2, end);
+}
+
+.zg-keycap-ring {
+    position: absolute;
+    inset: 0;
+    background: var(--zg-keycap-edge);
+}
+
+.zg-keycap-face::before {
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(
+            var(--zg-keycap-sweep) 25%,
+            transparent 0 50%,
+            var(--zg-keycap-sweep) 0 75%,
+            transparent 0
+        )
+        0 0 / 6px 6px;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 200ms steps(6, end);
+    content: "";
+}
+
+.zg-keycap-label {
+    position: relative;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.zg-keycap[data-size="sm"] {
+    font-size: 11px;
+}
+
+.zg-keycap[data-size="sm"] .zg-keycap-face {
+    padding: 8px 12px;
+}
+
+.zg-keycap[data-size="lg"] {
+    font-size: 14px;
+}
+
+.zg-keycap[data-size="lg"] .zg-keycap-face {
+    padding: 15px 26px;
+}
+
+.zg-keycap:hover:not(:disabled) .zg-keycap-face,
+.zg-keycap:focus-visible .zg-keycap-face {
+    transform: translate(-1px, -1px);
+}
+
+.zg-keycap:hover:not(:disabled) .zg-keycap-face::before,
+.zg-keycap:focus-visible .zg-keycap-face::before {
+    clip-path: inset(0);
+}
+
+.zg-keycap:active:not(:disabled) .zg-keycap-face {
+    transform: translate(var(--zg-keycap-depth), var(--zg-keycap-depth));
+}
+
+.zg-keycap:active:not(:disabled) .zg-keycap-shadow {
+    visibility: hidden;
+}
+
+.zg-keycap:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--zg-keycap-accent, #4ee1f2) 55%, currentColor);
+    outline-offset: 4px;
+}
+
+.zg-keycap:disabled {
+    cursor: not-allowed;
+    opacity: 0.42;
+}
+
+.zg-keycap:disabled .zg-keycap-shadow {
+    visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-keycap-face,
+    .zg-keycap-face::before {
+        transition: none;
+    }
+}

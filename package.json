@@ -41,9 +41,25 @@
             "types": "./dist/aperture/index.d.ts",
             "import": "./dist/aperture/index.js"
         },
+        "./bezel": {
+            "types": "./dist/bezel/index.d.ts",
+            "import": "./dist/bezel/index.js"
+        },
+        "./bitmap": {
+            "types": "./dist/bitmap/index.d.ts",
+            "import": "./dist/bitmap/index.js"
+        },
         "./diorama": {
             "types": "./dist/diorama/index.d.ts",
             "import": "./dist/diorama/index.js"
+        },
+        "./dither": {
+            "types": "./dist/dither/index.d.ts",
+            "import": "./dist/dither/index.js"
+        },
+        "./eclipse": {
+            "types": "./dist/eclipse/index.d.ts",
+            "import": "./dist/eclipse/index.js"
         },
         "./elemental": {
             "types": "./dist/elemental/index.d.ts",
@@ -53,13 +69,25 @@
             "types": "./dist/grid-trail/index.d.ts",
             "import": "./dist/grid-trail/index.js"
         },
+        "./keycap": {
+            "types": "./dist/keycap/index.d.ts",
+            "import": "./dist/keycap/index.js"
+        },
         "./kern": {
             "types": "./dist/kern/index.d.ts",
             "import": "./dist/kern/index.js"
         },
+        "./lattice": {
+            "types": "./dist/lattice/index.d.ts",
+            "import": "./dist/lattice/index.js"
+        },
         "./lodestone": {
             "types": "./dist/lodestone/index.d.ts",
             "import": "./dist/lodestone/index.js"
+        },
+        "./louvre": {
+            "types": "./dist/louvre/index.d.ts",
+            "import": "./dist/louvre/index.js"
         },
         "./meadow": {
             "types": "./dist/meadow/index.d.ts",
@@ -68,6 +96,18 @@
         "./overprint": {
             "types": "./dist/overprint/index.d.ts",
             "import": "./dist/overprint/index.js"
+        },
+        "./palimpsest": {
+            "types": "./dist/palimpsest/index.d.ts",
+            "import": "./dist/palimpsest/index.js"
+        },
+        "./phosphor": {
+            "types": "./dist/phosphor/index.d.ts",
+            "import": "./dist/phosphor/index.js"
+        },
+        "./pip": {
+            "types": "./dist/pip/index.d.ts",
+            "import": "./dist/pip/index.js"
         },
         "./pointer-fx": {
             "types": "./dist/pointer-fx/index.d.ts",
@@ -84,6 +124,14 @@
         "./scroll-stack": {
             "types": "./dist/scroll-stack/index.d.ts",
             "import": "./dist/scroll-stack/index.js"
+        },
+        "./seam": {
+            "types": "./dist/seam/index.d.ts",
+            "import": "./dist/seam/index.js"
+        },
+        "./sonar": {
+            "types": "./dist/sonar/index.d.ts",
+            "import": "./dist/sonar/index.js"
         },
         "./split-flap": {
             "types": "./dist/split-flap/index.d.ts",

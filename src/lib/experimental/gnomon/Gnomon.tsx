@@ -7,11 +7,11 @@ import {
     cx,
     damp,
     finite,
-    onFrame,
     onResize,
     pointerBox,
     useLatestRef,
     usePrefersReducedMotion,
+    wakeLoop,
 } from "../../internal"
 import "./Gnomon.css"
 
@@ -48,6 +48,7 @@ export function Gnomon({
     style,
 }: GnomonProps) {
     const hostRef = useRef<HTMLDivElement>(null)
+    const remeasureRef = useRef<() => void>(() => {})
 
     const reduced = usePrefersReducedMotion()
     const still = disabled || (respectReducedMotion && reduced)
@@ -104,6 +105,10 @@ export function Gnomon({
 
         measure()
         write()
+        remeasureRef.current = () => {
+            measure()
+            write()
+        }
 
         const stopResize = onResize(host, () => {
             box.invalidate()
@@ -111,11 +116,16 @@ export function Gnomon({
             write()
         })
 
-        const stop = onFrame((dt) => {
-            if (Math.abs(aim.x - at.x) < 0.0008 && Math.abs(aim.y - at.y) < 0.0008) return
+        const loop = wakeLoop((dt) => {
             at.x = damp(at.x, aim.x, 8, dt)
             at.y = damp(at.y, aim.y, 8, dt)
+            const settled = Math.abs(aim.x - at.x) < 0.0008 && Math.abs(aim.y - at.y) < 0.0008
+            if (settled) {
+                at.x = aim.x
+                at.y = aim.y
+            }
             write()
+            return !settled
         })
 
         const onMove = (event: PointerEvent) => {
@@ -124,24 +134,31 @@ export function Gnomon({
             if (!point) return
             aim.x = clamp(point.x, -0.6, 1.6)
             aim.y = clamp(point.y, -0.6, 1.6)
+            loop.wake()
         }
 
         const onLeave = () => {
             aim.x = 0.35
             aim.y = -0.4
+            loop.wake()
         }
 
         host.addEventListener("pointermove", onMove, { passive: true })
         host.addEventListener("pointerleave", onLeave)
 
         return () => {
-            stop()
+            remeasureRef.current = () => {}
+            loop.sleep()
             stopResize()
             host.removeEventListener("pointermove", onMove)
             host.removeEventListener("pointerleave", onLeave)
             box.dispose()
         }
-    }, [settings, children])
+    }, [settings])
+
+    useEffect(() => {
+        remeasureRef.current()
+    }, [children])
 
     return (
         <div

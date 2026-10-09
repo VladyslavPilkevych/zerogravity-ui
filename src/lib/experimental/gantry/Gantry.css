@@ -2,13 +2,16 @@
     --gy-height: 80vh;
     --gy-width: clamp(220px, 32vw, 420px);
     --gy-gap: 24px;
-    --gy-pace: 1;
+    --gy-pace: 0.7;
+    --gy-hold: 0.4;
+    --gy-count: 0;
     --gy-lean: 0;
     position: relative;
     width: 100%;
-    /* the stage is pinned for as long as the rail has left to travel, measured
-       in stages rather than viewports so an internal scroller behaves */
-    height: calc(var(--gy-height) * (1 + var(--gy-pace)));
+    /* measured in stages rather than viewports so an internal scroller behaves */
+    height: calc(
+        var(--gy-height) * (1 + var(--gy-steps, var(--gy-count)) * var(--gy-pace) + var(--gy-hold))
+    );
 }
 
 .xp-gantry-stage {

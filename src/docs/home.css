@@ -283,7 +283,8 @@
         border-color 140ms ease;
 }
 
-.pz-card:hover {
+.pz-card:hover,
+.pz-card:focus-visible {
     border-color: var(--pz-cyan);
     box-shadow: 5px 5px 0 rgba(78, 225, 242, 0.26);
     transform: translate(-2px, -2px);
@@ -450,10 +451,6 @@
     padding-bottom: clamp(28px, 5vh, 54px);
 }
 
-.pz-signature .pz-word {
-    width: 100%;
-}
-
 .pz-footer-bar {
     display: flex;
     flex-wrap: wrap;
@@ -492,53 +489,7 @@
     color: var(--pz-cyan);
 }
 
-/* ---------------------------------------------------------------- wordmark */
-
-.pz-word {
-    display: block;
-    line-height: 0;
-}
-
-.pz-word svg {
-    display: block;
-    width: 100%;
-    height: auto;
-    overflow: visible;
-}
-
-.pz-word rect {
-    fill: var(--dz-ink);
-    /* a hair of inset keeps the blocks reading as separate pixels */
-    transform: scale(0.88);
-    transform-origin: center;
-    transform-box: fill-box;
-}
-
-.pz-word-glow rect {
-    fill: var(--pz-cyan);
-    animation: pz-sweep 5.5s steps(1, end) infinite;
-    animation-delay: var(--pz-step, 0ms);
-}
-
-@keyframes pz-sweep {
-    0%,
-    8% {
-        fill: var(--pz-lime);
-        opacity: 1;
-    }
-    14%,
-    100% {
-        fill: var(--pz-cyan);
-        opacity: 0.82;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .pz-word-glow rect {
-        animation: none;
-        opacity: 0.85;
-    }
-
     .pz-badge-dot {
         animation: none;
     }
@@ -549,7 +500,8 @@
     }
 
     .pz-btn:hover,
-    .pz-card:hover {
+    .pz-card:hover,
+    .pz-card:focus-visible {
         transform: none;
     }
 }

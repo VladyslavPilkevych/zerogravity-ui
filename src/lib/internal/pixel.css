@@ -1,0 +1,78 @@
+.zg-px-notch,
+.zg-px-ring {
+    --zg-n: var(--zg-notch, 3px);
+    --zg-b: var(--zg-ring, 1px);
+}
+
+.zg-px-notch {
+    clip-path: polygon(
+        calc(var(--zg-n) * 2) 0,
+        calc(100% - var(--zg-n) * 2) 0,
+        calc(100% - var(--zg-n) * 2) var(--zg-n),
+        calc(100% - var(--zg-n)) var(--zg-n),
+        calc(100% - var(--zg-n)) calc(var(--zg-n) * 2),
+        100% calc(var(--zg-n) * 2),
+        100% calc(100% - var(--zg-n) * 2),
+        calc(100% - var(--zg-n)) calc(100% - var(--zg-n) * 2),
+        calc(100% - var(--zg-n)) calc(100% - var(--zg-n)),
+        calc(100% - var(--zg-n) * 2) calc(100% - var(--zg-n)),
+        calc(100% - var(--zg-n) * 2) 100%,
+        calc(var(--zg-n) * 2) 100%,
+        calc(var(--zg-n) * 2) calc(100% - var(--zg-n)),
+        var(--zg-n) calc(100% - var(--zg-n)),
+        var(--zg-n) calc(100% - var(--zg-n) * 2),
+        0 calc(100% - var(--zg-n) * 2),
+        0 calc(var(--zg-n) * 2),
+        var(--zg-n) calc(var(--zg-n) * 2),
+        var(--zg-n) var(--zg-n),
+        calc(var(--zg-n) * 2) var(--zg-n)
+    );
+}
+
+.zg-px-ring {
+    clip-path: polygon(
+        evenodd,
+        calc(var(--zg-n) * 2) 0,
+        calc(100% - var(--zg-n) * 2) 0,
+        calc(100% - var(--zg-n) * 2) var(--zg-n),
+        calc(100% - var(--zg-n)) var(--zg-n),
+        calc(100% - var(--zg-n)) calc(var(--zg-n) * 2),
+        100% calc(var(--zg-n) * 2),
+        100% calc(100% - var(--zg-n) * 2),
+        calc(100% - var(--zg-n)) calc(100% - var(--zg-n) * 2),
+        calc(100% - var(--zg-n)) calc(100% - var(--zg-n)),
+        calc(100% - var(--zg-n) * 2) calc(100% - var(--zg-n)),
+        calc(100% - var(--zg-n) * 2) 100%,
+        calc(var(--zg-n) * 2) 100%,
+        calc(var(--zg-n) * 2) calc(100% - var(--zg-n)),
+        var(--zg-n) calc(100% - var(--zg-n)),
+        var(--zg-n) calc(100% - var(--zg-n) * 2),
+        0 calc(100% - var(--zg-n) * 2),
+        0 calc(var(--zg-n) * 2),
+        var(--zg-n) calc(var(--zg-n) * 2),
+        var(--zg-n) var(--zg-n),
+        calc(var(--zg-n) * 2) var(--zg-n),
+        calc(var(--zg-n) * 2) 0,
+        calc(var(--zg-n) * 2 + var(--zg-b)) var(--zg-b),
+        calc(100% - var(--zg-n) * 2 - var(--zg-b)) var(--zg-b),
+        calc(100% - var(--zg-n) * 2 - var(--zg-b)) calc(var(--zg-n) + var(--zg-b)),
+        calc(100% - var(--zg-n) - var(--zg-b)) calc(var(--zg-n) + var(--zg-b)),
+        calc(100% - var(--zg-n) - var(--zg-b)) calc(var(--zg-n) * 2 + var(--zg-b)),
+        calc(100% - var(--zg-b)) calc(var(--zg-n) * 2 + var(--zg-b)),
+        calc(100% - var(--zg-b)) calc(100% - var(--zg-n) * 2 - var(--zg-b)),
+        calc(100% - var(--zg-n) - var(--zg-b)) calc(100% - var(--zg-n) * 2 - var(--zg-b)),
+        calc(100% - var(--zg-n) - var(--zg-b)) calc(100% - var(--zg-n) - var(--zg-b)),
+        calc(100% - var(--zg-n) * 2 - var(--zg-b)) calc(100% - var(--zg-n) - var(--zg-b)),
+        calc(100% - var(--zg-n) * 2 - var(--zg-b)) calc(100% - var(--zg-b)),
+        calc(var(--zg-n) * 2 + var(--zg-b)) calc(100% - var(--zg-b)),
+        calc(var(--zg-n) * 2 + var(--zg-b)) calc(100% - var(--zg-n) - var(--zg-b)),
+        calc(var(--zg-n) + var(--zg-b)) calc(100% - var(--zg-n) - var(--zg-b)),
+        calc(var(--zg-n) + var(--zg-b)) calc(100% - var(--zg-n) * 2 - var(--zg-b)),
+        var(--zg-b) calc(100% - var(--zg-n) * 2 - var(--zg-b)),
+        var(--zg-b) calc(var(--zg-n) * 2 + var(--zg-b)),
+        calc(var(--zg-n) + var(--zg-b)) calc(var(--zg-n) * 2 + var(--zg-b)),
+        calc(var(--zg-n) + var(--zg-b)) calc(var(--zg-n) + var(--zg-b)),
+        calc(var(--zg-n) * 2 + var(--zg-b)) calc(var(--zg-n) + var(--zg-b)),
+        calc(var(--zg-n) * 2 + var(--zg-b)) var(--zg-b)
+    );
+}

@@ -75,6 +75,12 @@ export function installCanvasHarness(): CanvasHarness {
         createLinearGradient: () => ({ addColorStop: () => {} }),
         measureText: () => ({ width: 0 }),
         getImageData: () => ({ data: new Uint8ClampedArray(4) }),
+        createImageData: (width: number, height: number) => ({
+            width,
+            height,
+            data: new Uint8ClampedArray(width * height * 4),
+        }),
+        putImageData: () => {},
     }
 
     const spy = vi

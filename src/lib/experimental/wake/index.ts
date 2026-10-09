@@ -1,2 +1,2 @@
 export { Wake } from "./Wake"
-export type { WakeMode, WakeProps } from "./Wake"
+export type { WakeProps, WakeSurface } from "./Wake"

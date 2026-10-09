@@ -2,16 +2,14 @@
 
 import { useState } from "react"
 
-import { Elemental, Meadow } from "@/lib"
+import { Elemental, Lattice, Meadow, Sonar } from "@/lib"
 import {
     Chroma,
     Drench,
-    Lattice,
     Nimbus,
     Perseid,
     Prism,
     Quartz,
-    Sonar,
     Undertow,
     UNDERTOW_DEMO_BACK,
     UNDERTOW_DEMO_FRONT,

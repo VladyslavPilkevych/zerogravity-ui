@@ -1,5 +1,5 @@
 import { createRef } from "react"
-import { render } from "@testing-library/react"
+import { act, render } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { mediaState } from "../../../test/environment"
@@ -88,5 +88,45 @@ describe("Gantry", () => {
         const { container } = render(<Gantry>{cars()}</Gantry>)
 
         expect(container.querySelector(".xp-gantry-window")).not.toHaveAttribute("tabindex")
+    })
+
+    it("names the phase of a given progress", () => {
+        const { container, rerender } = render(<Gantry progress={0.5}>{cars()}</Gantry>)
+        const host = container.querySelector(".xp-gantry") as HTMLElement
+
+        expect(host.dataset.phase).toBe("moving")
+        rerender(<Gantry progress={1}>{cars()}</Gantry>)
+        expect(host.dataset.phase).toBe("holding")
+    })
+
+    it("sizes the track from the stops, pace and hold", () => {
+        const { container } = render(
+            <Gantry pace={0.5} hold={0.25}>
+                {cars()}
+            </Gantry>,
+        )
+        const host = container.querySelector(".xp-gantry") as HTMLElement
+
+        expect(host.style.getPropertyValue("--gy-count")).toBe("2")
+        expect(host.style.getPropertyValue("--gy-pace")).toBe("0.5")
+        expect(host.style.getPropertyValue("--gy-hold")).toBe("0.25")
+    })
+
+    it("goes idle once a scroll has been followed, and leaves nothing behind", () => {
+        const { unmount } = render(<Gantry>{cars()}</Gantry>)
+        frames.advance(2)
+
+        act(() => {
+            window.dispatchEvent(new Event("scroll"))
+        })
+        expect(frames.pending()).toBe(1)
+        frames.advance(120)
+        expect(frames.pending()).toBe(0)
+
+        act(() => {
+            window.dispatchEvent(new Event("scroll"))
+        })
+        unmount()
+        expect(frames.pending()).toBe(0)
     })
 })

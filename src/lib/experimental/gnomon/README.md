@@ -13,6 +13,11 @@ light read as a place in the room rather than a global offset.
 </Gnomon>
 ```
 
+The root is the room the lamp moves in: one listener on it, so the light
+follows the pointer anywhere inside the root, between and around the children,
+not only over them. Size the root to the area that should answer the pointer
+— padding included — rather than wrapping the children tightly.
+
 ## How it works
 
 Each child's centre is measured once (and again on resize). Every frame, the

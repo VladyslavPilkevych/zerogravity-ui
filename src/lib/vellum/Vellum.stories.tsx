@@ -40,3 +40,22 @@ export const CustomHighlight: Story = {
 export const NoTilt: Story = {
     args: { tilt: 0 },
 }
+
+/** Pressed at a pinned point, so the stepped cells and the tilt are identical on every run. */
+export const PixelMode: Story = {
+    args: { surface: "pixel", radius: 6, pointer: { x: 0.36, y: 0.42 } },
+}
+
+export const PixelModeAtRest: Story = {
+    args: { surface: "pixel", radius: 6 },
+}
+
+export const PixelModeCustomHighlight: Story = {
+    args: {
+        surface: "pixel",
+        radius: 0,
+        pixel: 18,
+        pointer: { x: 0.7, y: 0.6 },
+        highlight: { dent: 0.7, sheen: 1, sheenColor: "#ffd166" },
+    },
+}

@@ -7,6 +7,87 @@ import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { PRODUCTS, type ReelDemoConfig } from "../reel/schema"
 
+const SPRITES = [
+    [
+        "..####..",
+        ".######.",
+        "########",
+        "...##...",
+        "...##...",
+        "...##...",
+        "..####..",
+        ".######.",
+    ],
+    [
+        ".######.",
+        ".#.##.#.",
+        ".#....#.",
+        ".#.##.#.",
+        ".##..##.",
+        ".##..##.",
+        ".#.##.#.",
+        ".######.",
+    ],
+    [
+        ".##.....",
+        ".##.....",
+        ".##.....",
+        ".##.....",
+        ".######.",
+        ".######.",
+        ".#....#.",
+        ".#....#.",
+    ],
+    [
+        "........",
+        "........",
+        "########",
+        "########",
+        ".#....#.",
+        ".#....#.",
+        ".#....#.",
+        ".#....#.",
+    ],
+    [
+        "..####..",
+        "..####..",
+        ".######.",
+        "##....##",
+        "##.#..##",
+        "##....##",
+        ".######.",
+        "..####..",
+    ],
+    [
+        "........",
+        "..##....",
+        "########",
+        "#..##..#",
+        "#.#..#.#",
+        "#..##..#",
+        "########",
+        "........",
+    ],
+    [
+        "..####..",
+        "..####..",
+        "..####..",
+        "..####..",
+        ".#.##.#.",
+        "..####..",
+        "...##...",
+        ".######.",
+    ],
+]
+
+const SPRITE_PATHS = SPRITES.map((rows) =>
+    rows
+        .flatMap((row, y) =>
+            Array.from(row).map((cell, x) => (cell === "#" ? `M${x} ${y}h1v1h-1z` : "")),
+        )
+        .join(""),
+)
+
 export function ReelPreview({ config }: PreviewApi) {
     const c = config as unknown as ReelDemoConfig
     const [index, setIndex] = useState(0)
@@ -38,7 +119,7 @@ export function ReelPreview({ config }: PreviewApi) {
                 clickToSelect={c.clickToSelect}
                 label="Products"
             >
-                {products.map((product) => (
+                {products.map((product, i) => (
                     <article
                         key={product.name}
                         className="pg-product"
@@ -47,6 +128,14 @@ export function ReelPreview({ config }: PreviewApi) {
                         }}
                     >
                         <span className="pg-product-tag">{product.tag}</span>
+                        <svg
+                            className="pg-product-sprite"
+                            viewBox="0 0 8 8"
+                            aria-hidden="true"
+                            shapeRendering="crispEdges"
+                        >
+                            <path d={SPRITE_PATHS[i % SPRITE_PATHS.length]} />
+                        </svg>
                         <div className="pg-product-body">
                             <h3>{product.name}</h3>
                             <span className="pg-product-price">{product.price}</span>
@@ -58,7 +147,8 @@ export function ReelPreview({ config }: PreviewApi) {
             <footer className="pg-reel-foot">
                 <strong>{current?.name}</strong>
                 <span>
-                    {index + 1} / {products.length}
+                    {String(index + 1).padStart(2, "0")} /{" "}
+                    {String(products.length).padStart(2, "0")}
                 </span>
             </footer>
         </div>

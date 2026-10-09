@@ -104,16 +104,28 @@ export default function Page() {
 | --------------------------------------------------- | ------------------------------------------------------------------------------ |
 | [Antigravity](src/lib/antigravity/README.md)        | A particle field that flows around the cursor and settles into formations      |
 | [Aperture](src/lib/aperture/README.md)              | A full-bleed panel that closes into a framed card as you scroll, or opens      |
+| [Bezel](src/lib/bezel/README.md)                    | A frame with stepped pixel corners, an optional label tab and a 1px grid       |
+| [Bitmap](src/lib/bitmap/README.md)                  | Pixel text on a 5x7 grid, lit by a sweep, a wave or a cycling palette          |
 | [Diorama](src/lib/diorama/README.md)                | Depth layers that part as the pointer moves, letting you see past the front    |
+| [Dither](src/lib/dither/README.md)                  | A pixel sweep that fills any card, link or button on hover and keyboard focus  |
+| [Eclipse](src/lib/eclipse/README.md)                | Full-screen sections that pin, and the next one slides over the last           |
 | [Elemental](src/lib/elemental/README.md)            | An animated edge that wraps any content in electricity or fire                 |
 | [GridTrail](src/lib/grid-trail/README.md)           | A pointer trail that lights cells on an invisible grid, then stops the loop    |
+| [Keycap](src/lib/keycap/README.md)                  | A native button with notched pixel corners and a hard shadow it presses into   |
 | [Kern](src/lib/kern/README.md)                      | Glyphs that open up, lift and gain weight as the pointer passes them           |
+| [Lattice](src/lib/lattice/README.md)                | A thread mesh that bulges away from the pointer and lets go where it stretches |
 | [Lodestone](src/lib/lodestone/README.md)            | Magnetic buttons that lean toward the pointer but never overlap each other     |
+| [Louvre](src/lib/louvre/README.md)                  | Sticky blinds whose slats rotate away to reveal the section behind them        |
 | [Meadow](src/lib/meadow/README.md)                  | A living pastel hero scene that drifts and flutters around your content        |
 | [Overprint](src/lib/overprint/README.md)            | Colour separations that misregister on scroll and converge back into register  |
+| [Palimpsest](src/lib/palimpsest/README.md)          | A word that comes apart into the ghost drafts written underneath it            |
+| [Phosphor](src/lib/phosphor/README.md)              | Type burned into a CRT tube: bloom, scanlines and a misaligned beam            |
+| [Pip](src/lib/pip/README.md)                        | A square status badge with its own pixel glyph per state                       |
 | [Reel](src/lib/reel/README.md)                      | A roulette-style carousel you can drag, flick, scroll sideways or step         |
 | [Ricochet](src/lib/ricochet/README.md)              | Destructible pixel text with breakout or shooter play                          |
 | [ScrollStack](src/lib/scroll-stack/README.md)       | Sections that slide over each other on scroll, and unstack back                |
+| [Seam](src/lib/seam/README.md)                      | A section divider built from pixel blocks: dash, stair, dither or pulse        |
+| [Sonar](src/lib/sonar/README.md)                    | A dot field that a shockwave crosses whenever the surface is pressed           |
 | [SplitFlap](src/lib/split-flap/README.md)           | An airport board that flips one character at a time: text, clock or countdown  |
 | [Stencil](src/lib/stencil/README.md)                | Display type filled with stripes, checks, gradients, an image or video         |
 | [Tessera](src/lib/tessera/README.md)                | A tiled route transition: tiles cover the viewport, the route swaps, they lift |
@@ -124,7 +136,7 @@ export default function Page() {
 Each component README carries the full prop table, accessibility notes and
 performance characteristics.
 
-A few prototypes — Facet, Louvre, Raster, Wash and the pixel loaders — live in
+A few prototypes — Facet, Raster, Wash and the pixel loaders — live in
 `src/lib/experimental` and have documentation pages, but they are **not part of
 the published package** and cannot be imported from `zerogravity`.
 

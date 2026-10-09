@@ -2,10 +2,10 @@
     --pe-height: 100vh;
     --pe-lift: 0;
     --pe-curl: 0.7;
+    --pe-span: 2.25;
     position: relative;
     width: 100%;
-    /* two screens: one to hold the sheet still, one to take it off */
-    height: calc(var(--pe-height) * 2);
+    height: calc(var(--pe-height) * (1 + var(--pe-span)));
 }
 
 .xp-peel-stage {
@@ -126,6 +126,10 @@
     clip-path: none;
     transform: none;
     will-change: auto;
+}
+
+.xp-peel[data-still="true"] .xp-peel-sheet {
+    order: -1;
 }
 
 .xp-peel[data-still="true"] .xp-peel-crease {

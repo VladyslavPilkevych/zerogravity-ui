@@ -30,6 +30,12 @@ describe("snippetFor", () => {
         expect(snippetFor(raster, raster.defaults)).not.toContain("import")
     })
 
+    it("keeps a required prop even when it matches the default", () => {
+        const kern = findComponent("kern")!
+
+        expect(snippetFor(kern, kern.defaults)).toContain('text="TYPESET"')
+    })
+
     it("never emits a demo-only prop", () => {
         const code = snippetFor(reel, { ...reel.defaults, items: 4, radius: 40 })
 
@@ -106,6 +112,17 @@ describe("snippetFor", () => {
         const code = snippetFor(antigravity, config)
 
         expect(code).toContain('formation={{ shape: "heart" }}')
+    })
+
+    it("prints the slot props of the active example", () => {
+        const diorama = findComponent("diorama")!
+        const poster = diorama.presets?.find((preset) => preset.id === "poster")
+
+        const code = snippetFor(diorama, { ...diorama.defaults, ...poster?.values })
+
+        expect(code).toContain("background={<SkyAndTitle />}")
+        expect(code).toContain("{ content: <NearHills />, depth: 1 },")
+        expect(code).not.toContain("example")
     })
 
     it("produces balanced JSX for every component at its defaults", () => {

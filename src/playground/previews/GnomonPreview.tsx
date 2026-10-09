@@ -15,14 +15,14 @@ export function GnomonPreview({ config }: PreviewApi) {
     }
 
     return (
-        <div className="xpg-gnomon-stage">
+        <div className="xpg-gnomon-room">
             <Gnomon
                 distance={c.distance}
                 softness={c.softness}
                 depth={c.depth}
                 color={c.color}
                 lift={c.lift}
-                className="xpg-gnomon-row"
+                className="xpg-gnomon-stage"
             >
                 <div className="xpg-gnomon-tile">Alpha</div>
                 <div className="xpg-gnomon-tile">Beta</div>

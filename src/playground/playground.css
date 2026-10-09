@@ -87,6 +87,82 @@ kbd {
     width: 100%;
     height: 100%;
     padding: 80px 0 40px;
+    overflow: hidden;
+}
+
+.pg-reel-stage .reel {
+    --reel-accent: #4ee1f2;
+}
+
+.pg-reel-stage .reel-item-inner {
+    transition:
+        transform 0.2s steps(4, end),
+        box-shadow 0.2s steps(2, end),
+        filter 0.2s steps(2, end);
+}
+
+.pg-reel-stage .reel-item[data-active="true"] .reel-item-inner:hover {
+    transform: translate(-4px, -4px);
+    box-shadow:
+        0 0 0 1px #4ee1f2,
+        8px 8px 0 rgba(78, 225, 242, 0.22);
+}
+
+.pg-reel-stage .reel-item-clickable[data-active="false"] .reel-item-inner:hover {
+    transform: none;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.pg-reel-stage .reel-viewport:focus-visible {
+    outline: 1px dashed #4ee1f2;
+    border-radius: 0;
+}
+
+.pg-reel-stage .reel-arrow {
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0;
+    background: rgba(8, 9, 12, 0.86);
+    backdrop-filter: none;
+    font-family: var(--font-mono);
+    font-size: 18px;
+    transition:
+        border-color 0.12s steps(2, end),
+        box-shadow 0.12s steps(2, end),
+        opacity 0.12s steps(2, end);
+}
+
+.pg-reel-stage .reel-arrow:hover:not(:disabled) {
+    border-color: #4ee1f2;
+    background: rgba(8, 9, 12, 0.92);
+    box-shadow: 3px 3px 0 rgba(78, 225, 242, 0.28);
+}
+
+.pg-reel-stage .reel-dots {
+    gap: 6px;
+}
+
+.pg-reel-stage .reel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.18);
+    transition:
+        width 0.16s steps(3, end),
+        background 0.16s steps(2, end);
+}
+
+.pg-reel-stage .reel-dot:hover {
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.pg-reel-stage .reel-dot-active {
+    width: 24px;
+    background: #c6f24e;
+    transform: none;
 }
 
 .pg-reel-foot {
@@ -103,6 +179,12 @@ kbd {
     font-weight: 500;
 }
 
+.pg-reel-foot span {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+}
+
 .pg-product {
     position: relative;
     display: flex;
@@ -110,8 +192,8 @@ kbd {
     justify-content: space-between;
     width: 100%;
     height: 100%;
-    padding: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: inherit;
     box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.8);
     overflow: hidden;
@@ -121,20 +203,42 @@ kbd {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 30% 12%, rgba(255, 255, 255, 0.16), transparent 55%);
+    background:
+        linear-gradient(transparent 0 15px, rgba(255, 255, 255, 0.05) 0) 0 0 / 16px 16px,
+        linear-gradient(90deg, transparent 0 15px, rgba(255, 255, 255, 0.05) 0) 0 0 / 16px 16px;
+    mask-image: linear-gradient(180deg, #000, transparent 70%);
     pointer-events: none;
 }
 
 .pg-product-tag {
     align-self: flex-start;
-    padding: 3px 9px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.22);
+    padding: 3px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(0, 0, 0, 0.28);
+    font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.78);
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.pg-product-sprite {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    width: 42%;
+    max-width: 128px;
+    fill: rgba(255, 255, 255, 0.82);
+    filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.28));
+}
+
+.reel-item[data-active="true"] .pg-product-sprite {
+    fill: #fff;
+}
+
+.pg-product-body {
+    position: relative;
+    z-index: 1;
 }
 
 .pg-product-body h3 {
@@ -148,6 +252,33 @@ kbd {
     font-family: var(--font-mono);
     font-size: 13px;
     color: rgba(255, 255, 255, 0.62);
+}
+
+.reel-item[data-active="true"] .pg-product-price::after {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 12px;
+    margin-left: 6px;
+    vertical-align: -1px;
+    background: #c6f24e;
+    animation: pg-reel-caret 1.1s steps(1, end) infinite;
+}
+
+@keyframes pg-reel-caret {
+    50% {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reel-item[data-active="true"] .pg-product-price::after {
+        animation: none;
+    }
+
+    .pg-reel-stage .reel-item[data-active="true"] .reel-item-inner:hover {
+        transform: none;
+    }
 }
 
 .pg-stencil-stage {

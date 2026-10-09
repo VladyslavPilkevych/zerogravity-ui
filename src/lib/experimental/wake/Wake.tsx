@@ -1,42 +1,56 @@
 "use client"
 
-import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from "react"
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react"
 
 import {
+    clamp,
+    context2d,
     cx,
     onFrame,
+    onResize,
     onVisible,
+    pointerBox,
     useLatestRef,
     useMediaQuery,
     usePrefersReducedMotion,
 } from "../../internal"
 import {
-    RIPPLE_DEFAULTS,
-    createField,
-    edgeAt,
-    energy,
-    age as rippleAge,
-    stepField,
-    strike,
-    trace,
-    type RippleSettings,
-} from "../liquid/ripples"
+    clearWater,
+    createWater,
+    paintSurface,
+    pixels,
+    parseRgb,
+    shade,
+    sizeWater,
+    stamp,
+    stampSegment,
+    stepWater,
+    type Palette,
+    type Rgb,
+    type WakeSurface,
+} from "./waterField"
 import "./Wake.css"
 
-export type WakeMode = "highlight" | "distortion"
+export type { WakeSurface } from "./waterField"
 
 export interface WakeProps {
     children?: ReactNode
-    /** `highlight` draws light on the surface, `distortion` bends it */
-    mode?: WakeMode
-    /** how far one ripple reaches, as a share of the shorter side */
-    radius?: number
-    /** how strongly the surface answers, 0 to 1 */
+    /** the built-in floor the water refracts, used when there is no `src` or it fails */
+    surface?: WakeSurface
+    /** an image to lay under the water instead, cover-fitted */
+    src?: string
+    /** how hard the pointer pushes the water, 0 to 1 */
     strength?: number
-    /** how quickly it settles, 0.2 to 3 */
-    speed?: number
-    /** the light a ripple carries */
-    color?: string
+    /** radius of the disturbance, in CSS pixels */
+    radius?: number
+    /** roughly how long a wave lives, in seconds */
+    decay?: number
+    /** how far a slope bends what is underneath */
+    refraction?: number
+    /** how much a slope facing the light brightens */
+    light?: number
+    /** hard pixel edges instead of a smooth upscale */
+    pixelated?: boolean
     /** react to a finger as well as a pointer */
     enableOnTouch?: boolean
     disabled?: boolean
@@ -45,15 +59,38 @@ export interface WakeProps {
     style?: CSSProperties
 }
 
-const FRAME_CAP = 0.05
+const CELL_MIN = 2.5
+const CELL_CAP = 120_000
+const WAVE_SPEED = 240
+const STEP_CAP = 6
+const SETTLE = 0.004
+const SWIFT = 900
+const BEND = 95
+const GLINT = 5
+const PITCH: Record<WakeSurface, number> = { tiles: 30, grid: 30, checker: 40 }
+
+const FALLBACK: Palette = {
+    deep: [10, 42, 66],
+    shallow: [27, 122, 140],
+    line: [168, 232, 240],
+}
+
+const STILL_DROPS: ReadonlyArray<readonly [number, number, number]> = [
+    [0.3, 0.42, 1],
+    [0.66, 0.58, 0.9],
+    [0.5, 0.24, 0.6],
+]
 
 export function Wake({
     children,
-    mode = "highlight",
-    radius = 0.26,
+    surface = "tiles",
+    src,
     strength = 0.6,
-    speed = 1,
-    color = "#cfe8ff",
+    radius = 14,
+    decay = 2.4,
+    refraction = 1,
+    light = 1,
+    pixelated = false,
     enableOnTouch = true,
     disabled = false,
     respectReducedMotion = true,
@@ -62,226 +99,287 @@ export function Wake({
 }: WakeProps) {
     const hostRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    const skinRef = useRef<HTMLDivElement>(null)
-    const warpRef = useRef<SVGFEDisplacementMapElement>(null)
 
     const reduced = usePrefersReducedMotion()
     const fine = useMediaQuery("(pointer: fine)")
     const still = disabled || (respectReducedMotion && reduced)
     const live = !still && (fine || enableOnTouch)
 
-    const filterId = `${useId().replace(/:/g, "")}w`
-    const settings = useLatestRef({ mode, radius, strength, speed, color, live })
+    const settings = useLatestRef({ strength, radius, decay, refraction, light, enableOnTouch })
 
     useEffect(() => {
         const host = hostRef.current
         const canvas = canvasRef.current
         if (!host || !canvas) return
 
-        const context = canvas.getContext("2d")
-        if (!context) return
+        const context = context2d(canvas)
+        if (!context || typeof context.createImageData !== "function") return
 
-        const field = createField()
-        const rule: RippleSettings = { ...RIPPLE_DEFAULTS }
-        let moved = 0
+        const water = createWater(3, 3)
+        const box = pointerBox(host)
+        let cell = CELL_MIN
+        let rate = 60
+        let image: ImageData | null = null
+        let texture = pixels(new Uint8ClampedArray(0))
+        let frame = texture
+        let picture: HTMLImageElement | null = null
+        let stopFrame: (() => void) | null = null
         let seen = true
-        let dpr = 1
+        let carry = 0
+        let last: { x: number; y: number; t: number; id: number } | null = null
+
+        const readPalette = (): Palette => {
+            const css = getComputedStyle(host)
+            const read = (name: string, fallback: Rgb): Rgb => {
+                const value = css.getPropertyValue(name).trim()
+                if (!value) return fallback
+                context.fillStyle = "#000000"
+                context.fillStyle = value
+                return parseRgb(String(context.fillStyle)) ?? parseRgb(value) ?? fallback
+            }
+            return {
+                deep: read("--wake-deep", FALLBACK.deep),
+                shallow: read("--wake-shallow", FALLBACK.shallow),
+                line: read("--wake-line", FALLBACK.line),
+            }
+        }
+
+        const fitPicture = () => {
+            if (!picture || !picture.naturalWidth) return false
+            try {
+                const scratch = document.createElement("canvas")
+                scratch.width = water.cols
+                scratch.height = water.rows
+                const pen = context2d(scratch)
+                if (!pen) return false
+                const scale = Math.max(
+                    water.cols / picture.naturalWidth,
+                    water.rows / picture.naturalHeight,
+                )
+                const w = picture.naturalWidth * scale
+                const h = picture.naturalHeight * scale
+                pen.drawImage(picture, (water.cols - w) / 2, (water.rows - h) / 2, w, h)
+                texture.bytes.set(pen.getImageData(0, 0, water.cols, water.rows).data)
+                return true
+            } catch {
+                return false
+            }
+        }
+
+        const paintTexture = () => {
+            if (fitPicture()) return
+            paintSurface(
+                texture.bytes,
+                water.cols,
+                water.rows,
+                surface,
+                readPalette(),
+                PITCH[surface] / cell,
+            )
+        }
+
+        const render = (calm: boolean) => {
+            if (!image) return
+            if (calm) {
+                image.data.set(texture.bytes)
+            } else {
+                const config = settings.current
+                const bend = (clamp(config.refraction, 0, 4) * BEND) / (2 * cell * cell)
+                const glint = (clamp(config.light, 0, 4) * GLINT) / (2 * cell)
+                shade(water, texture, frame, bend, glint)
+            }
+            context.putImageData(image, 0, 0)
+        }
 
         const measure = () => {
-            const box = host.getBoundingClientRect()
-            dpr = Math.min(window.devicePixelRatio || 1, 2)
-            canvas.width = Math.max(1, Math.round(box.width * dpr))
-            canvas.height = Math.max(1, Math.round(box.height * dpr))
-            canvas.style.width = `${Math.max(1, Math.round(box.width))}px`
-            canvas.style.height = `${Math.max(1, Math.round(box.height))}px`
+            box.invalidate()
+            const { width, height } = box.size()
+            const area = Math.max(1, width * height)
+            cell = Math.max(CELL_MIN, Math.sqrt(area / CELL_CAP))
+            const cols = Math.max(3, Math.round(width / cell))
+            const rows = Math.max(3, Math.round(height / cell))
+            rate = clamp(WAVE_SPEED / (cell * Math.SQRT1_2), 40, 200)
+
+            if (sizeWater(water, cols, rows) || !image) {
+                canvas.width = water.cols
+                canvas.height = water.rows
+                image = context.createImageData(water.cols, water.rows)
+                frame = pixels(image.data)
+                texture = pixels(new Uint8ClampedArray(water.cols * water.rows * 4))
+                last = null
+            }
+            paintTexture()
         }
 
-        measure()
+        const damping = () => Math.pow(SETTLE, 1 / (Math.max(0.3, settings.current.decay) * rate))
 
-        const paint = () => {
-            const config = settings.current
-            const w = canvas.width
-            const h = canvas.height
-            const short = Math.min(w, h)
-
-            context.setTransform(1, 0, 0, 1, 0, 0)
-            context.clearRect(0, 0, w, h)
-            // light adds rather than covers, which is what reads as refraction
-            context.globalCompositeOperation = "lighter"
-
-            for (const drop of field.drops) {
-                if (!drop.live) continue
-
-                const life = rippleAge(field, drop, rule)
-                const reach = short * config.radius * (0.3 + life * 1.05)
-                // additive light stacks fast: two dozen overlapping rings at
-                // full strength wash the surface out completely
-                const glow = (1 - life) * (1 - life) * drop.power * config.strength * 0.24
-                if (reach <= 0 || glow <= 0.005) continue
-
-                const cx_ = drop.x * w
-                const cy = drop.y * h
-
-                const gradient = context.createRadialGradient(cx_, cy, 0, cx_, cy, reach)
-                // a thin band rather than a filled disc: it is the crest that
-                // catches the light, not the whole ripple
-                gradient.addColorStop(0, "rgba(0,0,0,0)")
-                gradient.addColorStop(0.74, "rgba(0,0,0,0)")
-                gradient.addColorStop(0.88, tint(config.color, glow))
-                gradient.addColorStop(1, "rgba(0,0,0,0)")
-                context.fillStyle = gradient
-
-                // the same wobbling outline the reveal uses, so both surfaces
-                // disturb in the same language
-                context.beginPath()
-                const steps = 40
-                for (let index = 0; index <= steps; index += 1) {
-                    const angle = (index / steps) * Math.PI * 2
-                    const edge = edgeAt(drop, angle, reach, 0.3, life)
-                    const px = cx_ + Math.cos(angle) * edge
-                    const py = cy + Math.sin(angle) * edge
-                    if (index === 0) context.moveTo(px, py)
-                    else context.lineTo(px, py)
-                }
-                context.closePath()
-                context.fill()
+        const settleStill = () => {
+            clearWater(water)
+            const r = Math.max(2, (settings.current.radius * 1.4) / cell)
+            for (const [fx, fy, power] of STILL_DROPS) {
+                stamp(water, fx * water.cols, fy * water.rows, r, -power * 1.2)
             }
-
-            context.globalCompositeOperation = "source-over"
-
-            // in distortion mode the field's energy drives an SVG warp over the
-            // content, so the surface itself bends where the pointer passed
-            const warp = warpRef.current
-            if (warp) {
-                const scale =
-                    config.mode === "distortion" ? energy(field, rule) * 46 * config.strength : 0
-                warp.setAttribute("scale", scale.toFixed(2))
-            }
+            const steps = Math.round(rate * 0.45)
+            const d = damping()
+            for (let index = 0; index < steps; index += 1) stepWater(water, d)
+            render(false)
         }
 
-        const local = (event: PointerEvent) => {
-            const box = host.getBoundingClientRect()
-            if (box.width === 0 || box.height === 0) return null
-            return {
-                x: (event.clientX - box.left) / box.width,
-                y: (event.clientY - box.top) / box.height,
+        const halt = () => {
+            stopFrame?.()
+            stopFrame = null
+        }
+
+        const tick = (dt: number) => {
+            carry += dt * rate
+            const steps = Math.min(STEP_CAP, Math.floor(carry))
+            carry = steps === STEP_CAP ? 0 : carry - steps
+            const d = damping()
+            for (let index = 0; index < steps; index += 1) stepWater(water, d)
+
+            if (water.peak < SETTLE) {
+                clearWater(water)
+                render(true)
+                halt()
+                return
             }
+            render(false)
+        }
+
+        const wake = () => {
+            if (stopFrame || !seen) return
+            carry = 0
+            stopFrame = onFrame(tick)
+        }
+
+        const accepts = (event: PointerEvent) =>
+            live && (event.pointerType !== "touch" || settings.current.enableOnTouch)
+
+        const toCells = (event: PointerEvent) => {
+            const at = box.px(event)
+            return at ? { x: at.x / cell, y: at.y / cell } : null
         }
 
         const onMove = (event: PointerEvent) => {
-            if (!settings.current.live) return
-            const at = local(event)
+            if (!accepts(event)) return
+            const at = toCells(event)
             if (!at) return
-            const now = performance.now()
-            const dt = moved === 0 ? 0.016 : Math.min((now - moved) / 1000, FRAME_CAP)
-            moved = now
-            trace(field, at.x, at.y, dt, rule)
-        }
+            const now = event.timeStamp || performance.now()
 
-        const onLeave = () => {
-            field.over = false
+            if (last && last.id === event.pointerId && now - last.t < 120) {
+                const config = settings.current
+                const span = Math.hypot(at.x - last.x, at.y - last.y) * cell
+                const speed = span / Math.max(0.004, (now - last.t) / 1000)
+                const push = clamp(config.strength, 0, 1) * Math.min(1, speed / SWIFT)
+                if (push > 0.002) {
+                    stampSegment(
+                        water,
+                        last.x,
+                        last.y,
+                        at.x,
+                        at.y,
+                        Math.max(1.5, config.radius / cell),
+                        -push * 1.3,
+                    )
+                    wake()
+                }
+            }
+            last = { x: at.x, y: at.y, t: now, id: event.pointerId }
         }
 
         const onDown = (event: PointerEvent) => {
-            if (!settings.current.live) return
-            const at = local(event)
-            if (at) strike(field, at.x, at.y, 1)
+            if (!accepts(event)) return
+            const at = toCells(event)
+            if (!at) return
+            const config = settings.current
+            stamp(
+                water,
+                at.x,
+                at.y,
+                Math.max(2, (config.radius * 1.3) / cell),
+                -clamp(config.strength, 0, 1) * 2,
+            )
+            wake()
         }
 
-        host.addEventListener("pointermove", onMove, { passive: true })
-        host.addEventListener("pointerleave", onLeave)
-        host.addEventListener("pointerdown", onDown, { passive: true })
+        const onLeave = () => {
+            last = null
+        }
 
-        const sizer =
-            typeof ResizeObserver === "function"
-                ? new ResizeObserver(() => {
-                      measure()
-                      paint()
-                  })
-                : null
-        sizer?.observe(host)
+        measure()
+        if (still) settleStill()
+        else render(true)
+
+        let loading: HTMLImageElement | null = null
+        if (src) {
+            const next = new Image()
+            loading = next
+            next.crossOrigin = "anonymous"
+            next.decoding = "async"
+            next.onload = () => {
+                picture = next
+                if (!fitPicture()) {
+                    picture = null
+                    return
+                }
+                if (still) settleStill()
+                else if (!stopFrame) render(true)
+            }
+            next.onerror = () => {
+                picture = null
+            }
+            next.src = src
+        }
+
+        const stopResize = onResize(host, () => {
+            measure()
+            if (still) settleStill()
+            else if (!stopFrame) render(true)
+        })
+
+        const release = () => {
+            stopResize()
+            box.dispose()
+            if (loading) {
+                loading.onload = null
+                loading.onerror = null
+            }
+        }
+
+        if (!live) return release
+
+        host.addEventListener("pointermove", onMove, { passive: true })
+        host.addEventListener("pointerdown", onDown, { passive: true })
+        host.addEventListener("pointerleave", onLeave)
+        host.addEventListener("pointercancel", onLeave)
 
         const stopVisible = onVisible(host, (visible) => {
             seen = visible
-        })
-
-        const stopFrame = onFrame((dt) => {
-            if (!seen) return
-            stepField(field, dt * settings.current.speed, rule)
-            paint()
+            if (!visible) halt()
+            else if (water.peak >= SETTLE) wake()
         })
 
         return () => {
-            stopFrame()
+            halt()
             stopVisible()
+            release()
             host.removeEventListener("pointermove", onMove)
-            host.removeEventListener("pointerleave", onLeave)
             host.removeEventListener("pointerdown", onDown)
-            sizer?.disconnect()
+            host.removeEventListener("pointerleave", onLeave)
+            host.removeEventListener("pointercancel", onLeave)
         }
-    }, [settings])
+    }, [settings, surface, src, still, live])
 
     return (
         <div
             ref={hostRef}
             className={cx("xp-wake", className)}
-            data-mode={mode}
             data-still={still ? "true" : undefined}
+            data-pixelated={pixelated ? "true" : undefined}
             style={style}
         >
-            {mode === "distortion" && !still ? (
-                <svg className="xp-wake-defs" aria-hidden="true" focusable="false">
-                    <filter id={filterId} x="-8%" y="-8%" width="116%" height="116%">
-                        <feTurbulence
-                            type="fractalNoise"
-                            baseFrequency="0.012 0.016"
-                            numOctaves={2}
-                            seed={7}
-                            result="noise"
-                        />
-                        <feDisplacementMap
-                            ref={warpRef}
-                            in="SourceGraphic"
-                            in2="noise"
-                            scale="0"
-                            xChannelSelector="R"
-                            yChannelSelector="G"
-                        />
-                    </filter>
-                </svg>
-            ) : null}
-
-            <div
-                ref={skinRef}
-                className="xp-wake-skin"
-                style={
-                    mode === "distortion" && !still
-                        ? ({ filter: `url(#${filterId})` } as CSSProperties)
-                        : undefined
-                }
-            >
-                {children}
-            </div>
-
-            <canvas ref={canvasRef} className="xp-wake-light" aria-hidden="true" />
+            <canvas ref={canvasRef} className="xp-wake-water" aria-hidden="true" />
+            <div className="xp-wake-content">{children}</div>
         </div>
     )
-}
-
-/** `#rrggbb` or any CSS colour, carried through at a given alpha. */
-function tint(color: string, alpha: number): string {
-    const value = Math.max(0, Math.min(1, alpha))
-
-    if (color.startsWith("#") && (color.length === 7 || color.length === 4)) {
-        const full =
-            color.length === 4
-                ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
-                : color
-        const r = Number.parseInt(full.slice(1, 3), 16)
-        const g = Number.parseInt(full.slice(3, 5), 16)
-        const b = Number.parseInt(full.slice(5, 7), 16)
-        return `rgba(${r},${g},${b},${value})`
-    }
-
-    return `color-mix(in srgb, ${color} ${(value * 100).toFixed(1)}%, transparent)`
 }
