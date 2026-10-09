@@ -7,6 +7,8 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-09
+
 ### Added
 
 - `Bitmap` — pixel text on a 5x7 grid for any string, with a `sweep`, `wave` or
@@ -109,13 +111,6 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 - `Vellum`: the animation loop now stops when the sheet settles, and resizing the
   element no longer leaves a stale pointer box.
 
-- The README shipped with `0.1.0` still called the package `zerogravity-ui` and
-  told readers to run `pnpm add zerogravity-ui`, which installs an unrelated
-  package by another author. Every install command, import example and generated
-  usage snippet now uses `zerogravity`. Worth a patch release on its own: the
-  npm page is the first thing a reader sees, and it currently points at the
-  wrong package.
-
 ### Security
 
 - The documentation site moves to Next.js 15.5.27, which fixes two critical
@@ -124,6 +119,24 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 - High-severity advisories in development tooling (`sharp`, `js-yaml`,
   `undici`, `brace-expansion`, `source-map-js`) are resolved through pnpm
   overrides. `pnpm audit --prod` reports no known vulnerabilities.
+
+## [0.1.3] - 2026-08-25
+
+### Added
+
+- `Meadow` gained a living creature layer: flyers that drift, bob and react to
+  the pointer, with props for density, motion, interaction and event pace, and
+  the matching `MeadowCreatures`, `MeadowDensity`, `MeadowEventPace`,
+  `MeadowInteraction` and `MeadowMotion` types.
+
+## [0.1.1] - 2026-08-24
+
+### Fixed
+
+- The README shipped with `0.1.0` still called the package `zerogravity-ui` and
+  told readers to run `pnpm add zerogravity-ui`, which installs an unrelated
+  package by another author. Every install command, import example and generated
+  usage snippet now uses `zerogravity`.
 
 ## [0.1.0]
 
@@ -218,5 +231,8 @@ package.
 - Transitive advisories in `postcss`, `nanoid` and `sharp` resolved through
   pnpm overrides; `pnpm audit` reports no known vulnerabilities.
 
-[unreleased]: https://github.com/VladyslavPilkevych/zerogravity-ui/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/VladyslavPilkevych/zerogravity-ui/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/VladyslavPilkevych/zerogravity-ui/compare/v0.1.3...v0.2.0
+[0.1.3]: https://github.com/VladyslavPilkevych/zerogravity-ui/compare/v0.1.1...v0.1.3
+[0.1.1]: https://github.com/VladyslavPilkevych/zerogravity-ui/tree/v0.1.1
 [0.1.0]: https://github.com/VladyslavPilkevych/zerogravity-ui/releases/tag/v0.1.0

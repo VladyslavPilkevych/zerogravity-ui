@@ -55,7 +55,7 @@ export default function Home() {
                 <div className="pz-hero-inner">
                     <p className="pz-badge">
                         <span className="pz-badge-dot" aria-hidden="true" />
-                        React · v0.1.3 · MIT
+                        React · v0.2.0 · MIT
                     </p>
 
                     <h1 className="pz-hero-title">
