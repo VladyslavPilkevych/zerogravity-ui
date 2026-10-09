@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 
 
 import { mediaState, resetMediaState } from "../../../test/environment"
 import { installCanvasHarness, installFrameHarness } from "../../../test/frames"
-import { Prism } from "./Prism"
+import { lightPath, Prism, prismStrength } from "./Prism"
 import { cellSize, paintSpectrum, SPECTRUM, type SpectrumScene } from "./spectrum"
 
 let frames: ReturnType<typeof installFrameHarness>
@@ -81,6 +81,67 @@ describe("Prism", () => {
         expect(host.style.getPropertyValue("--pr-sheen")).toBe("0")
     })
 
+    it("clamps strength to 0..2 and falls back on nonsense", () => {
+        expect(prismStrength(Number.NaN)).toBe(0.6)
+        expect(prismStrength(Number.POSITIVE_INFINITY)).toBe(0.6)
+        expect(prismStrength("1")).toBe(0.6)
+        expect(prismStrength(-1)).toBe(0)
+        expect(prismStrength(5)).toBe(2)
+        expect(prismStrength(1.3)).toBe(1.3)
+
+        const { container } = render(<Prism strength={40}>card</Prism>)
+        expect(hostOf(container).style.getPropertyValue("--pr-strength")).toBe("2")
+    })
+
+    it("scales every optical layer from strength", () => {
+        const read = (strength: number) => {
+            const { container, unmount } = render(
+                <Prism strength={strength} pointer={{ x: 0, y: 0.5 }} dispersion={1}>
+                    card
+                </Prism>,
+            )
+            const host = hostOf(container)
+            const result = {
+                glow: Number(host.style.getPropertyValue("--pr-glow")),
+                dx: Number(container.querySelector("feOffset")?.getAttribute("dx")),
+            }
+            unmount()
+            return result
+        }
+
+        const quiet = read(0.2)
+        const loud = read(2)
+        expect(quiet.glow).toBeLessThan(loud.glow)
+        expect(loud.glow).toBe(1)
+        expect(quiet.dx).toBe(1)
+        expect(loud.dx).toBe(9)
+    })
+
+    it("drops the channel split entirely at zero strength", () => {
+        const { container } = render(<Prism strength={0}>card</Prism>)
+
+        expect(container.querySelector("filter")).toBeNull()
+        expect((container.querySelector(".xp-prism-body") as HTMLElement).style.filter).toBe("")
+    })
+
+    it("pushes red away from the light and blue toward it", () => {
+        const { container } = render(<Prism pointer={{ x: 0.1, y: 0.5 }}>card</Prism>)
+        const [red, blue] = Array.from(container.querySelectorAll("feOffset"))
+
+        expect(Number(red.getAttribute("dx"))).toBeGreaterThan(0)
+        expect(Number(blue.getAttribute("dx"))).toBeLessThan(0)
+        expect(Number(hostOf(container).style.getPropertyValue("--pr-dx"))).toBeGreaterThan(0)
+    })
+
+    it("wires the split filter to the content on the client only", () => {
+        const { container } = render(<Prism>card</Prism>)
+        const filter = container.querySelector("filter") as SVGFilterElement
+        const body = container.querySelector(".xp-prism-body") as HTMLElement
+
+        expect(filter.id).toMatch(/^xp-prism-split-\d+$/)
+        expect(body.style.filter).toContain(filter.id)
+    })
+
     it("answers the pointer against its own box", () => {
         const { container } = render(<Prism>card</Prism>)
         const host = hostOf(container)
@@ -132,6 +193,36 @@ describe("Prism", () => {
         expect(box.mock.calls.length).toBeGreaterThan(0)
     })
 
+    it("refits the canvas when the element is resized", () => {
+        let resized: () => void = () => {}
+        const original = globalThis.ResizeObserver
+        globalThis.ResizeObserver = class {
+            constructor(run: ResizeObserverCallback) {
+                resized = () => run([], this)
+            }
+            observe() {}
+            unobserve() {}
+            disconnect() {}
+        }
+        onTestFinished(() => {
+            globalThis.ResizeObserver = original
+        })
+        const { container } = render(<Prism>card</Prism>)
+        const host = hostOf(container)
+        const surface = container.querySelector("canvas") as HTMLCanvasElement
+        vi.spyOn(host, "getBoundingClientRect").mockReturnValue({
+            left: 0,
+            top: 0,
+            width: 320,
+            height: 160,
+        } as DOMRect)
+
+        resized()
+
+        expect(surface.style.width).toBe("320px")
+        expect(surface.style.height).toBe("160px")
+    })
+
     it("goes idle once the light has settled", () => {
         const { container } = render(<Prism>card</Prism>)
         const host = hostOf(container)
@@ -155,37 +246,47 @@ describe("Prism", () => {
         frames.advance(2)
         expect(frames.pending()).toBe(1)
 
+        const body = container.querySelector(".xp-prism-body") as HTMLElement
         unmount()
+        expect(frames.pending()).toBe(0)
+        expect(body.style.filter).toBe("")
+        fireEvent.pointerMove(host, { clientX: 20, clientY: 20 })
         expect(frames.pending()).toBe(0)
     })
 
-    it("holds the slab flat under reduced motion and still draws the light", () => {
+    it("holds a static pose under reduced motion and still draws the light", () => {
         mediaState.reducedMotion = true
         const paint = vi.spyOn(HTMLCanvasElement.prototype, "getContext")
         const { container } = render(<Prism>card</Prism>)
         const host = hostOf(container)
+        measure(host)
 
         fireEvent.pointerMove(host, { clientX: 10, clientY: 10 })
         frames.advance(10)
 
         expect(host.dataset.still).toBe("true")
-        expect(host.style.getPropertyValue("--pr-rx")).toBe("0.000")
-        expect(host.style.getPropertyValue("--pr-x")).toBe("0.5000")
+        expect(host.style.getPropertyValue("--pr-x")).toBe("0.2400")
+        expect(Number(host.style.getPropertyValue("--pr-rx"))).toBeGreaterThan(0)
+        expect(container.querySelector("feOffset")?.getAttribute("dx")).not.toBe("0")
         expect(paint).toHaveBeenCalled()
         expect(frames.pending()).toBe(0)
     })
 
-    it("ignores a coarse pointer", () => {
+    it("lets a touch place the light, and keeps it there after the finger lifts", () => {
         mediaState.fine = false
         const { container } = render(<Prism>card</Prism>)
         const host = hostOf(container)
         measure(host)
 
-        fireEvent.pointerMove(host, { clientX: 190, clientY: 10 })
-        frames.advance(10)
+        fireEvent.pointerMove(host, { clientX: 190, clientY: 10, pointerType: "touch", buttons: 0 })
+        expect(frames.pending()).toBe(0)
 
-        expect(host.dataset.touch).toBe("true")
-        expect(host.style.getPropertyValue("--pr-x")).toBe("0.5000")
+        fireEvent.pointerDown(host, { clientX: 180, clientY: 90, pointerType: "touch", buttons: 1 })
+        frames.advance(240)
+        fireEvent.pointerLeave(host, { pointerType: "touch" })
+        frames.advance(240)
+
+        expect(host.style.getPropertyValue("--pr-x")).toBe("0.9000")
         expect(frames.pending()).toBe(0)
     })
 
@@ -207,6 +308,21 @@ describe("Prism", () => {
 
         expect(html).toContain("xp-prism-cells")
         expect(html).toContain("card")
+    })
+})
+
+describe("lightPath", () => {
+    it("runs from the light through the centre", () => {
+        const path = lightPath(0, 0.5)
+        expect(path.dx).toBeCloseTo(1)
+        expect(path.dy).toBeCloseTo(0)
+        expect(path.reach).toBeCloseTo(0.8)
+    })
+
+    it("keeps a direction when the light sits dead centre", () => {
+        const path = lightPath(0.5, 0.5)
+        expect(Math.hypot(path.dx, path.dy)).toBeCloseTo(1)
+        expect(path.reach).toBe(0)
     })
 })
 
@@ -261,6 +377,29 @@ describe("paintSpectrum", () => {
         paintSpectrum(second.target, 320, 160, 2, scene)
 
         expect(second.colors).toEqual(first.colors)
+    })
+
+    it("draws louder with more gain and never past full alpha", () => {
+        const alphas = (gain: number) => {
+            const seen: number[] = []
+            const target = {
+                globalAlpha: 1,
+                fillStyle: "" as CanvasRenderingContext2D["fillStyle"],
+                setTransform: () => {},
+                clearRect: () => {},
+                fillRect: () => {
+                    seen.push(target.globalAlpha)
+                },
+            }
+            paintSpectrum(target, 400, 200, 1, { ...scene, gain })
+            return seen
+        }
+        const sum = (list: number[]) => list.reduce((total, value) => total + value, 0)
+        const quiet = alphas(0.3)
+        const loud = alphas(2)
+
+        expect(sum(loud)).toBeGreaterThan(sum(quiet) * 2)
+        expect(Math.max(...loud)).toBeLessThanOrEqual(1)
     })
 
     it("grows the cells instead of the cost on a huge surface", () => {

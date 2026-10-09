@@ -208,6 +208,19 @@
         background 140ms ease;
 }
 
+.dz-link-name {
+    flex: none;
+}
+
+.dz-link-label {
+    overflow: hidden;
+    min-width: 0;
+    color: var(--dz-faint);
+    font-size: 11.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .dz-link:hover {
     background: var(--dz-raise-2);
     color: var(--dz-ink);
@@ -341,6 +354,15 @@
     color: var(--dz-muted);
     font-size: 15.5px;
     line-height: 1.62;
+}
+
+.dz-head .dz-subtitle {
+    margin: -2px 0 10px;
+    color: var(--dz-ink);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .dz-section {

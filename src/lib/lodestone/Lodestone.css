@@ -39,9 +39,118 @@
     pointer-events: none;
 }
 
+/* Pixel variant: the button stays the magnet; the face inside it presses. */
+.xp-lodestone[data-variant="pixel"] {
+    --lodestone-depth: 3px;
+    --zg-notch: 3px;
+    --zg-ring: 2px;
+    --_accent: var(--lodestone-accent, #4ee1f2);
+    display: inline-grid;
+    align-items: stretch;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    font-family: var(--zg-font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+    font-size: 12.5px;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.xp-lodestone-cast,
+.xp-lodestone-face {
+    grid-area: 1 / 1;
+}
+
+/* Only the L that peeks out from under the face, so a translucent face stays clean. */
+.xp-lodestone-cast {
+    display: grid;
+    clip-path: polygon(
+        calc(100% - var(--lodestone-depth)) 0,
+        100% 0,
+        100% 100%,
+        0 100%,
+        0 calc(100% - var(--lodestone-depth)),
+        calc(100% - var(--lodestone-depth)) calc(100% - var(--lodestone-depth))
+    );
+    transform: translate(var(--lodestone-depth), var(--lodestone-depth));
+}
+
+.xp-lodestone-cast > span {
+    background: color-mix(in srgb, var(--_accent) 55%, transparent);
+}
+
+.xp-lodestone-face {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--lodestone-pad, 13px 22px);
+    background: var(--lodestone-bg, color-mix(in srgb, var(--_accent) 9%, transparent));
+    transition:
+        transform 90ms steps(2, end),
+        background 90ms steps(2, end);
+}
+
+/* A 2px pixel highlight along the top-left edge. */
+.xp-lodestone-face::before {
+    position: absolute;
+    inset: var(--zg-ring) auto auto var(--zg-ring);
+    width: calc(100% - var(--zg-ring) * 2);
+    height: calc(100% - var(--zg-ring) * 2);
+    box-shadow:
+        inset 2px 2px 0 color-mix(in srgb, #fff 16%, transparent),
+        inset -2px -2px 0 color-mix(in srgb, #000 22%, transparent);
+    pointer-events: none;
+    content: "";
+}
+
+.xp-lodestone-ring {
+    position: absolute;
+    inset: 0;
+    background: var(--lodestone-border, color-mix(in srgb, var(--_accent) 55%, currentColor));
+    transition: background 90ms steps(2, end);
+}
+
+.xp-lodestone[data-variant="pixel"]:hover:not(:disabled) {
+    background: none;
+}
+
+.xp-lodestone[data-variant="pixel"]:hover:not(:disabled) .xp-lodestone-face,
+.xp-lodestone[data-variant="pixel"]:focus-visible .xp-lodestone-face {
+    background: var(--lodestone-bg-hover, color-mix(in srgb, var(--_accent) 20%, transparent));
+    transform: translate(-1px, -1px);
+}
+
+.xp-lodestone[data-variant="pixel"]:hover:not(:disabled) .xp-lodestone-ring,
+.xp-lodestone[data-variant="pixel"]:focus-visible .xp-lodestone-ring {
+    background: var(--lodestone-border-hover, var(--_accent));
+}
+
+.xp-lodestone[data-variant="pixel"]:active:not(:disabled) .xp-lodestone-face {
+    transform: translate(var(--lodestone-depth), var(--lodestone-depth));
+}
+
+.xp-lodestone[data-variant="pixel"]:active:not(:disabled) .xp-lodestone-cast,
+.xp-lodestone[data-variant="pixel"]:disabled .xp-lodestone-cast {
+    visibility: hidden;
+}
+
+.xp-lodestone[data-variant="pixel"]:focus-visible {
+    outline: 2px solid var(--_accent);
+    outline-offset: 5px;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .xp-lodestone {
         transform: none !important;
         will-change: auto;
+    }
+
+    .xp-lodestone-face,
+    .xp-lodestone-ring {
+        transition: none;
     }
 }

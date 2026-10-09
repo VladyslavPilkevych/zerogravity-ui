@@ -1,7 +1,7 @@
 "use client"
 
-import { Wake } from "@/lib/experimental"
-import type { WakeSurface } from "@/lib/experimental"
+import { Wake } from "@/lib"
+import type { WakeSurface } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"

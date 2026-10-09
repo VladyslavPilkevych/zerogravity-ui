@@ -3,7 +3,7 @@ import Link from "next/link"
 import { CodeBlock } from "@/docs/components/CodeBlock"
 import { HomeField } from "@/docs/components/HomeField"
 import { Wordmark } from "@/docs/components/Wordmark"
-import { COMPONENTS, REPOSITORY_URL, groupByCategory } from "@/docs/registry"
+import { categoryId, COMPONENTS, REPOSITORY_URL, groupByCategory } from "@/docs/registry"
 import { Dither } from "@/lib/dither"
 
 const FEATURED = ["antigravity", "scroll-stack", "reel", "meadow", "ricochet", "elemental"]
@@ -154,7 +154,7 @@ export default function Home() {
                     {groups.map((group) => (
                         <Link
                             className="pz-cat"
-                            href={`/docs#${group.category.toLowerCase()}`}
+                            href={`/docs#${categoryId(group.category)}`}
                             key={group.category}
                         >
                             <b>{group.category}</b>

@@ -1,10 +1,11 @@
 "use client"
 
-import { Lodestone } from "@/lib"
+import { Lodestone, type LodestoneVariant } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function LodestonePreview({ config }: PreviewApi) {
     const c = config as {
+        variant: LodestoneVariant
         radius: number
         strength: number
         maxDisplacement: number
@@ -20,6 +21,7 @@ export function LodestonePreview({ config }: PreviewApi) {
             {Array.from({ length: c.buttons }, (_, index) => (
                 <Lodestone
                     key={index}
+                    variant={c.variant}
                     radius={c.radius}
                     strength={c.strength}
                     maxDisplacement={c.maxDisplacement}

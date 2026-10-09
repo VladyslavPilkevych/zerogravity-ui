@@ -22,7 +22,11 @@ const meta = {
     render: (args) => (
         <Dither {...args} style={tile}>
             <strong>Interface</strong>
-            <span>Blocks sweep in from the pointer and dissolve on exit.</span>
+            <span>
+                {args.variant === "edge"
+                    ? "A block frame steps in from the border and back out."
+                    : "Blocks sweep in from the pointer and dissolve on exit."}
+            </span>
         </Dither>
     ),
 } satisfies Meta<typeof Dither>
@@ -64,6 +68,45 @@ export const KeyboardFocus: Story = {
 
 export const HoverAndLeave: Story = {
     args: { as: "button", type: "button" },
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole("button")
+        await userEvent.hover(button)
+        await settled(canvasElement, "on")
+        await userEvent.unhover(button)
+        await settled(canvasElement, "idle")
+    },
+}
+
+const edgeOn = async (canvasElement: HTMLElement) => {
+    await settled(canvasElement, "on")
+    // let the stepped CSS transitions finish before the snapshot
+    await new Promise((resolve) => setTimeout(resolve, 300))
+}
+
+export const EdgeActive: Story = {
+    args: { variant: "edge", active: true },
+    parameters: { chromatic: { delay: 300 } },
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector(".zg-dither")).toHaveAttribute(
+            "data-variant",
+            "edge",
+        )
+        await edgeOn(canvasElement)
+    },
+}
+
+export const EdgeKeyboardFocus: Story = {
+    args: { variant: "edge", as: "button", type: "button" },
+    parameters: { chromatic: { delay: 300 } },
+    play: async ({ canvasElement }) => {
+        await userEvent.tab()
+        await expect(within(canvasElement).getByRole("button")).toHaveFocus()
+        await edgeOn(canvasElement)
+    },
+}
+
+export const EdgeHoverAndLeave: Story = {
+    args: { variant: "edge", as: "button", type: "button" },
     play: async ({ canvasElement }) => {
         const button = within(canvasElement).getByRole("button")
         await userEvent.hover(button)

@@ -15,7 +15,7 @@ const card = (
             color: "#eef2ff",
         }}
     >
-        <strong style={{ fontSize: 24 }}>Refraction</strong>
+        <strong style={{ fontSize: 40, fontWeight: 800, lineHeight: 1 }}>Refraction</strong>
         <span style={{ opacity: 0.72, fontSize: 14 }}>
             White light enters at one point and leaves split into bands.
         </span>
@@ -37,6 +37,27 @@ export const AtRest: Story = { args: { disabled: true } }
 
 /** The light is pinned, so the pixel spectrum and the tilt are identical on every run. */
 export const PixelMode: Story = { args: { pointer: { x: 0.22, y: 0.3 } } }
+
+/** A restrained strength: a hairline of colour on every edge, nothing more. */
+export const LowStrength: Story = { args: { pointer: { x: 0.22, y: 0.3 }, strength: 0.2 } }
+
+/** Full strength: the content splits into red, green and blue and the beam runs solid. */
+export const HighStrength: Story = {
+    args: { pointer: { x: 0.8, y: 0.25 }, strength: 1.8, dispersion: 1 },
+}
+
+/** A steep lean on thick glass: the rainbow edge and the caustic behind it are the point. */
+export const Deep: Story = {
+    args: {
+        pointer: { x: 0.85, y: 0.2 },
+        strength: 1.2,
+        tilt: 26,
+        depth: 40,
+        facets: "smooth",
+        radius: 16,
+    },
+    parameters: { surface: { padding: 72 } },
+}
 
 export const PixelModeCoarseCells: Story = {
     args: { pointer: { x: 0.7, y: 0.6 }, pixel: 14, dispersion: 1 },
@@ -69,7 +90,7 @@ const lightCard = (
             color: "#14161c",
         }}
     >
-        <strong style={{ fontSize: 24 }}>Refraction</strong>
+        <strong style={{ fontSize: 40, fontWeight: 800, lineHeight: 1 }}>Refraction</strong>
         <span style={{ opacity: 0.78, fontSize: 14 }}>
             White light enters at one point and leaves split into bands.
         </span>

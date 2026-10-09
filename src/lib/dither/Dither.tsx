@@ -28,8 +28,11 @@ import "./Dither.css"
 
 export type DitherState = "idle" | "enter" | "on" | "exit"
 
+export type DitherVariant = "sweep" | "edge"
+
 export interface DitherOwnProps {
     children?: ReactNode
+    variant?: DitherVariant
     cell?: number
     color?: string
     colors?: readonly string[]
@@ -62,10 +65,76 @@ function focusVisible(element: Element): boolean {
     }
 }
 
+interface ActiveWatch {
+    force: (on: boolean) => void
+    dispose: () => void
+}
+
+// Hover (mouse and pen only), :focus-visible anywhere inside, and the active prop all count as on.
+function watchActive(
+    root: HTMLElement,
+    change: (on: boolean, x?: number, y?: number) => void,
+): ActiveWatch {
+    const box = pointerBox(root)
+    let hovered = false
+    let focused = false
+    let forced = false
+
+    const update = (x?: number, y?: number) => change(hovered || focused || forced, x, y)
+
+    const onEnter = (event: PointerEvent) => {
+        if (event.pointerType === "touch") return
+        hovered = true
+        box.invalidate()
+        const point = box.px(event)
+        update(point?.x, point?.y)
+    }
+
+    const onLeave = (event: PointerEvent) => {
+        if (!hovered) return
+        hovered = false
+        const point = box.px(event)
+        update(point?.x, point?.y)
+    }
+
+    const onFocusIn = (event: FocusEvent) => {
+        if (!(event.target instanceof Element) || !focusVisible(event.target)) return
+        focused = true
+        update()
+    }
+
+    const onFocusOut = (event: FocusEvent) => {
+        const next = event.relatedTarget
+        if (next instanceof Node && root.contains(next)) return
+        focused = false
+        update()
+    }
+
+    root.addEventListener("pointerenter", onEnter)
+    root.addEventListener("pointerleave", onLeave)
+    root.addEventListener("focusin", onFocusIn)
+    root.addEventListener("focusout", onFocusOut)
+
+    return {
+        force(on) {
+            forced = on
+            update()
+        },
+        dispose() {
+            box.dispose()
+            root.removeEventListener("pointerenter", onEnter)
+            root.removeEventListener("pointerleave", onLeave)
+            root.removeEventListener("focusin", onFocusIn)
+            root.removeEventListener("focusout", onFocusOut)
+        },
+    }
+}
+
 function DitherInner(
     {
         as,
         children,
+        variant = "sweep",
         cell = 8,
         color,
         colors,
@@ -93,22 +162,31 @@ function DitherInner(
 
     useIsomorphicLayoutEffect(() => {
         const root = rootRef.current
+        if (!root || disabled) return
+
+        const mark = (state: DitherState) => root.setAttribute("data-state", state)
+
+        if (variant === "edge") {
+            const watch = watchActive(root, (on) => mark(on ? "on" : "idle"))
+            mark("idle")
+            forceRef.current = watch.force
+            return () => {
+                forceRef.current = null
+                watch.dispose()
+                root.removeAttribute("data-state")
+            }
+        }
+
         const canvas = canvasRef.current
-        if (!root || !canvas || disabled) return
+        if (!canvas) return
 
         const context = context2d(canvas)
-        const box = pointerBox(root)
         let grid: DitherGrid | null = null
         let dpr = 1
         let palette: string[] = [FALLBACK]
         let level = 0
         let target = 0
-        let hovered = false
-        let focused = false
-        let forced = false
         let stop: (() => void) | null = null
-
-        const mark = (state: DitherState) => root.setAttribute("data-state", state)
 
         const resolvePalette = (): string[] => {
             const config = settings.current
@@ -148,8 +226,7 @@ function DitherInner(
             mark(target > 0 ? "on" : "idle")
         }
 
-        const update = (x?: number, y?: number) => {
-            const on = hovered || focused || forced
+        const update = (on: boolean, x?: number, y?: number) => {
             const next = on ? FULL : 0
             if (next === target) return
 
@@ -176,33 +253,7 @@ function DitherInner(
             if (!stop) stop = onFrame(tick)
         }
 
-        const onEnter = (event: PointerEvent) => {
-            if (event.pointerType === "touch") return
-            hovered = true
-            box.invalidate()
-            const point = box.px(event)
-            update(point?.x, point?.y)
-        }
-
-        const onLeave = (event: PointerEvent) => {
-            if (!hovered) return
-            hovered = false
-            const point = box.px(event)
-            update(point?.x, point?.y)
-        }
-
-        const onFocusIn = (event: FocusEvent) => {
-            if (!(event.target instanceof Element) || !focusVisible(event.target)) return
-            focused = true
-            update()
-        }
-
-        const onFocusOut = (event: FocusEvent) => {
-            const next = event.relatedTarget
-            if (next instanceof Node && root.contains(next)) return
-            focused = false
-            update()
-        }
+        const watch = watchActive(root, update)
 
         const stopResize = onResize(root, () => {
             if (level <= 0 || stop) return
@@ -211,35 +262,23 @@ function DitherInner(
             draw()
         })
 
-        root.addEventListener("pointerenter", onEnter)
-        root.addEventListener("pointerleave", onLeave)
-        root.addEventListener("focusin", onFocusIn)
-        root.addEventListener("focusout", onFocusOut)
         mark("idle")
-
-        forceRef.current = (on: boolean) => {
-            forced = on
-            update()
-        }
+        forceRef.current = watch.force
 
         return () => {
             forceRef.current = null
             stop?.()
             stop = null
             stopResize()
-            box.dispose()
-            root.removeEventListener("pointerenter", onEnter)
-            root.removeEventListener("pointerleave", onLeave)
-            root.removeEventListener("focusin", onFocusIn)
-            root.removeEventListener("focusout", onFocusOut)
+            watch.dispose()
             context?.clearRect(0, 0, canvas.width, canvas.height)
             root.removeAttribute("data-state")
         }
-    }, [disabled, still, cell, density, origin, paletteKey, color, settings])
+    }, [variant, disabled, still, cell, density, origin, paletteKey, color, settings])
 
     useIsomorphicLayoutEffect(() => {
         forceRef.current?.(active)
-    }, [active, disabled, still, cell, density, origin, paletteKey, color])
+    }, [active, variant, disabled, still, cell, density, origin, paletteKey, color])
 
     const setRef = (node: HTMLElement | null) => {
         rootRef.current = node
@@ -248,24 +287,31 @@ function DitherInner(
     }
 
     const tint = colors?.[0] ?? color
+    const size = Math.max(2, Math.round(cell))
     const rootStyle = {
         ...style,
         ...(tint ? { "--zg-dither-color": tint } : null),
         "--zg-dither-glow": glow,
+        "--zg-dither-cell": `${size}px`,
+        "--zg-dither-gap": `${Math.max(1, Math.round(size * 0.14))}px`,
     } as CSSProperties
 
-    const Tag = as ?? "div"
-    const list = typeof Tag === "string" && LIST_TAGS.has(Tag)
-    const canvas = disabled ? null : (
+    const Host = as ?? "div"
+    const list = typeof Host === "string" && LIST_TAGS.has(Host)
+    const canvas = disabled ? null : variant === "edge" ? (
+        <span className="zg-dither-edge" aria-hidden="true" />
+    ) : (
         <canvas ref={canvasRef} className="zg-dither-canvas" aria-hidden="true" />
     )
 
     return (
-        <Tag
+        <Host
             {...rest}
             ref={setRef}
             className={cx("zg-dither", className)}
+            data-variant={variant}
             data-layer={layer}
+            data-still={still ? "" : undefined}
             style={rootStyle}
         >
             {list ? null : canvas}
@@ -275,7 +321,7 @@ function DitherInner(
                     {canvas}
                 </li>
             ) : null}
-        </Tag>
+        </Host>
     )
 }
 

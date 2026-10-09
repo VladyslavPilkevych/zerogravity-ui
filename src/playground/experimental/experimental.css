@@ -105,13 +105,6 @@
     background: linear-gradient(150deg, #06231f, #0d4f42);
 }
 
-.xpg-tessera-page {
-    min-height: 70vh;
-    border-radius: 22px;
-    overflow: hidden;
-    background: var(--xpg-tessera-tint);
-}
-
 .xpg-meadow-scene {
     border-radius: 24px;
 }
@@ -321,30 +314,6 @@
     margin: 0;
     font-size: clamp(26px, 4vw, 40px);
     letter-spacing: -0.025em;
-}
-
-.xpg-tessera-routes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-
-.xpg-tessera-route {
-    padding: 9px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.82);
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.xpg-tessera-route[aria-current="page"] {
-    border-color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff;
 }
 
 .xpg-overprint {
@@ -598,7 +567,6 @@
 .xp-quartz.xpg-quartz,
 .xp-ink.xpg-ink,
 .xpg-quartz .xpg-quartz-face,
-.xpg-nimbus .xpg-nimbus-face,
 .xpg-chroma .xpg-chroma-face,
 .xpg-sonar .xpg-sonar-face {
     min-height: inherit;
@@ -613,7 +581,6 @@
     min-height: inherit;
 }
 
-.xpg-prism-stage,
 .xpg-type-stage,
 .xpg-phosphor-stage,
 .xpg-lenticular-stage,
@@ -631,31 +598,6 @@
 /* the card and its hint sit together instead of splitting the stage's height */
 .xpg-lenticular-stage {
     align-content: center;
-}
-
-.xpg-prism-card {
-    display: grid;
-    gap: 12px;
-    align-content: start;
-    width: min(520px, 84cqw);
-    min-height: 260px;
-    padding: 36px 40px;
-    border-radius: inherit;
-    background: linear-gradient(160deg, #141a33, #1d1438 62%, #0f2633);
-    color: #eef2ff;
-}
-
-.xpg-prism-card h3 {
-    margin: 0;
-    font-size: 26px;
-    letter-spacing: -0.02em;
-}
-
-.xpg-prism-card p {
-    margin: 0;
-    max-width: 34ch;
-    color: rgba(238, 242, 255, 0.72);
-    font-size: 14px;
 }
 
 /* a shadow needs somewhere to fall: this demo is a lit room, not a dark one.
@@ -702,8 +644,7 @@
 
 .xpg-chroma-face,
 .xpg-sonar-face,
-.xpg-quartz-face,
-.xpg-nimbus-face {
+.xpg-quartz-face {
     display: grid;
     place-items: center;
     width: 100%;
@@ -741,15 +682,7 @@
     font-size: 14px;
 }
 
-.xpg-nimbus-face {
-    color: #f0f4ff;
-    font-size: clamp(30px, 6cqw, 62px);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-}
-
 .xpg-concertina-face,
-.xpg-gantry-car,
 .xpg-peel-front,
 .xpg-peel-back {
     display: grid;
@@ -776,10 +709,6 @@
 
 .xpg-fold-3 {
     background: linear-gradient(150deg, #101017, #4a2b18);
-}
-
-.xpg-gantry-car {
-    border-radius: 18px;
 }
 
 .xpg-peel-front {

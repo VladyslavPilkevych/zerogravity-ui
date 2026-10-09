@@ -10,8 +10,12 @@ test("search filters the sidebar as you type", async ({ page, browserLog: guard 
     await expect(side.getByRole("link")).toHaveCount(COMPONENT_SLUGS.length)
 
     await search.fill("carousel")
-    await expect(side.getByRole("link", { name: /^Reel/ })).toBeVisible()
+    await expect(side.getByRole("link").first()).toHaveAccessibleName(/^Reel/)
+    await expect(side.getByRole("link", { name: /^Stencil/ })).toHaveCount(0)
+
+    await search.fill("water ripple")
     await expect(side.getByRole("link")).toHaveCount(1)
+    await expect(side.getByRole("link", { name: /^Wake/ })).toBeVisible()
 
     guard.assertClean()
 })

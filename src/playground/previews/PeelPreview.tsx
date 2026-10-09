@@ -1,7 +1,7 @@
 "use client"
 
-import { Peel } from "@/lib/experimental"
-import type { PeelCorner } from "@/lib/experimental"
+import { Peel } from "@/lib"
+import type { PeelCorner } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint, ScrollPort } from "./parts"

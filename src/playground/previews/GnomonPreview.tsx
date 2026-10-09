@@ -1,6 +1,6 @@
 "use client"
 
-import { Gnomon } from "@/lib/experimental"
+import { Gnomon } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"

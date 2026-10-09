@@ -177,6 +177,103 @@ describe("Dither", () => {
     })
 })
 
+describe("Dither edge variant", () => {
+    it("marks the variant and draws a hidden span instead of a canvas", () => {
+        const { container, rerender } = render(<Dither>Card</Dither>)
+        const root = container.firstElementChild as HTMLElement
+        expect(root.dataset.variant).toBe("sweep")
+
+        rerender(<Dither variant="edge">Card</Dither>)
+        expect(root.dataset.variant).toBe("edge")
+        expect(root.querySelector("canvas")).toBeNull()
+        expect(root.querySelector(".zg-dither-edge")).toHaveAttribute("aria-hidden", "true")
+    })
+
+    it("turns on with hover and off on leave without a frame loop", () => {
+        const { container } = render(<Dither variant="edge">Card</Dither>)
+        const root = container.firstElementChild as HTMLElement
+
+        pointer("pointerenter", root)
+        expect(root.dataset.state).toBe("on")
+        expect(frameCount()).toBe(0)
+        expect(frames.pending()).toBe(0)
+
+        pointer("pointerleave", root)
+        expect(root.dataset.state).toBe("idle")
+    })
+
+    it("turns on for keyboard focus inside, like hover", () => {
+        render(
+            <Dither variant="edge" as="label">
+                <input type="radio" name="plan" aria-label="Plan" />
+            </Dither>,
+        )
+        const input = screen.getByRole("radio", { name: "Plan" })
+        const root = input.parentElement!
+
+        act(() => input.focus())
+        expect(root.dataset.state).toBe("on")
+
+        act(() => input.blur())
+        expect(root.dataset.state).toBe("idle")
+    })
+
+    it("ignores touch and follows the active prop", () => {
+        const { container, rerender } = render(<Dither variant="edge">Card</Dither>)
+        const root = container.firstElementChild as HTMLElement
+
+        pointer("pointerenter", root, "touch")
+        expect(root.dataset.state).toBe("idle")
+
+        rerender(
+            <Dither variant="edge" active>
+                Card
+            </Dither>,
+        )
+        expect(root.dataset.state).toBe("on")
+    })
+
+    it("flags reduced motion so CSS drops the stepping and the lift", () => {
+        mediaState.reducedMotion = true
+        const { container, rerender } = render(<Dither variant="edge">Card</Dither>)
+        const root = container.firstElementChild as HTMLElement
+        expect(root).toHaveAttribute("data-still")
+
+        rerender(
+            <Dither variant="edge" respectReducedMotion={false}>
+                Card
+            </Dither>,
+        )
+        expect(root).not.toHaveAttribute("data-still")
+    })
+
+    it("keeps a list host valid", () => {
+        const { container } = render(
+            <Dither as="ol" variant="edge">
+                <li>One</li>
+            </Dither>,
+        )
+        const list = container.querySelector("ol")!
+
+        expect([...list.children].every((child) => child.tagName === "LI")).toBe(true)
+        expect(list.lastElementChild).toHaveClass("zg-dither-slot")
+        expect(list.lastElementChild!.querySelector(".zg-dither-edge")).not.toBeNull()
+        expect(screen.getAllByRole("listitem")).toHaveLength(1)
+    })
+
+    it("passes the cell size and a matching gap to CSS", () => {
+        const { container } = render(
+            <Dither variant="edge" cell={16}>
+                Card
+            </Dither>,
+        )
+        const root = container.firstElementChild as HTMLElement
+
+        expect(root.style.getPropertyValue("--zg-dither-cell")).toBe("16px")
+        expect(root.style.getPropertyValue("--zg-dither-gap")).toBe("2px")
+    })
+})
+
 describe("Dither engine", () => {
     it("reaches cells near the origin first", () => {
         const grid = makeGrid(160, 16, 8, 0.3, 1)

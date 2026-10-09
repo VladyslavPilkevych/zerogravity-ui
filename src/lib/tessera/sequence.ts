@@ -1,6 +1,7 @@
 import { rngFrom } from "../internal"
 
-export type TesseraSequence = "row" | "column" | "reverse" | "center" | "random"
+export type TesseraSequence =
+    "row" | "column" | "reverse" | "center" | "random" | "diagonal" | "spiral"
 
 export interface TesseraTile {
     cover: number
@@ -22,6 +23,35 @@ function scrambleWeights(count: number, seed: number): number[] {
 
     const weights = new Array<number>(count)
     for (let rank = 0; rank < count; rank += 1) weights[order[rank]] = rank
+    return weights
+}
+
+/** Rank of each tile along a clockwise walk from the top-left corner inwards. */
+function spiralWeights(rows: number, columns: number): number[] {
+    const weights = new Array<number>(rows * columns)
+    let top = 0
+    let bottom = rows - 1
+    let left = 0
+    let right = columns - 1
+    let rank = 0
+
+    while (top <= bottom && left <= right) {
+        for (let column = left; column <= right; column += 1)
+            weights[top * columns + column] = rank++
+        for (let row = top + 1; row <= bottom; row += 1) weights[row * columns + right] = rank++
+        if (top < bottom) {
+            for (let column = right - 1; column >= left; column -= 1)
+                weights[bottom * columns + column] = rank++
+        }
+        if (left < right) {
+            for (let row = bottom - 1; row > top; row -= 1) weights[row * columns + left] = rank++
+        }
+        top += 1
+        bottom -= 1
+        left += 1
+        right -= 1
+    }
+
     return weights
 }
 
@@ -49,6 +79,7 @@ export function delayFactors(
     if (count <= 0) return []
 
     if (sequence === "random") return normalize(scrambleWeights(count, seed))
+    if (sequence === "spiral") return normalize(spiralWeights(rows, columns))
 
     const weights = new Array<number>(count)
 
@@ -58,6 +89,7 @@ export function delayFactors(
 
         if (sequence === "column") weights[index] = column * rows + row
         else if (sequence === "reverse") weights[index] = count - 1 - index
+        else if (sequence === "diagonal") weights[index] = row + column
         else if (sequence === "center")
             weights[index] = Math.hypot(column - (columns - 1) / 2, row - (rows - 1) / 2)
         else weights[index] = index

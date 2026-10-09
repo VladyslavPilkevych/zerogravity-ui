@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 
-import { Tide, type TideEdge } from "@/lib/experimental"
+import { Tide, type TideEdge } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 export function TidePreview({ config }: PreviewApi) {

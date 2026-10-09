@@ -1,7 +1,28 @@
 .xp-ink {
+    --xp-ink-paper: #f4eee0;
     position: relative;
     min-height: 220px;
-    background: #f6f1e6;
+    overflow: hidden;
+    isolation: isolate;
+    background-color: var(--xp-ink-paper);
+    /* a little light falling across the sheet */
+    background-image: radial-gradient(
+        ellipse at 30% 20%,
+        rgba(255, 255, 255, 0.35),
+        rgba(255, 255, 255, 0) 60%
+    );
+}
+
+.xp-ink[data-drawing="true"] {
+    cursor: crosshair;
+    touch-action: none;
+}
+
+/* a finger still has to scroll the page past it; sideways strokes draw */
+@media (pointer: coarse) {
+    .xp-ink[data-drawing="true"] {
+        touch-action: pan-y pinch-zoom;
+    }
 }
 
 .xp-ink-word {
@@ -17,7 +38,25 @@
 }
 
 .xp-ink-paper {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
+    mix-blend-mode: multiply;
+    /* rounds off the simulation's cells without softening the word */
+    filter: blur(0.3px);
+}
+
+/* the paper's grain sits over the ink too, so the ink reads as in the sheet, not on it */
+.xp-ink::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: var(--xp-ink-grain, none);
+    background-size: 128px 128px;
+    mix-blend-mode: multiply;
+    opacity: 0.09;
 }

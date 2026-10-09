@@ -85,6 +85,24 @@ describe("presets", () => {
         for (const id of ids) expect(getAntigravityPreset(id)).toBeDefined()
     })
 
+    it("appends new presets so published positions stay put", () => {
+        const ids = ANTIGRAVITY_PRESETS.map((preset) => preset.id)
+
+        expect(ids.slice(0, 2)).toEqual(["nebula", "neon"])
+        expect(ids.indexOf("minimal")).toBeLessThan(ids.indexOf("pixel"))
+    })
+
+    it("ships the square-pixel showcase", () => {
+        const pixel = getAntigravityPreset("pixel")!
+        const config = resolveAntigravityConfig(pixel.options)
+
+        expect(config.particle.shape).toBe("square")
+        expect(config.particle.rotation).toBe("none")
+        expect(config.formation.shape).toBe("grid")
+        expect(config.count).toBeGreaterThan(1500)
+        expect(config.render.dprCap).toBeLessThanOrEqual(2)
+    })
+
     it("returns undefined for an unknown id", () => {
         expect(getAntigravityPreset("does-not-exist")).toBeUndefined()
     })

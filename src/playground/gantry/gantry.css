@@ -1,0 +1,151 @@
+/* docs demo cards for Gantry: pixel plates that light up when centred */
+
+.gyd-card {
+    --gyd-accent: #4ee1f2;
+    --gyd-band: rgba(238, 241, 255, 0.5);
+    --zg-notch: 4px;
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 100%;
+    padding-block: clamp(18px, 9cqh, 64px);
+    color: #eef1ff;
+}
+
+.gyd-card[data-tone="1"] {
+    --gyd-accent: #c6f24e;
+}
+
+.gyd-card[data-tone="2"] {
+    --gyd-accent: #ff5fa2;
+}
+
+.gyd-card[data-tone="3"] {
+    --gyd-accent: #9d7bff;
+}
+
+.gyd-plate,
+.gyd-ring {
+    grid-area: 1 / 1;
+}
+
+.gyd-plate {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 14px 16px;
+    background-color: #0c0e15;
+    background-image:
+        linear-gradient(
+            to top,
+            color-mix(in srgb, var(--gyd-band) 12%, transparent) 0 8%,
+            color-mix(in srgb, var(--gyd-band) 7%, transparent) 0 16%,
+            color-mix(in srgb, var(--gyd-band) 3%, transparent) 0 24%,
+            transparent 0
+        ),
+        linear-gradient(transparent 0 15px, rgba(255, 255, 255, 0.04) 0),
+        linear-gradient(90deg, transparent 0 15px, rgba(255, 255, 255, 0.04) 0);
+    background-size:
+        100% 100%,
+        16px 16px,
+        16px 16px;
+}
+
+.gyd-ring {
+    background: rgba(238, 241, 255, 0.16);
+    pointer-events: none;
+    transition: background-color 180ms steps(2, end);
+}
+
+.gyd-head,
+.gyd-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.gyd-index {
+    padding: 3px 7px 2px;
+    background: rgba(238, 241, 255, 0.08);
+    color: rgba(238, 241, 255, 0.72);
+    font-variant-numeric: tabular-nums;
+    transition:
+        background-color 180ms steps(2, end),
+        color 180ms steps(2, end);
+}
+
+.gyd-kind {
+    color: rgba(238, 241, 255, 0.4);
+}
+
+.gyd-title {
+    align-self: center;
+    justify-self: center;
+    color: rgba(238, 241, 255, 0.62);
+    font-size: clamp(26px, 5cqw, 46px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    transition: color 180ms steps(2, end);
+}
+
+/* one block per car, the car's own one lit */
+.gyd-meter {
+    display: flex;
+    gap: 3px;
+}
+
+.gyd-meter i {
+    width: 8px;
+    height: 8px;
+    background: rgba(238, 241, 255, 0.14);
+}
+
+.gyd-meter i[data-on] {
+    background: var(--gyd-accent);
+}
+
+.gyd-foot span {
+    color: rgba(238, 241, 255, 0.4);
+    transition: color 180ms steps(2, end);
+}
+
+/* the centred car, as marked by Gantry */
+[data-active] > .gyd-card {
+    --gyd-band: var(--gyd-accent);
+}
+
+[data-active] > .gyd-card .gyd-ring {
+    background: var(--gyd-accent);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gyd-accent) 70%, transparent));
+}
+
+[data-active] > .gyd-card .gyd-index {
+    background: var(--gyd-accent);
+    color: #06080d;
+}
+
+[data-active] > .gyd-card .gyd-title {
+    color: #f6f8ff;
+}
+
+[data-active] > .gyd-card .gyd-foot span {
+    color: var(--gyd-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gyd-ring,
+    .gyd-index,
+    .gyd-title,
+    .gyd-foot span {
+        transition: none;
+    }
+}
+
+/* no centring to follow once the rail is an ordinary scroller */
+.xp-gantry[data-still="true"] .gyd-title {
+    color: #f6f8ff;
+}

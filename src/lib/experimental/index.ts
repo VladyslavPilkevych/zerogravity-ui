@@ -1,9 +1,6 @@
 export { Anaglyph } from "./anaglyph"
 export type { AnaglyphMode, AnaglyphProps } from "./anaglyph"
 
-export { Chroma, CHROMA_COLORS } from "./chroma"
-export type { ChromaProps } from "./chroma"
-
 export { Concertina, ConcertinaPanel } from "./concertina"
 export type { ConcertinaPanelProps, ConcertinaProps } from "./concertina"
 
@@ -42,35 +39,17 @@ export type { RasterGlyphSet, RasterMode, RasterProps } from "./raster"
 export { Undertow, UNDERTOW_DEMO_FRONT, UNDERTOW_DEMO_BACK } from "./undertow"
 export type { UndertowProps } from "./undertow"
 
-export { Wake } from "./wake"
-export type { WakeProps, WakeSurface } from "./wake"
-
-export { Wash } from "./wash"
-export type { WashMode, WashProps } from "./wash"
-
 export { Emulsion } from "./emulsion"
 export type { EmulsionProps } from "./emulsion"
-
-export { Gantry } from "./gantry"
-export type { GantryEasing, GantryProps } from "./gantry"
-
-export { Gnomon } from "./gnomon"
-export type { GnomonProps } from "./gnomon"
 
 export { Ink } from "./ink"
 export type { InkProps } from "./ink"
 
-export { Lenticular } from "./lenticular"
-export type { LenticularProps } from "./lenticular"
-
 export { Meniscus } from "./meniscus"
 export type { MeniscusProps, MeniscusShape } from "./meniscus"
 
-export { Nimbus, NIMBUS_COLORS } from "./nimbus"
-export type { NimbusProps } from "./nimbus"
-
-export { Peel } from "./peel"
-export type { PeelCorner, PeelProps } from "./peel"
+export { Nimbus, NIMBUS_COLORS, NIMBUS_PRESETS, NIMBUS_PRESET_NAMES } from "./nimbus"
+export type { NimbusProps, NimbusPreset, NimbusScene } from "./nimbus"
 
 export { Prism } from "./prism"
 export type { PrismFacets, PrismPoint, PrismProps } from "./prism"
@@ -80,6 +59,3 @@ export type { QuartzBlend, QuartzProps } from "./quartz"
 
 export { Quiver } from "./quiver"
 export type { QuiverProps } from "./quiver"
-
-export { Tide } from "./tide"
-export type { TideProps, TideEdge } from "./tide"

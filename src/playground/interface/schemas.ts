@@ -1,6 +1,7 @@
 import type { ControlGroup } from "../panel/types"
 
 export const DITHER_DEFAULTS = {
+    variant: "sweep",
     cell: 8,
     density: 0.3,
     glow: 0.5,
@@ -15,11 +16,11 @@ export const DITHER_CONTROLS: ControlGroup[] = [
     {
         id: "pixels",
         title: "Pixels",
-        hint: "block size, resting texture and glow",
+        hint: "hover style, block size, glow and colour",
         open: true,
         controls: [
+            { kind: "select", path: "variant", label: "Variant", options: ["sweep", "edge"] },
             { kind: "number", path: "cell", label: "Cell", min: 4, max: 24, step: 1, unit: "px" },
-            { kind: "number", path: "density", label: "Rest density", min: 0, max: 1, step: 0.02 },
             { kind: "number", path: "glow", label: "Glow", min: 0, max: 1.5, step: 0.05 },
             { kind: "color", path: "color", label: "Colour" },
         ],
@@ -27,9 +28,10 @@ export const DITHER_CONTROLS: ControlGroup[] = [
     {
         id: "sweep",
         title: "Sweep",
-        hint: "where the fill starts and how long it takes",
+        hint: "fill, resting texture and timing; sweep variant only",
         open: true,
         controls: [
+            { kind: "number", path: "density", label: "Rest density", min: 0, max: 1, step: 0.02 },
             {
                 kind: "number",
                 path: "duration",
@@ -45,9 +47,38 @@ export const DITHER_CONTROLS: ControlGroup[] = [
                 label: "Origin",
                 options: ["pointer", "center", "left", "right", "top", "bottom"],
             },
+        ],
+    },
+    {
+        id: "state",
+        title: "State",
+        hint: "stacking and a held-on state",
+        open: true,
+        controls: [
             { kind: "select", path: "layer", label: "Layer", options: ["under", "over"] },
             { kind: "boolean", path: "active", label: "Force active" },
         ],
+    },
+]
+
+export const DITHER_PRESETS = [
+    {
+        id: "sweep",
+        label: "Sweep",
+        hint: "blocks fill from the pointer",
+        values: {},
+    },
+    {
+        id: "edge",
+        label: "Edge",
+        hint: "quick block frame and lift",
+        values: { variant: "edge" },
+    },
+    {
+        id: "lime",
+        label: "Lime",
+        hint: "lime sweep from the left edge",
+        values: { color: "#c6f24e", origin: "left", cell: 10 },
     },
 ]
 
@@ -131,17 +162,24 @@ export const SEAM_CONTROLS: ControlGroup[] = [
     },
 ]
 
-export const PIP_DEFAULTS = {
+export const TAG_DEFAULTS = {
+    status: "neutral",
     variant: "outline",
 }
 
-export const PIP_CONTROLS: ControlGroup[] = [
+export const TAG_CONTROLS: ControlGroup[] = [
     {
-        id: "pip",
-        title: "Pip",
-        hint: "outline or filled",
+        id: "tag",
+        title: "Your tag",
+        hint: "the tag at the top and the code below",
         open: true,
         controls: [
+            {
+                kind: "select",
+                path: "status",
+                label: "Status",
+                options: ["neutral", "info", "success", "warning", "danger", "live"],
+            },
             { kind: "select", path: "variant", label: "Variant", options: ["outline", "solid"] },
         ],
     },

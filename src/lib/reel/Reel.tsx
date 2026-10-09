@@ -53,6 +53,10 @@ const SETTLED = 0.0005
 const DRAG_THRESHOLD = 4
 const WHEEL_STEP = 60
 const WHEEL_COOLDOWN = 220
+const WHEEL_IDLE = 160
+const WHEEL_LINE = 40
+const SAMPLES = 16
+const VELOCITY_SPAN = 60
 const MAX_FLICK = 3
 const HEADROOM = 56
 
@@ -66,6 +70,36 @@ function shortest(delta: number, length: number): number {
 
 function clamp(value: number, min: number, max: number): number {
     return value < min ? min : value > max ? max : value
+}
+
+interface Track {
+    x: Float64Array
+    t: Float64Array
+    head: number
+    size: number
+}
+
+function record(track: Track, x: number, t: number): void {
+    track.head = (track.head + 1) % SAMPLES
+    track.x[track.head] = x
+    track.t[track.head] = t
+    if (track.size < SAMPLES) track.size += 1
+}
+
+/**
+ * Pointer speed in px/ms over the last ~VELOCITY_SPAN ms before `now`. Measured
+ * against the release moment, so a pointer that stopped before letting go reads
+ * as still, and only the latest direction of travel counts.
+ */
+function releaseSpeed(track: Track, x: number, now: number): number {
+    let anchor = -1
+    for (let n = 0; n < track.size; n += 1) {
+        anchor = (track.head - n + SAMPLES) % SAMPLES
+        if (now - track.t[anchor] >= VELOCITY_SPAN) break
+    }
+    if (anchor < 0) return 0
+    const elapsed = now - track.t[anchor]
+    return elapsed > 0 ? (x - track.x[anchor]) / elapsed : 0
 }
 
 export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
@@ -122,13 +156,16 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         pointerId: -1,
         startX: 0,
         startPosition: 0,
-        lastX: 0,
-        lastTime: 0,
-        velocity: 0,
+        track: {
+            x: new Float64Array(SAMPLES),
+            t: new Float64Array(SAMPLES),
+            head: 0,
+            size: 0,
+        } as Track,
         moved: false,
         pressed: -1,
     })
-    const wheelRef = useRef({ delta: 0, time: 0 })
+    const wheelRef = useRef({ delta: 0, time: 0, last: 0, level: 0, locked: false })
 
     const controlled = index !== undefined
     const [internal, setInternal] = useState(() => clamp(defaultIndex, 0, Math.max(0, count - 1)))
@@ -348,18 +385,39 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
 
         const onWheel = (event: WheelEvent) => {
             const horizontal = Math.abs(event.deltaX) > Math.abs(event.deltaY)
-            const delta = horizontal ? event.deltaX : event.shiftKey ? event.deltaY : 0
+            let delta = horizontal ? event.deltaX : event.shiftKey ? event.deltaY : 0
             if (delta === 0) return
 
             event.preventDefault()
-            const now = performance.now()
-            if (now - wheelRef.current.time < WHEEL_COOLDOWN) return
+            if (event.deltaMode === 1) delta *= WHEEL_LINE
+            else if (event.deltaMode === 2) delta *= viewport.clientWidth
 
-            wheelRef.current.delta += delta
-            if (Math.abs(wheelRef.current.delta) >= WHEEL_STEP) {
-                step(Math.sign(wheelRef.current.delta))
-                wheelRef.current.delta = 0
-                wheelRef.current.time = now
+            const state = wheelRef.current
+            const now = performance.now()
+            const gap = now - state.last
+            const magnitude = Math.abs(delta)
+            const decaying = magnitude <= state.level
+            state.last = now
+            state.level = magnitude
+
+            // a trackpad swipe keeps streaming shrinking deltas (momentum) long
+            // after it stepped; that tail belongs to the same gesture
+            if (state.locked) {
+                const tail =
+                    now - state.time < WHEEL_COOLDOWN || (decaying && magnitude < WHEEL_STEP)
+                if (gap < WHEEL_IDLE && tail) return
+                state.locked = false
+            }
+
+            // stray deltas from an earlier gesture must not add up into a step
+            if (gap >= WHEEL_IDLE) state.delta = 0
+
+            state.delta += delta
+            if (Math.abs(state.delta) >= WHEEL_STEP) {
+                step(Math.sign(state.delta))
+                state.delta = 0
+                state.time = now
+                state.locked = true
             }
         }
 
@@ -373,6 +431,8 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         if (count === 0 || event.button !== 0) return
 
         const state = dragStateRef.current
+        // a second finger must not hijack the drag in progress
+        if (state.active && !event.isPrimary) return
         const card = (event.target as HTMLElement).closest(".reel-item") as HTMLElement | null
         state.pressed = card ? Number(card.dataset.index) : -1
         state.moved = false
@@ -383,9 +443,8 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         state.pointerId = event.pointerId
         state.startX = event.clientX
         state.startPosition = positionRef.current
-        state.lastX = event.clientX
-        state.lastTime = performance.now()
-        state.velocity = 0
+        state.track.size = 0
+        record(state.track, event.clientX, performance.now())
         event.currentTarget.setPointerCapture(event.pointerId)
     }
 
@@ -396,13 +455,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         const dx = event.clientX - state.startX
         if (Math.abs(dx) > DRAG_THRESHOLD) state.moved = true
 
-        const now = performance.now()
-        const elapsed = (now - state.lastTime) / 1000
-        if (elapsed > 0.001) {
-            state.velocity = -(event.clientX - state.lastX) / settings.current.spacing / elapsed
-            state.lastX = event.clientX
-            state.lastTime = now
-        }
+        record(state.track, event.clientX, performance.now())
 
         let next = state.startPosition - dx / settings.current.spacing
 
@@ -416,7 +469,7 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         start()
     }
 
-    const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const finishDrag = (event: ReactPointerEvent<HTMLDivElement>, fling: boolean) => {
         const state = dragStateRef.current
         const pressed = state.pressed
         const tapped = clickToSelect && !state.moved && pressed >= 0
@@ -437,12 +490,22 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
         if (tapped) {
             commit(pressed)
         } else {
-            const projected =
-                positionRef.current + clamp(state.velocity * 0.2, -MAX_FLICK, MAX_FLICK)
+            const speed = fling ? releaseSpeed(state.track, event.clientX, performance.now()) : 0
+            // px/ms -> slides/s, projected 0.2s ahead
+            const velocity = (-speed * 1000) / settings.current.spacing
+            const projected = positionRef.current + clamp(velocity * 0.2, -MAX_FLICK, MAX_FLICK)
             commit(Math.round(projected))
         }
 
         start()
+    }
+
+    const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => finishDrag(event, true)
+
+    // the browser took the pointer (scroll, gesture, capture lost): settle, never fling
+    const cancelDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+        dragStateRef.current.pressed = -1
+        finishDrag(event, false)
     }
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -492,7 +555,8 @@ export const Reel = forwardRef<ReelHandle, ReelProps>(function Reel(
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
                 onPointerUp={endDrag}
-                onPointerCancel={endDrag}
+                onPointerCancel={cancelDrag}
+                onLostPointerCapture={cancelDrag}
             >
                 {items.map((item, i) => (
                     <div

@@ -1,0 +1,87 @@
+.zg-tag {
+    --zg-tag-default: color-mix(in srgb, currentColor 60%, transparent);
+    --zg-tag-c: var(--zg-tag-tone, var(--zg-tag-default));
+    display: inline-flex;
+    gap: 7px;
+    align-items: center;
+    padding: 4px 8px 4px 6px;
+    border: 1px solid color-mix(in srgb, var(--zg-tag-c) 52%, transparent);
+    background: color-mix(in srgb, var(--zg-tag-c) 10%, transparent);
+    font-family: var(--zg-font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.zg-tag[data-status="info"] {
+    --zg-tag-default: #4ee1f2;
+}
+
+.zg-tag[data-status="success"] {
+    --zg-tag-default: #b4e43c;
+}
+
+.zg-tag[data-status="warning"] {
+    --zg-tag-default: #ffb84e;
+}
+
+.zg-tag[data-status="danger"] {
+    --zg-tag-default: #ff5f6d;
+}
+
+.zg-tag[data-status="live"] {
+    --zg-tag-default: #ff5fa2;
+}
+
+.zg-tag-glyph {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    fill: color-mix(in srgb, var(--zg-tag-c) 62%, currentColor);
+    shape-rendering: crispEdges;
+}
+
+.zg-tag[data-status="live"] .zg-tag-glyph {
+    filter: drop-shadow(0 0 3px var(--zg-tag-c));
+}
+
+.zg-tag-ring {
+    animation: zg-tag-blink 1.4s steps(1, end) infinite;
+}
+
+@keyframes zg-tag-blink {
+    0%,
+    55% {
+        opacity: 1;
+    }
+    56%,
+    100% {
+        opacity: 0.18;
+    }
+}
+
+.zg-tag[data-variant="solid"] {
+    border-color: var(--zg-tag-c);
+    background: var(--zg-tag-c);
+    color: var(--zg-tag-ink, #05080d);
+}
+
+.zg-tag[data-status="neutral"][data-variant="solid"] {
+    --zg-tag-default: #c3c8d1;
+    border-color: color-mix(in srgb, currentColor 38%, transparent);
+}
+
+.zg-tag[data-variant="solid"] .zg-tag-glyph {
+    fill: currentColor;
+    filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-tag-ring {
+        animation: none;
+    }
+}

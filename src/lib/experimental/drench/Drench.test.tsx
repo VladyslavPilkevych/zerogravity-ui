@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 import { mediaState } from "../../../test/environment"
 import { installCanvasHarness, installFrameHarness } from "../../../test/frames"
@@ -19,91 +19,46 @@ afterEach(() => {
 })
 
 describe("Drench", () => {
-    it("keeps the word as real text, whatever the water is doing", () => {
-        const { getByText, container } = render(<Drench text="ZERO" />)
+    it("keeps the words as real, semantic text and hides the canvas", () => {
+        const { getByRole, container } = render(<Drench text="RAIN" as="h2" />)
 
-        expect(getByText("ZERO")).toBeInTheDocument()
+        expect(getByRole("heading", { level: 2, name: "RAIN" })).toBeInTheDocument()
         expect(container.querySelector("canvas")).toHaveAttribute("aria-hidden", "true")
     })
 
-    it("builds the glyph stencil and the wet layer offscreen", () => {
-        const made: string[] = []
-        const real = document.createElement.bind(document)
-        const spy = vi.spyOn(document, "createElement").mockImplementation(((tag: string) => {
-            made.push(tag)
-            return real(tag)
-        }) as never)
-
-        const { container } = render(<Drench text="ZERO" />)
-
-        // one on screen, plus the stencil and the wet layer that never mount
-        expect(made.filter((tag) => tag === "canvas")).toHaveLength(3)
-        expect(container.querySelectorAll("canvas")).toHaveLength(1)
-        spy.mockRestore()
-    })
-
-    it("stencils the word as an outline and never as a solid", () => {
-        const calls: string[] = []
-        const context = {
-            globalAlpha: 1,
-            globalCompositeOperation: "source-over" as GlobalCompositeOperation,
-            fillStyle: "",
-            strokeStyle: "",
-            lineWidth: 1,
-            lineJoin: "round" as CanvasLineJoin,
-            lineCap: "butt" as CanvasLineCap,
-            font: "",
-            textAlign: "start" as CanvasTextAlign,
-            textBaseline: "alphabetic" as CanvasTextBaseline,
-            save: () => {},
-            restore: () => {},
-            setTransform: () => {},
-            clearRect: () => {},
-            fillRect: () => {},
-            beginPath: () => {},
-            moveTo: () => {},
-            lineTo: () => {},
-            arc: () => {},
-            closePath: () => {},
-            fill: () => {},
-            stroke: () => {},
-            drawImage: () => {},
-            createRadialGradient: () => ({ addColorStop: () => {} }),
-            createLinearGradient: () => ({ addColorStop: () => {} }),
-            measureText: () => ({ width: 0 }),
-            getImageData: () => ({ data: new Uint8ClampedArray(4) }),
-            fillText: () => calls.push("fill"),
-            strokeText: () => calls.push("stroke"),
-        }
-        const spy = vi
-            .spyOn(HTMLCanvasElement.prototype, "getContext")
-            .mockImplementation(() => context as unknown as CanvasRenderingContext2D)
-
-        render(<Drench text="ZERO" />)
-
-        expect(calls).toContain("stroke")
-        expect(calls).not.toContain("fill")
-        spy.mockRestore()
-    })
-
-    it("holds a readable soaked word and no loop under reduced motion", () => {
+    it("holds a soaked, still state and no loop under reduced motion", () => {
         mediaState.reducedMotion = true
 
-        const { container, getByText } = render(<Drench text="ZERO" />)
+        const { container, getByText } = render(<Drench text="RAIN" />)
 
         expect((container.querySelector(".xp-drench") as HTMLElement).dataset.still).toBe("true")
-        expect(getByText("ZERO")).toBeInTheDocument()
+        expect(getByText("RAIN")).toBeInTheDocument()
         expect(frames.pending()).toBe(0)
     })
 
-    it("keeps its loop to one frame at a time and gives it back on unmount", () => {
-        const { unmount } = render(<Drench text="ZERO" />)
+    it("simulates a frozen frame without starting a loop", () => {
+        render(<Drench text="RAIN" seed={4} freezeAt={120} />)
 
-        expect(frames.pending()).toBe(1)
-        frames.advance(5)
+        expect(frames.pending()).toBe(0)
+    })
+
+    it("survives a long downpour on one frame subscription", () => {
+        const { unmount } = render(<Drench text="RAIN" rain={1} wetness={1} fall={3} />)
+
+        frames.advance(600)
         expect(frames.pending()).toBe(1)
 
         unmount()
         expect(frames.pending()).toBe(0)
+    })
+
+    it("stops its loop once nothing falls and nothing is wet, and wakes for rain", () => {
+        const { rerender } = render(<Drench text="RAIN" rain={0} />)
+
+        frames.advance(3)
+        expect(frames.pending()).toBe(0)
+
+        rerender(<Drench text="RAIN" rain={0.5} />)
+        expect(frames.pending()).toBe(1)
     })
 })

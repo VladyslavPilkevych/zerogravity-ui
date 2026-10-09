@@ -1,63 +1,80 @@
 # Drench
 
-A word that is not drawn until the rain finds it. The glyphs are invisible;
-water falling down the pane collects on them, and the letters appear as wet
-traces — not as text fading in.
+Words that are not drawn until the rain finds them. Rain streaks down a dark
+pane of glass; where it hits a letter the water stays, runs down inside the
+stroke, gathers in beads along the underside and every so often lets go, leaving
+a short runoff trail on the glass. When the rain stops the letters slowly dry
+and disappear again.
 
 ```tsx
-<Drench text="ZERO" />
+<Drench text="RAIN" as="h1" />
 ```
 
 ## How it works
 
-Three layers. A glyph layer holds the word as a stencil — an **outline**, not a
-solid, so the letter itself is never drawn and what appears is its contour. A wet
-layer accumulates every streak and bead the rain leaves behind. The wet layer is
-then masked by the stencil with `destination-in`, so water only survives on that
-contour, and the result is tinted with `source-atop`.
+The word is rendered once (per resize or font load) into an offscreen glyph
+mask, and read back once at a coarse grid (2 CSS px per cell) to give the water
+model its cells. Everything else is a simulation in `sim.ts`, free of the DOM:
 
-The stencil is also read back once to find the lowest lit pixel in each column —
-the underside of every letter. Water gathers there, swells, lets go, and runs
-down the frame leaving a streak, which is the part you actually watch.
+- **Rain**: a fixed pool of 240 drops in typed arrays, in three populations —
+  a faint fast far curtain, a middle layer, and heavy near drops. `rain` decides
+  how many slots are active, never how many exist. `wind` slants them all.
+- **Landing**: heavy and some middle drops meet the pane at a seeded height and
+  splat water onto the grid; only cells inside a letter keep it. A fine mist of
+  tiny droplets wets the strokes all over.
+- **Flow**: cells are processed bottom row first; anything above a thin film
+  moves one cell down, or diagonally when the stroke slants. Undersides (no
+  stroke below) collect water; neighbouring underside cells pull towards the
+  wetter one, so water breaks into separate beads.
+- **Drips**: a bead past its (seeded) limit leaves the letter — it hangs and
+  swells, then slides down, shedding mass every cell until it stalls. A pool of
+  40 drips and a ring of 56 runoff trails keep this bounded.
+- **Evaporation** dries everything slowly; trails go a little sooner.
 
-Nothing animates the text's opacity. What changes is how much water is standing
-on it: each frame drains the wet layer a little with `destination-out`, so a
-letter that stops being rained on dries out and disappears again. Rain that falls
-away from the word is drawn faintly on the scene and leaves nothing behind.
+Rendering: the water grid is blurred and shaded (depth gives tone, its slope
+gives a specular highlight) into a small `ImageData`, scaled up, masked by the
+crisp glyph, and given a precomputed sheen — a light upper rim, a meniscus along
+lower edges and a seeded scatter of micro-beads — with `source-atop`, so that
+sheen shows only where there is water. Beads, drips and trail residue are one
+pre-rendered droplet sprite. All compositing is cropped to the word's box.
 
 ## Props
 
-| Prop                   | Default                   | Notes                                 |
-| ---------------------- | ------------------------- | ------------------------------------- |
-| `text`                 | —                         | The word the rain finds               |
-| `rain`                 | `0.55`                    | How many drops fall at once, 0 to 1   |
-| `fall`                 | `1`                       | How fast they fall                    |
-| `wetness`              | `0.6`                     | How much water a hit leaves behind    |
-| `evaporation`          | `0.35`                    | How quickly it dries                  |
-| `color`                | `"#9fd8ff"`               | The colour of the water on the glyphs |
-| `fontFamily`           | `"system-ui, sans-serif"` | Face used for the stencil             |
-| `fontWeight`           | `800`                     | Heavier faces hold more water         |
-| `disabled`             | `false`                   | Hold the still, soaked state          |
-| `respectReducedMotion` | `true`                    | Honour `prefers-reduced-motion`       |
+| Prop                   | Default                   | Notes                                           |
+| ---------------------- | ------------------------- | ----------------------------------------------- |
+| `text`                 | —                         | The words the rain finds                        |
+| `as`                   | `"p"`                     | Element for the real text (`h1`, `h2`, …)       |
+| `rain`                 | `0.6`                     | How hard it rains, 0 to 1                       |
+| `wind`                 | `0.12`                    | Slant, -1 to 1                                  |
+| `fall`                 | `1`                       | Fall speed                                      |
+| `wetness`              | `0.6`                     | How much water a hit leaves                     |
+| `evaporation`          | `0.3`                     | How quickly the letters dry                     |
+| `color`                | `"#9fd8ff"`               | Tint of the water                               |
+| `fontFamily`           | `"system-ui, sans-serif"` | Face of the letters                             |
+| `fontWeight`           | `800`                     | Heavy faces hold more water                     |
+| `seed`                 | `1`                       | Fixes every drop, bead and drip                 |
+| `freezeAt`             | —                         | Simulate N frames at 60 fps, draw once and hold |
+| `disabled`             | `false`                   | Still, soaked state with no falling rain        |
+| `respectReducedMotion` | `true`                    | Honour `prefers-reduced-motion`                 |
 
-Heavy weights read best: a thin face gives the water very little to cling to.
+The pane itself (dark glass with soft reflections) is the root's CSS
+background; override it with `style` or `className`.
 
 ## Accessibility
 
-The word is always in the DOM as real text — a visually hidden `<span>` — so it
-is read, found by in-page search and selected by anything that walks the
-document. The canvas is `aria-hidden`. The visual effect is a rendering of text
-that is already there, never a replacement for it.
+The text is real DOM text in the element given by `as`, laid exactly over the
+letters with transparent colour: screen readers read it, in-page search finds
+it, and selecting it highlights the wet letters. The canvas is `aria-hidden`.
 
 ## Reduced motion
 
-Under `prefers-reduced-motion: reduce`, or with `disabled`, the word is rendered
-already soaked and standing still, using a fixed bead pattern rather than random
-placement. It is legible, it is the same on every render, and no frame loop runs.
+Under `prefers-reduced-motion: reduce`, or with `disabled`, the component
+simulates a seeded shower once and shows the soaked word with its beads and
+runoff, without any falling rain. No frame loop runs.
 
 ## Performance
 
-One visible canvas plus two offscreen layers, a fixed pool of 160 drops — `rain`
-decides how many of them are active, never how many exist — and one
-`requestAnimationFrame`. The loop pauses offscreen and the stencil is re-rendered
-only when the text, the face or the box changes.
+One shared frame subscription (`wakeLoop`) that sleeps offscreen and once the
+rain is at 0 and everything has dried. No per-frame allocation: all pools and
+fields are typed arrays sized on resize. DPR is capped at 2. The mask is
+re-measured on resize and when a web font changes the word's width.

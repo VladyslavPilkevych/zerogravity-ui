@@ -1,6 +1,6 @@
 # Pixel vocabulary
 
-The shared visual language behind `Dither`, `Keycap`, `Bezel`, `Seam`, `Pip`
+The shared visual language behind `Dither`, `Keycap`, `Bezel`, `Seam`, `Tag`
 and the docs site. A new pixel component should pick a few of these and use them
 for its own idea, not repeat another component's look.
 
@@ -35,7 +35,7 @@ for its own idea, not repeat another component's look.
   into on `:active`; hover lifts it `1`–`2px` the other way.
 - **Clean exits.** Effects retract or dissolve; they never snap off.
 - Every loop is idle when nothing moves. Canvas work runs on `onFrame` only
-  during a transition. CSS loops (`Seam` pulse, `Pip` live ring) are short
+  during a transition. CSS loops (`Seam` pulse, `Tag` live ring) are short
   `steps()` cycles and stop under `prefers-reduced-motion`.
 
 ## Light
@@ -44,8 +44,11 @@ for its own idea, not repeat another component's look.
   the accent colour, on the lit part only.
 - **Stepped lighting.** Density or alpha changes in a few hard bands (three or
   four), never a smooth gradient.
+- **Rings.** The cheap form of a block fill: a 1px line, a ring of blocks, then
+  a ring of every other block, switched on in turn by `steps(1)` transitions and
+  off in reverse (`Dither variant="edge"`). Needs no canvas and no frame loop.
 - Accents: cyan `#4ee1f2`, lime `#c6f24e`, pink `#ff5fa2`, violet `#9d7bff`.
-  Status colours in `Pip` add amber `#ffb84e` and red `#ff5f6d`.
+  Status colours in `Tag` add amber `#ffb84e` and red `#ff5f6d`.
 
 ## Type
 

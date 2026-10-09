@@ -81,7 +81,7 @@ export function DocsShell({ index, children }: DocsShellProps) {
                     />
                 </div>
                 <div className="dz-side-scroll">
-                    <SidebarList entries={results} active={active} />
+                    <SidebarList entries={results} ranked={query.trim() !== ""} active={active} />
                 </div>
             </nav>
 
@@ -127,6 +127,7 @@ export function DocsShell({ index, children }: DocsShellProps) {
                         <div className="dz-side-scroll">
                             <SidebarList
                                 entries={results}
+                                ranked={query.trim() !== ""}
                                 active={active}
                                 onNavigate={() => setDrawer(false)}
                             />

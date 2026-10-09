@@ -1,6 +1,6 @@
 "use client"
 
-import { Chroma } from "@/lib/experimental"
+import { Chroma } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { Hint } from "./parts"

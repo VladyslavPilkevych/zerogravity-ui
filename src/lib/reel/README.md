@@ -93,12 +93,16 @@ in agreement.
 
 ## Input details
 
-- **Drag** follows the pointer one-to-one. Releasing projects the current
-  velocity forward, so a flick can travel up to three slides; a slow release
-  snaps to the nearest. Outside `loop` mode the ends have rubber-band
-  resistance.
+- **Drag** follows the pointer one-to-one. Releasing projects the pointer's
+  speed over the last ~60 ms forward, so a flick can travel up to three slides,
+  while a slow release — or one after holding still — snaps to the nearest.
+  Outside `loop` mode the ends have rubber-band resistance. If the browser takes
+  the pointer away (`pointercancel`, lost pointer capture) the drag ends and the
+  reel settles without a flick; a second finger never takes over a running drag.
 - **Wheel** only reacts to horizontal deltas and shift+wheel, so vertical page
-  scrolling is never hijacked.
+  scrolling is never hijacked. One trackpad swipe moves one slide: its momentum
+  tail is treated as the same gesture, and stray deltas from separate gestures
+  never add up into a step. Each mouse-wheel notch still steps.
 - **Keyboard**: `←` `→` step, `Home` and `End` jump to the ends. The viewport is
   focusable and shows a focus ring.
 - **Click** on any neighbour glides it to the centre through the same spring as

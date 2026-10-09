@@ -1,6 +1,6 @@
 "use client"
 
-import { Wash } from "@/lib/experimental"
+import { Wash } from "@/lib"
 import type { PreviewApi } from "@/docs/useDocsConfig"
 
 import { PALETTES } from "../experimental/schemas"
@@ -27,7 +27,7 @@ export function WashPreview({ config }: PreviewApi) {
         >
             <span className="xpg-wash-hint" aria-hidden="true">
                 <i />
-                Click anywhere
+                Click or tap anywhere
             </span>
         </Wash>
     )

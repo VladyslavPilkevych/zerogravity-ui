@@ -1,55 +1,75 @@
 "use client"
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react"
+import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react"
 
 import {
-    clamp,
     context2d,
     cx,
+    damp,
     finite,
-    onFrame,
+    noiseTile,
     onResize,
     onVisible,
-    rngFor,
+    pointerBox,
     useLatestRef,
+    useMediaQuery,
     usePrefersReducedMotion,
+    wakeLoop,
 } from "../../internal"
+import {
+    resolveNimbus,
+    sceneKey,
+    type NimbusPreset,
+    type NimbusScene,
+    type NimbusTuning,
+} from "./presets"
+import { bufferSize, createField, createRenderer, type Pointer } from "./render"
 import "./Nimbus.css"
 
-export interface NimbusProps {
+export interface NimbusProps extends Partial<NimbusTuning> {
     children?: ReactNode
-    /** the clouds it is built from */
+    /** the look everything else starts from */
+    preset?: NimbusPreset
+    /** one palette for the fog, replacing the preset's scenes */
     colors?: readonly string[]
-    /** how many bodies drift, clamped to 12 */
-    count?: number
-    /** how fast they move, 0.1 to 3 */
-    speed?: number
-    /** how strongly they read, 0 to 1 */
-    intensity?: number
+    /** several moods that crossfade slowly; wins over `colors` */
+    scenes?: readonly NimbusScene[]
+    /** the colour of dust, rays and sweeps in every scene */
+    accent?: string
     seed?: number
+    /** hold the field at this many seconds in, for stills and screenshots */
+    time?: number
     disabled?: boolean
     respectReducedMotion?: boolean
     className?: string
     style?: CSSProperties
 }
 
-export const NIMBUS_COLORS: readonly string[] = ["#3b1d6e", "#0e4f6b", "#7a1f5c", "#123a7a"]
+let grainUrl: string | null | undefined
 
-const LIMIT = 12
-/**
- * The field is drawn small and stretched back up. Upscaling a quarter-size
- * buffer gives the same softness a large blur filter would, for a sixteenth of
- * the pixels and no filter at all.
- */
-const SCALE = 0.25
+function grainTile(): string | null {
+    if (grainUrl === undefined && typeof document !== "undefined") {
+        grainUrl = noiseTile(document.createElement("canvas"), { size: 128, seed: 5 })
+    }
+    return grainUrl ?? null
+}
 
 export function Nimbus({
     children,
-    colors = NIMBUS_COLORS,
-    count = 6,
-    speed = 1,
-    intensity = 0.75,
+    preset,
+    colors,
+    scenes,
+    accent,
+    motion,
+    parallax,
+    density,
+    lighting,
+    grain,
+    scrim,
+    intensity,
+    speed,
     seed = 9,
+    time,
     disabled = false,
     respectReducedMotion = true,
     className,
@@ -57,88 +77,76 @@ export function Nimbus({
 }: NimbusProps) {
     const hostRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const grainRef = useRef<HTMLDivElement>(null)
+    const repaint = useRef<(() => void) | null>(null)
 
     const reduced = usePrefersReducedMotion()
-    const still = disabled || (respectReducedMotion && reduced)
+    const fine = useMediaQuery("(pointer: fine)")
+    const frozen = time !== undefined
+    const still = disabled || frozen || (respectReducedMotion && reduced)
 
-    const settings = useLatestRef({
-        colors: colors.length > 0 ? colors : NIMBUS_COLORS,
-        count: Math.round(clamp(finite(count, 6), 0, LIMIT)),
-        speed: clamp(finite(speed, 1), 0.1, 3),
-        intensity: clamp(finite(intensity, 0.75), 0, 1),
-        seed,
-        still,
+    const config = resolveNimbus({
+        preset,
+        colors,
+        scenes,
+        accent,
+        motion,
+        parallax,
+        density,
+        lighting,
+        grain,
+        scrim,
+        intensity,
+        speed,
     })
+    const settings = useLatestRef(config)
+    const key = useMemo(() => sceneKey(config.scenes), [config.scenes])
+    const pixel = config.dither > 0
+    const interactive = !still && fine && config.parallax > 0
+    const startAt = Math.max(0, finite(time, 0))
+    const fieldSeed = Math.round(finite(seed, 9))
 
     useEffect(() => {
         const host = hostRef.current
         const canvas = canvasRef.current
         if (!host || !canvas) return
 
-        const context = context2d(canvas)
+        const context = context2d(canvas, pixel ? { willReadFrequently: true } : undefined)
         if (!context) return
 
-        const bodies = Array.from({ length: LIMIT }, (_, index) => {
-            const random = rngFor(settings.current.seed + 31, index)
-            return {
-                x: random(),
-                y: random(),
-                reach: 0.28 + random() * 0.42,
-                driftX: (random() - 0.5) * 0.06,
-                driftY: (random() - 0.5) * 0.05,
-                phase: random() * Math.PI * 2,
-                pulse: 0.5 + random() * 0.9,
-            }
-        })
-
-        let width = 1
-        let height = 1
+        const renderer = createRenderer(context, settings.current.scenes, createField(fieldSeed))
+        const pointer: Pointer = { x: 0, y: 0 }
+        const target: Pointer = { x: 0, y: 0 }
+        let clock = startAt
+        let pending = 0
         let visible = true
-        let time = 0
 
         const measure = () => {
             const box = host.getBoundingClientRect()
-            width = Math.max(1, Math.round(box.width * SCALE))
-            height = Math.max(1, Math.round(box.height * SCALE))
-            canvas.width = width
-            canvas.height = height
+            const size = bufferSize(box.width, box.height, settings.current.cell)
+            if (canvas.width !== size.width) canvas.width = size.width
+            if (canvas.height !== size.height) canvas.height = size.height
+            renderer.resize(size.width, size.height)
         }
 
-        const paint = () => {
-            const config = settings.current
-
-            context.setTransform(1, 0, 0, 1, 0, 0)
-            context.clearRect(0, 0, width, height)
-            context.globalCompositeOperation = "lighter"
-
-            const span = Math.max(width, height)
-
-            for (let index = 0; index < config.count; index += 1) {
-                const body = bodies[index]
-                const swell = 1 + Math.sin(time * body.pulse + body.phase) * 0.18
-                const reach = body.reach * span * swell
-                const x = (((body.x + body.driftX * time) % 1) + 1) % 1
-                const y = (((body.y + body.driftY * time) % 1) + 1) % 1
-                const cx_ = x * width
-                const cy = y * height
-
-                const cloud = context.createRadialGradient(cx_, cy, 0, cx_, cy, reach)
-                const tone = config.colors[index % config.colors.length]
-                cloud.addColorStop(0, tone)
-                cloud.addColorStop(1, "rgba(0,0,0,0)")
-                context.globalAlpha = config.intensity * 0.55
-                context.fillStyle = cloud
-                context.beginPath()
-                context.arc(cx_, cy, reach, 0, Math.PI * 2)
-                context.fill()
-            }
-
-            context.globalAlpha = 1
-            context.globalCompositeOperation = "source-over"
-        }
+        const paint = () => renderer.paint(clock, settings.current, pointer)
 
         measure()
         paint()
+        repaint.current = paint
+
+        const loop = wakeLoop((dt) => {
+            if (!visible) return false
+            pending += dt
+            const current = settings.current
+            // a little slack, so 30 a second lands on every second 60 Hz frame
+            if (pending < 1 / current.fps - 0.004) return
+            pointer.x = damp(pointer.x, target.x, 2.2, pending)
+            pointer.y = damp(pointer.y, target.y, 2.2, pending)
+            clock += pending * current.speed
+            pending = 0
+            paint()
+        })
 
         const stopResize = onResize(host, () => {
             measure()
@@ -146,31 +154,80 @@ export function Nimbus({
         })
         const stopVisible = onVisible(host, (seen) => {
             visible = seen
+            if (seen && !still) loop.wake()
         })
 
-        const stopFrame = settings.current.still
-            ? () => {}
-            : onFrame((dt) => {
-                  if (!visible) return
-                  time += dt * settings.current.speed
-                  paint()
-              })
+        let box: ReturnType<typeof pointerBox> | null = null
+        const move = (event: PointerEvent) => {
+            const at = box?.at(event)
+            if (!at) return
+            target.x = Math.max(-0.5, Math.min(0.5, at.x - 0.5))
+            target.y = Math.max(-0.5, Math.min(0.5, at.y - 0.5))
+        }
+        const leave = () => {
+            target.x = 0
+            target.y = 0
+        }
+        if (interactive) {
+            box = pointerBox(host)
+            host.addEventListener("pointermove", move, { passive: true })
+            host.addEventListener("pointerleave", leave)
+        }
+
+        if (!still) loop.wake()
 
         return () => {
-            stopFrame()
+            repaint.current = null
+            loop.sleep()
             stopResize()
             stopVisible()
+            if (box) {
+                host.removeEventListener("pointermove", move)
+                host.removeEventListener("pointerleave", leave)
+                box.dispose()
+            }
         }
-    }, [settings])
+    }, [settings, key, pixel, still, interactive, startAt, fieldSeed])
+
+    // a held frame still answers a knob that changed; a live one picks it up next paint
+    const { motion: m, density: d, lighting: l, intensity: i } = config
+    useEffect(() => {
+        if (still) repaint.current?.()
+    }, [still, m, d, l, i])
+
+    const grained = config.grain > 0
+    useEffect(() => {
+        const layer = grainRef.current
+        const url = grained ? grainTile() : null
+        if (layer && url) layer.style.backgroundImage = `url(${url})`
+    }, [grained])
+
+    const sky = config.scenes[0].sky
+    const rootStyle = {
+        "--xp-nimbus-ground": sky[1],
+        "--xp-nimbus-scrim": config.scrim,
+        "--xp-nimbus-grain": config.grain,
+        ...style,
+    } as CSSProperties
 
     return (
         <div
             ref={hostRef}
             className={cx("xp-nimbus", className)}
+            data-preset={config.preset}
             data-still={still ? "true" : undefined}
-            style={style}
+            data-pixel={pixel ? "true" : undefined}
+            data-interactive={interactive ? "true" : undefined}
+            style={rootStyle}
         >
-            <canvas ref={canvasRef} className="xp-nimbus-sky" aria-hidden="true" />
+            <canvas
+                key={pixel ? "pixel" : "soft"}
+                ref={canvasRef}
+                className="xp-nimbus-sky"
+                aria-hidden="true"
+            />
+            {config.scrim > 0 ? <div className="xp-nimbus-scrim" aria-hidden="true" /> : null}
+            {grained ? <div ref={grainRef} className="xp-nimbus-grain" aria-hidden="true" /> : null}
             {children ? <div className="xp-nimbus-content">{children}</div> : null}
         </div>
     )

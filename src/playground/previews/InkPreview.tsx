@@ -7,10 +7,15 @@ export function InkPreview({ config }: PreviewApi) {
     const c = config as unknown as {
         text: string
         color: string
+        paper: string
         bleed: number
-        duration: number
         feather: number
+        pigment: number
+        rim: number
+        duration: number
         repeat: number
+        interactive: boolean
+        nib: number
         seed: number
     }
 
@@ -18,10 +23,15 @@ export function InkPreview({ config }: PreviewApi) {
         <Ink
             text={c.text}
             color={c.color}
+            paper={c.paper}
             bleed={c.bleed}
-            duration={c.duration}
             feather={c.feather}
+            pigment={c.pigment}
+            rim={c.rim}
+            duration={c.duration}
             repeat={c.repeat}
+            interactive={c.interactive}
+            nib={c.nib}
             seed={c.seed}
             className="xpg-ink"
         />

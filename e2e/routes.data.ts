@@ -55,6 +55,6 @@ export const COMPONENT_SLUGS = [
     "keycap",
     "bezel",
     "seam",
-    "pip",
+    "tag",
     "loaders",
 ] as const

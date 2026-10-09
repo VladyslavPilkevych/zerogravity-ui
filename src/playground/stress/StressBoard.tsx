@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 
-import { Elemental, Lattice, Meadow, Sonar } from "@/lib"
+import { Chroma, Elemental, Lattice, Meadow, Sonar } from "@/lib"
 import {
-    Chroma,
     Drench,
     Nimbus,
     Perseid,

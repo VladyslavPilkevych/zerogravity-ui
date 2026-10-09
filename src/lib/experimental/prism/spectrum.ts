@@ -11,6 +11,8 @@ export interface SpectrumScene {
     sheen: number
     /** cell edge in CSS px */
     cell: number
+    /** how loud every layer is, 0 to 2; 1 is the reference picture */
+    gain?: number
 }
 
 export type SpectrumTarget = Pick<
@@ -69,7 +71,8 @@ export function paintSpectrum(
     const headLength = Math.hypot(headX, headY) || 1
     const beamX = headX / headLength
     const beamY = headY / headLength
-    const reach = Math.max(columns, rows) * 0.7
+    const gain = clamp(scene.gain ?? 1, 0, 2)
+    const reach = Math.max(columns, rows) * (0.55 + 0.25 * Math.min(gain, 1.6))
     const glow = reach * 0.45
     const spread = clamp(scene.dispersion, 0, 1)
     const sheen = clamp(scene.sheen, 0, 1)
@@ -84,8 +87,9 @@ export function paintSpectrum(
 
     let drawn = 0
     const fill = (column: number, row: number, color: string, alpha: number) => {
-        if (alpha <= 0) return
-        context.globalAlpha = alpha
+        const level = Math.min(1, alpha * gain)
+        if (level <= 0) return
+        context.globalAlpha = level
         context.fillStyle = color
         context.fillRect(column * size, row * size, size - gap, size - gap)
         drawn += 1

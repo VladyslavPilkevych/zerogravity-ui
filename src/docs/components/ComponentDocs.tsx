@@ -46,6 +46,7 @@ export function ComponentDocs({ entry }: { entry: DocEntry }) {
                     <span>{entry.status}</span>
                 </p>
                 <h1>{entry.name}</h1>
+                <p className="dz-subtitle">{entry.label}</p>
                 <p>{entry.description}</p>
             </header>
 

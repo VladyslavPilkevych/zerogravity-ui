@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, waitFor } from "storybook/test"
 
 import { Antigravity } from "./Antigravity"
+import { getAntigravityPreset } from "./presets"
+
+const PIXEL = getAntigravityPreset("pixel")!.options
 
 const meta = {
     title: "Components/Antigravity",
@@ -21,6 +24,17 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/** The homepage hero and the docs opening state: the "pixel" preset, frozen. */
+export const Showcase: Story = {
+    args: {
+        ...PIXEL,
+        seed: 2049,
+        paused: true,
+        render: { ...PIXEL.render, fadeIn: 0 },
+        style: { position: "relative", width: "100%", height: 520 },
+    },
+}
 
 export const Ring: Story = {
     args: { count: 400, formation: { shape: "ring" } },

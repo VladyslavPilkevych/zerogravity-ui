@@ -22,9 +22,9 @@ export function GazePreview({ config }: PreviewApi) {
                 maxPitch={c.maxPitch}
                 damping={c.damping}
                 headDelay={c.headDelay}
-                label="A stand-in head that follows the pointer"
+                label="A low-poly owl whose eyes and head follow the pointer"
             />
-            <Hint>Move cursor</Hint>
+            <Hint>Point or tap</Hint>
         </div>
     )
 }

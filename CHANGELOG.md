@@ -18,8 +18,10 @@ this project adheres to [Semantic Versioning](https://semver.org/).
   component through `as`.
 - `Keycap` (a native button with notched pixel corners and press depth), `Bezel`
   (a stepped-corner frame with an optional label and grid), `Seam` (a pixel
-  divider) and `Pip` (a status badge with a glyph per state). They appear under
-  a new **Interface** category in the docs.
+  divider) and `Tag` (a status badge with a glyph per state, at
+  `zerogravity/tag`). They appear under a new **Interface** category in the
+  docs. `Tag` was called `Pip` during development; it never shipped under that
+  name, so there is no alias.
 - Promoted from the prototypes after review, each with its own subpath export:
   `Eclipse` / `EclipseSection`, `Lattice`, `Louvre`, `Palimpsest`
   (+ `PALIMPSEST_COLORS`), `Phosphor` and `Sonar`. During review their animation
@@ -29,9 +31,37 @@ this project adheres to [Semantic Versioning](https://semver.org/).
   and a dithered dent, `pixel` sets the tile size, and `pointer` pins the dent.
   The default output is unchanged.
 - `ScrollStack`: `hold`, how long the finished stack stays pinned, in viewports.
+- Promoted from the prototypes after a second review, each at
+  `zerogravity/<name>`: `Wake` (water ripple), `Chroma` (cursor trail, now with
+  `enableOnTouch`), `Wash` (click colour bloom), `Peel`, `Gantry`, `Tide`,
+  `Lenticular` and `Gnomon`.
+- `Antigravity`: `pixel` (the homepage hero, now shared with it), `orbit` and
+  `helix` presets, appended so existing preset positions are unchanged.
+- `Lodestone`: `variant="pixel"`, a stepped-corner face with a hard shadow and a
+  blocky press, and the `LodestoneVariant` type.
+- `Dither`: `variant="edge"`, a CSS-only block frame with a lift and an offset
+  shadow that steps in on hover or keyboard focus, and the `DitherVariant` type.
+- `Tessera`: `diagonal` and `spiral` sequences.
+- `Gantry` marks the car in focus with `data-active`.
 
 ### Changed
 
+- Documentation is regrouped into eight categories that describe intent —
+  Backgrounds, Surfaces, Cursor, Scroll, Typography, Media, Interface, and
+  Loading & transitions — sorted alphabetically within each. Every component
+  now carries a plain-words subtitle next to its brand name (Wake: _Water
+  ripple_), and search matches subtitles and wider tags, with every word of a
+  query required to match.
+- Generated usage code imports each component from its own entry point, such as
+  `zerogravity/reel`, and always includes the props a component cannot render
+  without.
+- `Wash` defaults to `mode="both"`, so clicks pour as well as the timer.
+- `Lenticular` under reduced motion follows the pointer without tilt or easing,
+  instead of freezing on a striped half-and-half view.
+- `zerogravity/tide` exposes `Tide` and the `TideEdge` type only; the contour
+  helper stays internal.
+- Docs demos for `Antigravity`, `Lodestone`, `Gantry`, `Tessera`, `Dither` and
+  `Tag` were restyled; the Antigravity page opens on the pixel field.
 - `ScrollStack` now leaves room after the last card so it docks and rests like
   every other card before the stack releases. This adds `hold` (default `0.3`)
   viewports of scroll after the stack; pass `hold={0}` for the old release
@@ -46,6 +76,29 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `Reel`: releasing a drag after holding still no longer flings, because release
+  velocity is measured over the last ~60 ms. A lost pointer capture or
+  `pointercancel` ends the drag instead of freezing the carousel, a second
+  finger no longer hijacks a drag, a trackpad swipe moves exactly one slide, and
+  stray wheel deltas no longer add up to a step.
+- `Wake`, `Lenticular` and `Chroma`: touch drags are no longer cancelled by the
+  browser, and vertical scrolling still works over them.
+- `Wash`: a swipe to scroll no longer pours, Enter or Space on a control inside
+  pours from it, fragments take non-hex colours, and timed pours skip while
+  offscreen.
+- `Gnomon`: a tap places the lamp on touch screens, and disabling it or turning
+  on reduced motion returns the light to rest.
+- `Peel`: crease shading follows the bottom corners, and progress is re-read
+  when the container resizes.
+- `Gantry`: the rail ends with its end padding visible instead of the last car
+  flush against the edge, and `respectReducedMotion={false}` keeps the lean.
+- `Tide`: `speed={0}` holds no frame, and straight sides no longer show a
+  sub-pixel hairline.
+- `Lenticular` re-measures when the card itself resizes.
+- The generated code for `Louvre`, `Palimpsest`, `Phosphor`, `Peel` and
+  `Lenticular` left out required props and did not compile.
+- The `Lodestone` docs preview ran stronger values than the generated code
+  printed.
 - `ScrollStack`: the last card no longer slides over the stack and scrolls away
   without docking, earlier cards taller than the last are no longer pushed out
   before it arrives, and a resize while scrolled no longer skews the offsets.
@@ -62,6 +115,15 @@ this project adheres to [Semantic Versioning](https://semver.org/).
   usage snippet now uses `zerogravity`. Worth a patch release on its own: the
   npm page is the first thing a reader sees, and it currently points at the
   wrong package.
+
+### Security
+
+- The documentation site moves to Next.js 15.5.27, which fixes two critical
+  remote code execution advisories. `next` is a development dependency and was
+  never installed by consumers of the package.
+- High-severity advisories in development tooling (`sharp`, `js-yaml`,
+  `undici`, `brace-expansion`, `source-map-js`) are resolved through pnpm
+  overrides. `pnpm audit --prod` reports no known vulnerabilities.
 
 ## [0.1.0]
 

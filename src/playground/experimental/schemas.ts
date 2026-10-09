@@ -1,3 +1,9 @@
+import {
+    NIMBUS_PRESETS,
+    NIMBUS_PRESET_NAMES,
+    type NimbusPreset,
+} from "@/lib/experimental/nimbus/presets"
+
 import type { ControlGroup } from "../panel/types"
 
 export const PALETTES = {
@@ -63,12 +69,12 @@ export const LOUVRE_CONTROLS: ControlGroup[] = [
 ]
 
 export const LODESTONE_DEFAULTS = {
-    radius: 150,
-    strength: 0.5,
-    maxDisplacement: 30,
+    radius: 130,
+    strength: 0.32,
+    maxDisplacement: 16,
     minGap: 12,
     release: 0.16,
-    lift: 0.05,
+    lift: 0.04,
     buttons: 4,
     spacing: 18,
 }
@@ -405,7 +411,7 @@ export const DIORAMA_CONTROLS: ControlGroup[] = [
 export const WASH_DEFAULTS = {
     mode: "both",
     paletteName: "ink",
-    interval: 4000,
+    interval: 6000,
     duration: 1400,
     softness: 0.35,
     burst: true,
@@ -486,7 +492,7 @@ export const TESSERA_CONTROLS: ControlGroup[] = [
                 kind: "select",
                 path: "sequence",
                 label: "Sequence",
-                options: ["random", "row", "column", "reverse", "center"],
+                options: ["random", "row", "column", "reverse", "center", "diagonal", "spiral"],
             },
         ],
     },
@@ -980,12 +986,12 @@ export const WAKE_CONTROLS: ControlGroup[] = [
 /* --------------------------------------------------------------- Drench */
 
 export const DRENCH_DEFAULTS = {
-    text: "ZERO",
-    rain: 0.55,
-    fall: 1,
+    text: "RAIN",
+    rain: 0.6,
+    wind: 0.12,
     wetness: 0.6,
-    evaporation: 0.35,
-    outline: 0.045,
+    evaporation: 0.3,
+    fall: 1,
     color: "#9fd8ff",
 }
 
@@ -993,12 +999,12 @@ export const DRENCH_CONTROLS: ControlGroup[] = [
     {
         id: "weather",
         title: "Weather",
-        hint: "the word is always there; the rain is what finds it",
+        hint: "set rain to 0 and watch the letters dry out",
         open: true,
         controls: [
             { kind: "text", path: "text", label: "Text", maxLength: 12 },
             { kind: "number", path: "rain", label: "Rain", min: 0, max: 1, step: 0.05 },
-            { kind: "number", path: "fall", label: "Fall speed", min: 0.2, max: 3, step: 0.1 },
+            { kind: "number", path: "wind", label: "Wind", min: -1, max: 1, step: 0.05 },
             { kind: "number", path: "wetness", label: "Wetness", min: 0, max: 1, step: 0.05 },
             {
                 kind: "number",
@@ -1008,14 +1014,7 @@ export const DRENCH_CONTROLS: ControlGroup[] = [
                 max: 1,
                 step: 0.05,
             },
-            {
-                kind: "number",
-                path: "outline",
-                label: "Outline",
-                min: 0.01,
-                max: 0.14,
-                step: 0.005,
-            },
+            { kind: "number", path: "fall", label: "Fall speed", min: 0.2, max: 3, step: 0.1 },
             { kind: "color", path: "color", label: "Water" },
         ],
     },
@@ -1071,10 +1070,10 @@ export const PERSEID_CONTROLS: ControlGroup[] = [
 
 export const GAZE_DEFAULTS = {
     sensitivity: 1,
-    maxYaw: 26,
-    maxPitch: 16,
-    damping: 0.12,
-    headDelay: 0.45,
+    maxYaw: 34,
+    maxPitch: 18,
+    damping: 0.1,
+    headDelay: 0.6,
 }
 
 export const GAZE_CONTROLS: ControlGroup[] = [
@@ -1153,40 +1152,6 @@ export const ECLIPSE_CONTROLS: ControlGroup[] = [
 ]
 
 /* ------------------------------------------------------- 0.3.0 batch */
-
-export const PRISM_DEFAULTS = {
-    facets: "pixel",
-    pixel: 8,
-    tilt: 12,
-    dispersion: 0.6,
-    sheen: 0.7,
-    radius: 4,
-}
-
-export const PRISM_CONTROLS: ControlGroup[] = [
-    {
-        id: "glass",
-        title: "Glass",
-        hint: "how the slab leans, and how hard it splits the light",
-        open: true,
-        controls: [
-            { kind: "select", path: "facets", label: "Facets", options: ["pixel", "smooth"] },
-            { kind: "number", path: "pixel", label: "Cell", min: 4, max: 20, step: 1, unit: "px" },
-            { kind: "number", path: "tilt", label: "Tilt", min: 0, max: 24, step: 1, unit: "°" },
-            { kind: "number", path: "dispersion", label: "Dispersion", min: 0, max: 1, step: 0.05 },
-            { kind: "number", path: "sheen", label: "Sheen", min: 0, max: 1, step: 0.05 },
-            {
-                kind: "number",
-                path: "radius",
-                label: "Radius",
-                min: 0,
-                max: 48,
-                step: 2,
-                unit: "px",
-            },
-        ],
-    },
-]
 
 export const GNOMON_DEFAULTS = {
     distance: 28,
@@ -1403,9 +1368,9 @@ export const PEEL_CONTROLS: ControlGroup[] = [
         hint: "scroll per phase, in stage heights",
         open: true,
         controls: [
-            { kind: "number", path: "lead", label: "Before the peel", min: 0, max: 2, step: 0.05 },
-            { kind: "number", path: "travel", label: "Peel length", min: 0.2, max: 4, step: 0.1 },
-            { kind: "number", path: "hold", label: "Hold the reveal", min: 0, max: 2, step: 0.05 },
+            { kind: "number", path: "lead", label: "Before the peel", min: 0, max: 3, step: 0.05 },
+            { kind: "number", path: "travel", label: "Peel length", min: 0.2, max: 5, step: 0.1 },
+            { kind: "number", path: "hold", label: "Hold the reveal", min: 0, max: 3, step: 0.05 },
         ],
     },
 ]
@@ -1612,26 +1577,60 @@ export const QUIVER_CONTROLS: ControlGroup[] = [
 export const INK_DEFAULTS = {
     text: "Ink",
     color: "#1b2a4a",
+    paper: "#f4eee0",
     bleed: 0.5,
-    duration: 2.6,
     feather: 0.6,
-    repeat: 6,
+    pigment: 0.7,
+    rim: 0.6,
+    duration: 2.6,
+    repeat: 0,
+    interactive: true,
+    nib: 6,
     seed: 12,
 }
 
 export const INK_CONTROLS: ControlGroup[] = [
     {
-        id: "paper",
-        title: "Paper",
-        hint: "ink wicking into fibres, not a fade-in",
+        id: "ink",
+        title: "Ink",
+        hint: "water carries the dye out along the fibres; the drying edge darkens",
         open: true,
         controls: [
             { kind: "text", path: "text", label: "Text", maxLength: 12 },
             { kind: "number", path: "bleed", label: "Bleed", min: 0, max: 1, step: 0.05 },
             { kind: "number", path: "feather", label: "Feather", min: 0, max: 1, step: 0.05 },
-            { kind: "number", path: "duration", label: "Soak", min: 0.4, max: 8, step: 0.2 },
-            { kind: "number", path: "repeat", label: "Repeat", min: 0, max: 20, step: 1 },
+            { kind: "number", path: "pigment", label: "Pigment", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "rim", label: "Tide line", min: 0, max: 1, step: 0.05 },
             { kind: "color", path: "color", label: "Ink" },
+            { kind: "color", path: "paper", label: "Paper" },
+        ],
+    },
+    {
+        id: "soak",
+        title: "Soak",
+        hint: "drag on the paper to write with the nib",
+        open: true,
+        controls: [
+            {
+                kind: "number",
+                path: "duration",
+                label: "Soak",
+                min: 0.4,
+                max: 8,
+                step: 0.2,
+                unit: "s",
+            },
+            {
+                kind: "number",
+                path: "repeat",
+                label: "Repeat",
+                min: 0,
+                max: 20,
+                step: 1,
+                unit: "s",
+            },
+            { kind: "boolean", path: "interactive", label: "Draw with the pointer" },
+            { kind: "number", path: "nib", label: "Nib", min: 2, max: 20, step: 1, unit: "px" },
             { kind: "number", path: "seed", label: "Seed", min: 1, max: 40, step: 1 },
         ],
     },
@@ -1850,11 +1849,27 @@ export const QUARTZ_CONTROLS: ControlGroup[] = [
     },
 ]
 
+const NIMBUS_KNOBS = [
+    "motion",
+    "parallax",
+    "density",
+    "lighting",
+    "grain",
+    "scrim",
+    "intensity",
+    "speed",
+] as const
+
+function nimbusKnobs(preset: NimbusPreset): Record<string, unknown> {
+    const look = NIMBUS_PRESETS[preset]
+    return Object.fromEntries(NIMBUS_KNOBS.map((knob) => [knob, look[knob]]))
+}
+
 export const NIMBUS_DEFAULTS = {
-    count: 6,
-    speed: 1,
-    intensity: 0.75,
-    paletteName: "aurora",
+    preset: "calm",
+    ...nimbusKnobs("calm"),
+    paletteName: "preset",
+    accent: null as string | null,
     seed: 9,
 }
 
@@ -1865,23 +1880,60 @@ export const NIMBUS_PALETTES: Record<string, string[]> = {
     ash: ["#1b1b22", "#2a2a35", "#101018", "#33333f"],
 }
 
+const NIMBUS_HINTS: Record<NimbusPreset, string> = {
+    calm: "One mood, a slow camera and a little dust",
+    drift: "Three moods crossfading, deeper parallax, faint light",
+    cinematic: "Warm and cold scenes, light rays and sweeps, a wide frame",
+    pixel: "Low-res dithered fog, crisp motes, a stepped twelve frames a second",
+}
+
+export const NIMBUS_DOC_PRESETS = NIMBUS_PRESET_NAMES.map((preset) => ({
+    id: preset,
+    label: preset.charAt(0).toUpperCase() + preset.slice(1),
+    hint: NIMBUS_HINTS[preset],
+    values: { preset, ...nimbusKnobs(preset) },
+}))
+
 export const NIMBUS_CONTROLS: ControlGroup[] = [
     {
-        id: "fog",
-        title: "Fog",
-        hint: "drawn small and stretched back up, so the softness is free",
+        id: "scene",
+        title: "Scene",
+        hint: "the preset picks the moods, the frame and the resolution; the knobs below override it",
         open: true,
         controls: [
-            { kind: "number", path: "count", label: "Bodies", min: 0, max: 12, step: 1 },
-            { kind: "number", path: "speed", label: "Speed", min: 0.1, max: 3, step: 0.1 },
-            { kind: "number", path: "intensity", label: "Intensity", min: 0, max: 1, step: 0.05 },
+            { kind: "select", path: "preset", label: "Preset", options: NIMBUS_PRESET_NAMES },
             {
                 kind: "select",
                 path: "paletteName",
-                label: "Palette",
-                options: ["aurora", "ember", "tide", "ash"],
+                label: "Fog colours",
+                options: ["preset", "aurora", "ember", "tide", "ash"],
             },
+            { kind: "colorNullable", path: "accent", label: "Accent" },
             { kind: "number", path: "seed", label: "Seed", min: 1, max: 40, step: 1 },
+        ],
+    },
+    {
+        id: "life",
+        title: "Life",
+        hint: "all 0 to 1; the field is drawn small and stretched up, so none of it is expensive",
+        open: true,
+        controls: [
+            { kind: "number", path: "motion", label: "Motion", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "parallax", label: "Parallax", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "density", label: "Dust", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "lighting", label: "Lighting", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "speed", label: "Speed", min: 0.1, max: 3, step: 0.1 },
+        ],
+    },
+    {
+        id: "contrast",
+        title: "Contrast",
+        hint: "for the content on top",
+        open: false,
+        controls: [
+            { kind: "number", path: "intensity", label: "Fog", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "scrim", label: "Scrim", min: 0, max: 1, step: 0.05 },
+            { kind: "number", path: "grain", label: "Grain", min: 0, max: 1, step: 0.05 },
         ],
     },
 ]

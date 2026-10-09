@@ -1,20 +1,21 @@
 "use client"
 
-import Link from "next/link"
+import { useState } from "react"
 
 import type { PreviewApi } from "@/docs/useDocsConfig"
-import { Dither, type DitherOrigin } from "@/lib"
+import { Dither, Tag, type DitherOrigin, type DitherVariant } from "@/lib"
 
 import "../interface/interface.css"
 
-const TARGETS = [
-    { slug: "keycap", name: "Keycap", note: "A button with real press depth." },
-    { slug: "bezel", name: "Bezel", note: "A pixel frame for any content." },
-    { slug: "pip", name: "Pip", note: "Status badges drawn as glyphs." },
+const CARDS = [
+    { id: "draft", name: "Draft", note: "Private to you while you work." },
+    { id: "review", name: "Review", note: "Shared with your team for comments." },
+    { id: "public", name: "Public", note: "Listed and open to anyone." },
 ]
 
 export function DitherPreview({ config }: PreviewApi) {
     const c = config as {
+        variant: DitherVariant
         cell: number
         density: number
         glow: number
@@ -24,16 +25,17 @@ export function DitherPreview({ config }: PreviewApi) {
         color: string
         active: boolean
     }
+    const [picked, setPicked] = useState("review")
 
     return (
         <div className="ipg">
-            <nav className="ipg-tiles" aria-label="Interface components">
-                {TARGETS.map(({ slug, name, note }) => (
+            <div className="ipg-tiles" role="radiogroup" aria-label="Visibility">
+                {CARDS.map(({ id, name, note }) => (
                     <Dither
-                        key={slug}
-                        as={Link}
-                        href={`/docs/${slug}`}
+                        key={id}
+                        as="label"
                         className="ipg-tile"
+                        variant={c.variant}
                         cell={c.cell}
                         density={c.density}
                         glow={c.glow}
@@ -43,14 +45,27 @@ export function DitherPreview({ config }: PreviewApi) {
                         color={c.color}
                         active={c.active}
                     >
-                        <small>Interface</small>
+                        <input
+                            className="ipg-tile-input"
+                            type="radio"
+                            name="ipg-dither-visibility"
+                            value={id}
+                            checked={picked === id}
+                            onChange={() => setPicked(id)}
+                        />
+                        <small>Visibility</small>
                         <strong>{name}</strong>
                         <span>{note}</span>
+                        {picked === id ? (
+                            <Tag className="ipg-tile-mark" status="success" variant="solid">
+                                Selected
+                            </Tag>
+                        ) : null}
                     </Dither>
                 ))}
-            </nav>
+            </div>
             <p className="ipg-hint" aria-hidden="true">
-                Hover a block, or Tab to it
+                {c.variant === "edge" ? "Edge" : "Sweep"}: hover a card or Tab to it
             </p>
         </div>
     )

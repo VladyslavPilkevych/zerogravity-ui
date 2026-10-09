@@ -13,7 +13,7 @@ import { SearchIcon } from "./icons"
 
 export type SidebarEntry = Pick<
     DocEntry,
-    "slug" | "name" | "description" | "category" | "status" | "tags"
+    "slug" | "name" | "label" | "description" | "category" | "status" | "tags"
 >
 
 interface SearchFieldProps {
@@ -72,11 +72,13 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
 
 interface ListProps {
     entries: SidebarEntry[]
+    /** entries arrive in relevance order from a search */
+    ranked?: boolean
     active?: string
     onNavigate?: () => void
 }
 
-export function SidebarList({ entries, active, onNavigate }: ListProps) {
+export function SidebarList({ entries, ranked, active, onNavigate }: ListProps) {
     if (entries.length === 0) {
         return (
             <p className="dz-empty">
@@ -88,7 +90,7 @@ export function SidebarList({ entries, active, onNavigate }: ListProps) {
 
     return (
         <>
-            {groupByCategory(entries as DocEntry[]).map((group) => (
+            {groupByCategory(entries as DocEntry[], { ranked }).map((group) => (
                 <div className="dz-group" key={group.category}>
                     <h2 className="dz-group-title">{group.category}</h2>
                     <ul>
@@ -100,7 +102,8 @@ export function SidebarList({ entries, active, onNavigate }: ListProps) {
                                     aria-current={entry.slug === active ? "page" : undefined}
                                     onClick={onNavigate}
                                 >
-                                    {entry.name}
+                                    <span className="dz-link-name">{entry.name}</span>{" "}
+                                    <span className="dz-link-label">{entry.label}</span>
                                     {entry.status === "experimental" ? (
                                         <>
                                             {" "}
@@ -118,5 +121,5 @@ export function SidebarList({ entries, active, onNavigate }: ListProps) {
 }
 
 export function filterEntries(entries: SidebarEntry[], query: string): SidebarEntry[] {
-    return searchComponents(entries as DocEntry[], query)
+    return searchComponents(entries, query)
 }

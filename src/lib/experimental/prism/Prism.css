@@ -1,13 +1,28 @@
 .xp-prism {
-    --pr-x: 0.5;
-    --pr-y: 0.5;
+    --pr-x: 0.24;
+    --pr-y: 0.22;
     --pr-rx: 0;
     --pr-ry: 0;
+    --pr-dx: 0.6;
+    --pr-dy: 0.8;
+    --pr-angle: 53deg;
     --pr-radius: 4px;
+    --pr-strength: 0.6;
+    --pr-glow: 0.5;
     --pr-split: 0.6;
     --pr-sheen: 0.7;
+    --pr-depth: 14px;
     position: relative;
-    perspective: 900px;
+    perspective: var(--prism-perspective, 900px);
+    /* a horizontal drag moves the light on touch; a vertical one still scrolls the page */
+    touch-action: pan-y pinch-zoom;
+}
+
+.xp-prism-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
 }
 
 .xp-prism-slab {
@@ -15,6 +30,12 @@
     border-radius: var(--pr-radius);
     transform: rotateX(calc(var(--pr-rx) * 1deg)) rotateY(calc(var(--pr-ry) * 1deg));
     transform-style: preserve-3d;
+}
+
+/* the content and everything blended into it share one flat plane at the front of the glass */
+.xp-prism-face {
+    position: relative;
+    border-radius: inherit;
     isolation: isolate;
 }
 
@@ -28,12 +49,72 @@
 .xp-prism-split,
 .xp-prism-sheen,
 .xp-prism-cells,
-.xp-prism-rim {
+.xp-prism-rim,
+.xp-prism-edge,
+.xp-prism-caustic,
+.xp-prism-glare {
     position: absolute;
     z-index: 2;
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
+}
+
+/*
+ * The glass has thickness: a stack of outlines behind the face, one per band,
+ * deepest first. Flat on, they hide behind the content; once the slab leans
+ * they fan out along the edge away from the light as a rainbow rim.
+ */
+.xp-prism-edge {
+    border: 1px solid var(--pr-tint);
+    background: color-mix(in srgb, var(--pr-tint) 16%, transparent);
+    opacity: calc(0.25 + var(--pr-glow) * 0.75);
+    transform: translateZ(calc(var(--pr-depth) * var(--pr-layer) * -1));
+}
+
+/*
+ * What a prism throws on the wall behind it: a spectrum, laid across the
+ * light's direction and pushed away from the light by the thickness of the glass.
+ */
+.xp-prism-caustic {
+    inset: 8%;
+    background: linear-gradient(
+        calc(var(--pr-angle) + 90deg),
+        transparent 4%,
+        #ff3b5c 18%,
+        #ff9f1c 30%,
+        #ffe53b 42%,
+        #3bff8a 56%,
+        #29c7ff 70%,
+        #8a5bff 84%,
+        transparent 96%
+    );
+    filter: blur(calc(10px + var(--pr-depth) * 0.6));
+    opacity: calc(var(--pr-glow) * (0.3 + var(--pr-split) * 0.7));
+    transform: translate3d(
+        calc(var(--pr-dx) * (var(--pr-depth) * 1.4 + var(--pr-strength) * 26px)),
+        calc(var(--pr-dy) * (var(--pr-depth) * 1.4 + var(--pr-strength) * 26px)),
+        calc(var(--pr-depth) * -2.2)
+    );
+}
+
+/* a glass surface floating over the content, so it slides against it as the slab turns */
+.xp-prism-glare {
+    background:
+        radial-gradient(
+            38% 46% at calc(var(--pr-x) * 100%) calc(var(--pr-y) * 100%),
+            rgba(255, 255, 255, 0.34),
+            rgba(255, 255, 255, 0.06) 55%,
+            transparent 72%
+        ),
+        linear-gradient(
+            calc(var(--pr-angle) + 90deg),
+            transparent calc(var(--pr-x) * 60% + 4%),
+            rgba(255, 255, 255, 0.16) calc(var(--pr-x) * 60% + 12%),
+            transparent calc(var(--pr-x) * 60% + 20%)
+        );
+    opacity: calc(var(--pr-sheen) * (0.3 + var(--pr-glow) * 0.7));
+    transform: translateZ(calc(var(--pr-depth) * 0.6));
 }
 
 /*
@@ -53,12 +134,21 @@
             rgba(40, 220, 255, 0.85),
             rgba(40, 220, 255, 0) 34%
         ),
-        linear-gradient(180deg, rgba(180, 120, 255, 0.5), rgba(120, 255, 220, 0) 46%);
+        linear-gradient(
+            calc(var(--pr-angle) + 90deg),
+            transparent 20%,
+            rgba(255, 59, 92, 0.5) 32%,
+            rgba(255, 229, 59, 0.5) 42%,
+            rgba(59, 255, 138, 0.5) 52%,
+            rgba(41, 199, 255, 0.5) 62%,
+            rgba(138, 91, 255, 0.5) 72%,
+            transparent 84%
+        );
     mix-blend-mode: var(--prism-blend, screen);
-    opacity: calc(var(--pr-split) * 0.55);
+    opacity: calc(var(--pr-split) * var(--pr-glow));
     transform: translate3d(
-        calc(var(--pr-ry) * 0.9px * var(--pr-split)),
-        calc(var(--pr-rx) * -0.9px * var(--pr-split)),
+        calc(var(--pr-dx) * var(--pr-strength) * 14px),
+        calc(var(--pr-dy) * var(--pr-strength) * 14px),
         0
     );
 }
@@ -82,10 +172,12 @@
     opacity: calc(var(--pr-sheen) * 0.7);
 }
 
+/* lit on the side that faces the light, shaded on the side it leaves through */
 .xp-prism-rim {
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.45),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+        inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+        inset calc(var(--pr-dx) * 3px) calc(var(--pr-dy) * 3px) 0 -1px rgba(255, 255, 255, 0.4),
+        inset calc(var(--pr-dx) * -4px) calc(var(--pr-dy) * -4px) 0 -1px rgba(0, 0, 0, 0.35);
 }
 
 .xp-prism-cells {
@@ -93,22 +185,4 @@
     width: 100%;
     height: 100%;
     mix-blend-mode: var(--prism-blend, screen);
-}
-
-/* a hard two-pixel bevel instead of a soft rim: lit on the top left, shaded on the bottom right */
-.xp-prism[data-facets="pixel"] .xp-prism-rim {
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.16),
-        inset 3px 3px 0 -1px rgba(255, 255, 255, 0.22),
-        inset -3px -3px 0 -1px rgba(0, 0, 0, 0.32);
-}
-
-.xp-prism[data-still="true"] .xp-prism-slab {
-    transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .xp-prism-slab {
-        transform: none;
-    }
 }

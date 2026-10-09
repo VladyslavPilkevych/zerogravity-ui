@@ -141,7 +141,7 @@ export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
     keycap: dynamic(() =>
         import("@/playground/previews/KeycapPreview").then((m) => m.KeycapPreview),
     ),
-    pip: dynamic(() => import("@/playground/previews/PipPreview").then((m) => m.PipPreview)),
+    tag: dynamic(() => import("@/playground/previews/TagPreview").then((m) => m.TagPreview)),
     seam: dynamic(() => import("@/playground/previews/SeamPreview").then((m) => m.SeamPreview)),
     wash: dynamic(() => import("@/playground/previews/WashPreview").then((m) => m.WashPreview)),
 }
