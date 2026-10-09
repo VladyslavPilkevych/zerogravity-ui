@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process"
 import { readFileSync, readdirSync, statSync } from "node:fs"
 import path from "node:path"
 
+import { cloudCopyMessage, findCloudCopies, isCloudCopy } from "./duplicates.mjs"
 import { packLibrary, REPO_ROOT } from "./pack.mjs"
 
 const ALLOWED_ROOTS = new Set(["dist", "package.json", "README.md", "CHANGELOG.md", "LICENSE"])
@@ -39,9 +40,24 @@ function step(name, fn) {
         console.log(`  PASS  ${name}${detail ? ` — ${detail}` : ""}`)
     } catch (error) {
         failures.push(name)
-        const output = error.stdout || error.stderr || error.message
-        console.log(`  FAIL  ${name}\n${String(output).split("\n").slice(-30).join("\n")}`)
+        const output = String(error.stdout || error.stderr || error.message).split("\n")
+        // a list of offending paths is the whole point, so it is never cut short
+        const shown = error.complete ? output : output.slice(-30)
+        console.log(`  FAIL  ${name}\n${shown.join("\n")}`)
     }
+}
+
+function cloudCopyError(paths, where) {
+    const error = new Error(cloudCopyMessage(paths, where))
+    error.complete = true
+    return error
+}
+
+// before packing: prepack builds every file under src/lib, copies included
+const sourceCopies = findCloudCopies(REPO_ROOT)
+if (sourceCopies.length) {
+    console.error(cloudCopyMessage(sourceCopies, "the repository"))
+    process.exit(1)
 }
 
 const tarball = packLibrary()
@@ -64,6 +80,16 @@ step("tarball excludes source, tests and tooling", () => {
     const leaked = entries.filter((entry) => FORBIDDEN.some((pattern) => pattern.test(entry)))
     if (leaked.length) throw new Error(`leaked: ${leaked.slice(0, 10).join(", ")}`)
     return "no leakage"
+})
+
+step("no cloud-sync duplicate copies in the build output or the tarball", () => {
+    const built = findCloudCopies(path.join(REPO_ROOT, "dist")).map((file) => `dist/${file}`)
+    if (built.length) throw cloudCopyError(built, "dist")
+
+    const packed = entries.filter((entry) => entry.split("/").some((part) => isCloudCopy(part)))
+    if (packed.length) throw cloudCopyError(packed, "the tarball")
+
+    return `source, dist and ${entries.length} tarball entries clean`
 })
 
 step("tarball ships declarations and stylesheets", () => {

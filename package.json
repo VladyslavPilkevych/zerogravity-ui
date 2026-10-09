@@ -225,7 +225,7 @@
         "chromatic": "chromatic",
         "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:browser",
         "release:check": "pnpm check && pnpm build:lib && pnpm check:package && pnpm test:consumer",
-        "prepack": "pnpm build:lib"
+        "prepack": "node scripts/duplicates.mjs && pnpm build:lib"
     },
     "peerDependencies": {
         "react": "^18.2.0 || ^19.0.0",
