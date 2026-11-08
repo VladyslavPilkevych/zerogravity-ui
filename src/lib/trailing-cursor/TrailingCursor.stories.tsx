@@ -114,9 +114,8 @@ function centreOf(element: Element) {
 }
 
 /**
- * Size once the scale transition reaches its end. A throttled test frame can
- * hold a CSS transition at its start value; the scale it is heading for is
- * what the story checks.
+ * Size once the scale transition reaches its end, so the check reads the scale
+ * the dot is heading for rather than racing the transition.
  */
 function settledSize(element: Element) {
     for (const animation of element.getAnimations()) {
@@ -171,22 +170,31 @@ export const DotInteraction: Story = {
         const box = button.getBoundingClientRect()
         const x = Math.round(box.left + box.width / 2)
         const y = Math.round(box.top + box.height / 2)
+        /*
+         * The test browser's real pointer also sends pointerover when layout
+         * shifts under it, which moves hover off the button. Restating the
+         * synthetic hover keeps the story about press and release.
+         */
+        const sizeOnButton = () => {
+            pointer("pointerover", x, y, button)
+            return settledSize(dot)
+        }
 
         pointer("pointermove", x, y)
         pointer("pointerover", x, y, button)
         await expect(root).toHaveAttribute("data-hovering", "true")
-        await waitFor(() => expect(settledSize(dot)).toBeCloseTo(30, 0))
+        await waitFor(() => expect(sizeOnButton()).toBeCloseTo(30, 0))
         await waitFor(() => expect(centreOf(dot).x).toBeCloseTo(x, 0))
         await waitFor(() => expect(centreOf(dot).y).toBeCloseTo(y, 0))
 
         pointer("pointerdown", x, y, button)
         await expect(root).toHaveAttribute("data-pressed", "true")
-        await waitFor(() => expect(settledSize(dot)).toBeCloseTo(6, 0))
+        await waitFor(() => expect(sizeOnButton()).toBeCloseTo(6, 0))
         await waitFor(() => expect(centreOf(dot).x).toBeCloseTo(x, 0))
 
         pointer("pointerup", x, y, button)
         await expect(root).toHaveAttribute("data-pressed", "false")
-        await waitFor(() => expect(settledSize(dot)).toBeCloseTo(30, 0))
+        await waitFor(() => expect(sizeOnButton()).toBeCloseTo(30, 0))
     },
 }
 
