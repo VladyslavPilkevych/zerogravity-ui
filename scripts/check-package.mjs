@@ -167,8 +167,11 @@ step("package size stays within the tracked baseline", () => {
     // entry points, 276 kB to 340 kB), then from 350 kB when Wake, Chroma,
     // Wash, Peel, Gantry, Tide, Lenticular and Gnomon graduated (29 to 37
     // components, 337 kB to 418 kB; about 10 kB each, three fifths of it
-    // source maps). Headroom for polish, not for more components.
-    if (kb > 430) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 430 kB)`)
+    // source maps), then from 430 kB when Ascender, Frost, Halo, Sash, Detent,
+    // Tether and Folio graduated (37 to 44 components, 419 kB to 448 kB; about
+    // 3.5 kB each, half of it source maps; no experimental, test or duplicated
+    // code ships). Headroom for polish, not for more components.
+    if (kb > 460) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 460 kB)`)
     return `${kb.toFixed(0)} kB tarball`
 })
 

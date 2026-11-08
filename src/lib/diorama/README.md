@@ -21,10 +21,13 @@ look around the obstruction to see the background more clearly.
 | `parallax`    | `46`    | Displacement budget at full deflection, px |
 | `blur`        | `7`     | Blur applied to the nearest plane, px      |
 | `perspective` | `1200`  | 3D depth, px                               |
+| `tilt`        | `0`     | Degrees the scene turns toward the pointer |
 | `ease`        | `0.11`  | Camera follow rate                         |
 
 Each plane takes `{ content, depth, blur?, opacity? }`. `depth` runs 0 (far) to 1
-(near) and defaults to an even spread across the list. Displacement scales
+(near) and defaults to an even spread across the list. A negative `depth` moves
+a plane against the pointer, like the background, which suits counter-moving
+layers behind the subject. Displacement scales
 linearly with depth and blur scales with **depth squared**, so the nearest layer
 is clearly out of focus while mid layers stay only slightly soft. The background
 moves slightly against the pointer, which strengthens the separation.
@@ -37,6 +40,14 @@ every layer; nothing chases the pointer literally.
 composition rather than a jumpy one. No device-orientation APIs are used. The
 background is never hidden behind foreground layers to the point of being
 unreadable, so no essential content requires pointer movement.
+
+**Sharp planes.** A plane whose blur works out to zero — `blur: 0` on the plane,
+`blur={0}` on the component, or a depth of 0 — gets no `filter` at all rather
+than `blur(0px)`, so a crisp composition costs no filter pass.
+
+**Tilt.** `tilt` rotates every layer a few degrees toward the pointer, which is
+when `perspective` becomes visible. At the default `0` the composition stays
+flat, exactly as before.
 
 **Reduced motion.** A static composition with depth and blur intact but no
 pointer tracking.

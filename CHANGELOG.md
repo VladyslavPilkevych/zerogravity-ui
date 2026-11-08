@@ -7,6 +7,65 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `TrailingCursor`: `dotEase` lets the dot trail the pointer. The default of `1`
+  keeps it pinned, as before; `ease` still controls only the ring.
+- `TrailingCursor`: `dotHoverScale` and `dotPressScale` give the dot hover and
+  press feedback, which `dot-only` cursors had no way to show. Both default to
+  `1`. The root also exposes `data-hovering` and `data-pressed`.
+- `Diorama`: `tilt`, an opt-in rotation of a few degrees toward the pointer,
+  which gives `perspective` a visible effect. The default of `0` keeps the
+  composition flat, as before.
+- `Ascender` (`zerogravity/ascender`) — a scroll text reveal: words rise out of
+  their own masks as a line enters the view. One IntersectionObserver and CSS
+  transitions; `trigger="mount"` needs no JavaScript at all.
+- `Frost` (`zerogravity/frost`) — a glass surface for any content, with a
+  conservative 12 px blur, no `saturate()`, a `tint` variant with no backdrop
+  pass, and `-webkit-backdrop-filter` declared before `backdrop-filter` so
+  Lightning CSS keeps both. A server component.
+- `Halo` (`zerogravity/halo`) — circular text around a centre, spread evenly
+  over the full turn in every browser. A server component.
+- `Sash` (`zerogravity/sash`) — a marquee band at a constant speed that pauses
+  on hover, on keyboard focus and while offscreen, with copies made `inert`.
+- `Detent` (`zerogravity/detent`) — a segmented control built on native radios,
+  so keyboard, forms and right-to-left come from the browser.
+- `Tether` (`zerogravity/tether`) — an SVG path drawn by scroll progress or by a
+  `progress` value, with a stroke that keeps its width when stretched.
+- `Folio` (`zerogravity/folio`) — expanding panels that never resize: one
+  animated position moves and clips every panel, so the motion does no layout
+  work and the gaps never drift. Stacks below 560 px.
+- Sash, Detent, Tether and Folio take `variant`: `"pixel"`, the
+  default, in the library's stepped, square, block-accented style, or
+  `"classic"` for a smooth, rounded look.
+
+### Changed
+
+- Compared with their experimental versions on the documentation site, the four
+  styled components (Sash, Detent, Tether and Folio) now default to a pixel-first presentation, with the
+  previous look kept as `variant="classic"`, and `Folio` moves far more
+  smoothly: rapid hovering no longer pulls the gaps apart mid-transition, and
+  the default timing is a gentler 650 ms curve.
+- `TrailingCursor`: easing is now corrected for frame time, so the trail feels
+  the same at 120 Hz as at 60 Hz. At 60 Hz nothing changes. In `dot-only` the
+  hidden ring is no longer simulated, and the dot and ring are positioned with
+  the `translate` property instead of `transform`.
+- `Meadow`, `Elemental` and `Stencil` (with `animate`) hold their CSS animations
+  while scrolled out of view, and `Ricochet` and Meadow's flyers stop their
+  animation frames there instead of ticking idly. Nothing changes on screen.
+- `Diorama`: a plane whose blur works out to zero now gets no `filter` at all
+  instead of `blur(0px)`. Negative `depth`, which moves a plane against the
+  pointer, is now documented.
+
+### Fixed
+
+- `TrailingCursor` no longer hides the native text cursor in text fields
+  (`textarea`, `contenteditable` and text-like inputs) and steps aside there
+  instead. Pass `preserveTextCursor={false}` to restore the previous behaviour.
+- `TrailingCursor` no longer stays pressed after a press that started inside a
+  scoped container is released outside it, cancelled, or interrupted by the
+  window losing focus.
+
 ## [0.2.0] - 2026-10-09
 
 ### Added

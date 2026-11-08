@@ -13,7 +13,11 @@ export interface TrailingCursorDemoConfig {
     ringHoverSize: number
     ringPressSize: number
     ease: number
+    dotEase: number
+    dotHoverScale: number
+    dotPressScale: number
     hideNativeCursor: boolean
+    preserveTextCursor: boolean
     mixBlendMode: string
 }
 
@@ -28,7 +32,11 @@ export const TRAILING_CURSOR_DEFAULTS: TrailingCursorDemoConfig = {
     ringHoverSize: 52,
     ringPressSize: 26,
     ease: 0.16,
+    dotEase: 1,
+    dotHoverScale: 1,
+    dotPressScale: 1,
     hideNativeCursor: true,
+    preserveTextCursor: true,
     mixBlendMode: "normal",
 }
 
@@ -97,8 +105,37 @@ export const TRAILING_CURSOR_CONTROLS: ControlGroup[] = [
                 step: 2,
                 unit: "px",
             },
-            { kind: "number", path: "ease", label: "Ease", min: 0.02, max: 1, step: 0.01 },
+            { kind: "number", path: "ease", label: "Ring ease", min: 0.02, max: 1, step: 0.01 },
+            {
+                kind: "number",
+                path: "dotEase",
+                label: "Dot ease (1 pins it)",
+                min: 0.02,
+                max: 1,
+                step: 0.01,
+            },
+            {
+                kind: "number",
+                path: "dotHoverScale",
+                label: "Dot on hover",
+                min: 0,
+                max: 4,
+                step: 0.1,
+            },
+            {
+                kind: "number",
+                path: "dotPressScale",
+                label: "Dot when pressed",
+                min: 0,
+                max: 2,
+                step: 0.05,
+            },
             { kind: "boolean", path: "hideNativeCursor", label: "Hide the native cursor" },
+            {
+                kind: "boolean",
+                path: "preserveTextCursor",
+                label: "Keep the text cursor in fields",
+            },
         ],
     },
 ]
@@ -114,6 +151,13 @@ export const TRAILING_CURSOR_PRESET_VALUES: Record<string, Partial<TrailingCurso
     cyan: { preset: "cyan", ease: 0.1, ringSize: 42 },
     violet: { preset: "violet", variant: "ring-only", ringSize: 44, ringHoverSize: 72 },
     emerald: { preset: "emerald", ease: 0.28, ringSize: 28 },
-    rose: { preset: "rose", variant: "dot-only", dotSize: 14 },
+    rose: {
+        preset: "rose",
+        variant: "dot-only",
+        dotSize: 14,
+        dotEase: 0.2,
+        dotHoverScale: 2.4,
+        dotPressScale: 0.7,
+    },
     mono: { preset: "mono", mixBlendMode: "difference", ringSize: 40 },
 }

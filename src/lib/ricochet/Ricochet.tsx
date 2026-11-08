@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react"
 
-import { cx, useIsomorphicLayoutEffect, useLatestRef, usePrefersReducedMotion } from "../internal"
+import {
+    cx,
+    onVisible,
+    useIsomorphicLayoutEffect,
+    useLatestRef,
+    usePrefersReducedMotion,
+} from "../internal"
 import {
     bonusById,
     createGame,
@@ -168,6 +174,7 @@ export function Ricochet({
         let frame = 0
         let last = 0
         let live = true
+        let onscreen = true
 
         const size = () => {
             const rect = shell.getBoundingClientRect()
@@ -362,7 +369,7 @@ export function Ricochet({
         }
 
         const tick = (now: number) => {
-            if (!live) return
+            if (!live || !onscreen) return
             const delta = last === 0 ? 0 : (now - last) / 1000
             last = now
 
@@ -384,6 +391,16 @@ export function Ricochet({
         setPhase(game.phase)
         frame = requestAnimationFrame(tick)
 
+        const stopVisible = onVisible(shell, (visible) => {
+            if (visible === onscreen) return
+            onscreen = visible
+            cancelAnimationFrame(frame)
+            frame = 0
+            if (!visible) return
+            last = 0
+            frame = requestAnimationFrame(tick)
+        })
+
         let watcher: ResizeObserver | undefined
         if (typeof ResizeObserver === "function") {
             watcher = new ResizeObserver(size)
@@ -393,6 +410,7 @@ export function Ricochet({
         return () => {
             live = false
             cancelAnimationFrame(frame)
+            stopVisible()
             watcher?.disconnect()
             gameRef.current = null
         }

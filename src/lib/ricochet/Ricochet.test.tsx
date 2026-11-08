@@ -1,6 +1,7 @@
-import { render } from "@testing-library/react"
+import { act, render } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
+import { installFrameHarness } from "../../test/frames"
 import { mediaState } from "../../test/environment"
 import { Ricochet } from "./Ricochet"
 
@@ -99,6 +100,38 @@ describe("Ricochet", () => {
 
         start.mockRestore()
         stop.mockRestore()
+    })
+
+    it("holds its loop while scrolled out of view and resumes on return", () => {
+        const frames = installFrameHarness()
+        const original = globalThis.IntersectionObserver
+        let report: (entries: Array<{ isIntersecting: boolean }>) => void = () => {}
+        globalThis.IntersectionObserver = class {
+            constructor(callback: typeof report) {
+                report = callback
+            }
+            observe() {}
+            disconnect() {}
+        } as unknown as typeof IntersectionObserver
+
+        try {
+            const { unmount } = render(<Ricochet />)
+            expect(frames.pending()).toBe(1)
+
+            act(() => report([{ isIntersecting: false }]))
+            expect(frames.pending()).toBe(0)
+            act(() => frames.advance(5))
+            expect(frames.pending()).toBe(0)
+
+            act(() => report([{ isIntersecting: true }]))
+            expect(frames.pending()).toBe(1)
+
+            unmount()
+            expect(frames.pending()).toBe(0)
+        } finally {
+            globalThis.IntersectionObserver = original
+            frames.restore()
+        }
     })
 
     it("never starts a loop under reduced motion", () => {

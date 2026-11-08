@@ -1,0 +1,73 @@
+.zg-halo {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: var(--zg-halo-size);
+    max-width: 100%;
+    aspect-ratio: 1;
+    vertical-align: middle;
+    container-type: inline-size;
+}
+
+.zg-halo-ring {
+    position: absolute;
+    inset: 0;
+    font-size: var(--zg-halo-font);
+    font-size: calc(var(--zg-halo-font-ratio) * 100cqi);
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: pre;
+    pointer-events: none;
+}
+
+.zg-halo-glyph {
+    position: absolute;
+    top: 0;
+    bottom: 50%;
+    left: 50%;
+    width: 0;
+    transform: rotate(var(--zg-halo-angle));
+    transform-origin: 0 100%;
+}
+
+.zg-halo-glyph > span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-50%);
+}
+
+.zg-halo[data-spin] .zg-halo-ring {
+    animation: zg-halo-turn var(--zg-halo-duration) linear infinite;
+}
+
+.zg-halo[data-direction="counterclockwise"] .zg-halo-ring {
+    animation-direction: reverse;
+}
+
+.zg-halo[data-paused] .zg-halo-ring,
+.zg-halo[data-hover-pause]:hover .zg-halo-ring,
+.zg-halo[data-hover-pause]:focus-within .zg-halo-ring {
+    animation-play-state: paused;
+}
+
+.zg-halo-centre {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 64%;
+    aspect-ratio: 1;
+}
+
+@keyframes zg-halo-turn {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-halo:not([data-motion="always"]) .zg-halo-ring {
+        animation: none;
+    }
+}

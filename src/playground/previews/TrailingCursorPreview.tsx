@@ -27,7 +27,11 @@ export function TrailingCursorPreview({ config }: PreviewApi) {
                 ringHoverSize={c.ringHoverSize}
                 ringPressSize={c.ringPressSize}
                 ease={c.ease}
+                dotEase={c.dotEase}
+                dotHoverScale={c.dotHoverScale}
+                dotPressScale={c.dotPressScale}
                 hideNativeCursor={c.hideNativeCursor}
+                preserveTextCursor={c.preserveTextCursor}
                 mixBlendMode={c.mixBlendMode as CSSProperties["mixBlendMode"]}
             />
             <Hint>Move cursor</Hint>

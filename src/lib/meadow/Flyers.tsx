@@ -116,8 +116,11 @@ export function Flyers(props: FlyersProps) {
         let seen = typeof IntersectionObserver !== "function"
 
         const loop = (now: number) => {
+            if (!seen) {
+                frame = 0
+                return
+            }
             frame = requestAnimationFrame(loop)
-            if (!seen) return
 
             const dt = last === 0 ? 0.016 : Math.min((now - last) / 1000, FRAME_CAP)
             last = now
@@ -128,13 +131,14 @@ export function Flyers(props: FlyersProps) {
 
         frame = requestAnimationFrame(loop)
 
-        // an offscreen meadow keeps its frame callback but does no work in it
         const watcher =
             typeof IntersectionObserver === "function"
                 ? new IntersectionObserver(
                       ([entry]) => {
                           seen = entry.isIntersecting
-                          if (seen) last = 0
+                          if (!seen || frame !== 0) return
+                          last = 0
+                          frame = requestAnimationFrame(loop)
                       },
                       { threshold: 0 },
                   )

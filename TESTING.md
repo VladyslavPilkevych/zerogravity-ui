@@ -114,6 +114,18 @@ public types resolve while invalid usage still fails to compile, that importing
 one component does not pull in the others, and that `"use client"` survives on the
 individual modules rather than collapsing onto the entry point.
 
+One consumer runs on React 18, the bottom of the peer range. It type-checks the
+public API against `@types/react` 18, renders a page on the server with
+`react-dom/server` 18, hydrates it with development React so its warnings are
+live, and drives TrailingCursor, Ascender, Detent, Sash and Folio from the
+tarball with a real pointer and keyboard. Any React warning fails it — the case
+it exists for is a prop only React 19 understands, such as `inert={true}`.
+
+Tree shaking is measured per import style from one install: a root `SplitFlap`
+and `Tag`, and the `split-flap`, `folio`, `frost` and `ascender` entry points.
+Each bundle must contain its own component and none of the others, checked by
+class names that survive minification.
+
 ## Local versus CI
 
 Git hooks are installed by `pnpm install` through Lefthook.

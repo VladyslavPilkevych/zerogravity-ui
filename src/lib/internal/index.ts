@@ -19,7 +19,14 @@ export { rngFor, rngFrom, pick } from "./rng"
 export { onFrame, frameCount, type FrameTick } from "./frames"
 export { wakeLoop, type WakeLoop } from "./wakeLoop"
 export { fitCanvas, context2d, DPR_CAP, type SurfaceSize } from "./surface"
-export { onResize, onVisible } from "./observe"
+export {
+    onResize,
+    onVisible,
+    pauseOffscreen,
+    OFFSCREEN_ATTRIBUTE,
+    type VisibleOptions,
+} from "./observe"
 export { pointerBox, type PointerBox } from "./pointerBox"
 export { noiseTile, type GrainOptions } from "./grain"
 export { bayer4, quantize } from "./dither"
+export { usePauseOffscreen } from "./usePauseOffscreen"

@@ -10,6 +10,19 @@ import type { PreviewApi } from "./useDocsConfig"
  * Keys match `slug` in the registry.
  */
 export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
+    ascender: dynamic(() =>
+        import("@/playground/previews/AscenderPreview").then((m) => m.AscenderPreview),
+    ),
+    detent: dynamic(() =>
+        import("@/playground/previews/DetentPreview").then((m) => m.DetentPreview),
+    ),
+    folio: dynamic(() => import("@/playground/previews/FolioPreview").then((m) => m.FolioPreview)),
+    frost: dynamic(() => import("@/playground/previews/FrostPreview").then((m) => m.FrostPreview)),
+    halo: dynamic(() => import("@/playground/previews/HaloPreview").then((m) => m.HaloPreview)),
+    sash: dynamic(() => import("@/playground/previews/SashPreview").then((m) => m.SashPreview)),
+    tether: dynamic(() =>
+        import("@/playground/previews/TetherPreview").then((m) => m.TetherPreview),
+    ),
     anaglyph: dynamic(() =>
         import("@/playground/previews/AnaglyphPreview").then((m) => m.AnaglyphPreview),
     ),

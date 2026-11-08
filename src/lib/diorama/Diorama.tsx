@@ -2,7 +2,14 @@
 
 import { useRef, type CSSProperties, type ReactNode } from "react"
 
-import { cx, useIsomorphicLayoutEffect, useLatestRef, usePrefersReducedMotion } from "../internal"
+import {
+    clamp,
+    cx,
+    finite,
+    useIsomorphicLayoutEffect,
+    useLatestRef,
+    usePrefersReducedMotion,
+} from "../internal"
 import "./Diorama.css"
 
 export interface DioramaPlane {
@@ -18,6 +25,7 @@ export interface DioramaProps {
     parallax?: number
     blur?: number
     perspective?: number
+    tilt?: number
     ease?: number
     disabled?: boolean
     enableOnTouch?: boolean
@@ -32,6 +40,7 @@ export function Diorama({
     parallax = 46,
     blur = 7,
     perspective = 1200,
+    tilt = 0,
     ease = 0.11,
     disabled = false,
     enableOnTouch = false,
@@ -117,6 +126,7 @@ export function Diorama({
         ["--diorama-perspective" as string]: `${perspective}px`,
         ["--diorama-parallax" as string]: parallax,
         ["--diorama-blur" as string]: blur,
+        ["--diorama-tilt" as string]: clamp(finite(tilt, 0), 0, 30),
     }
 
     return (
@@ -129,10 +139,13 @@ export function Diorama({
 
             {planes.map((plane, index) => {
                 const depth = plane.depth ?? (index + 1) / planes.length
+                const sharp =
+                    plane.blur === undefined ? blur === 0 || depth === 0 : plane.blur === 0
                 return (
                     <div
                         key={index}
                         className="xp-diorama-near"
+                        data-sharp={sharp ? "" : undefined}
                         style={{
                             ["--depth" as string]: depth,
                             ["--plane-blur" as string]:

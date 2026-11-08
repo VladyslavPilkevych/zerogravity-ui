@@ -57,4 +57,11 @@ export const COMPONENT_SLUGS = [
     "seam",
     "tag",
     "loaders",
+    "ascender",
+    "frost",
+    "halo",
+    "sash",
+    "detent",
+    "tether",
+    "folio",
 ] as const

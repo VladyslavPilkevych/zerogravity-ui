@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties, type RefObject } from "react"
 
-import { cx, useLatestRef } from "../internal"
+import { clamp, cx, finite, useLatestRef, wakeLoop } from "../internal"
 import { resolveColor, usePointerFxEnabled, type PointerFxPreset } from "../pointer-fx"
 import { pointerFxTokens } from "../pointer-fx/presets"
 import "./TrailingCursor.css"
@@ -22,7 +22,11 @@ export interface TrailingCursorProps {
     ringHoverSize?: number
     ringPressSize?: number
     ease?: number
+    dotEase?: number
+    dotHoverScale?: number
+    dotPressScale?: number
     hideNativeCursor?: boolean
+    preserveTextCursor?: boolean
     interactiveSelector?: string
     mixBlendMode?: CSSProperties["mixBlendMode"]
     zIndex?: number
@@ -34,8 +38,38 @@ export interface TrailingCursorProps {
 
 const SETTLE_PX = 0.15
 const HIDE_CLASS = "trailing-cursor-none"
+const KEEP_TEXT_CLASS = "trailing-cursor-keep-text"
 const DEFAULT_SELECTOR = "a, button, input, select, textarea, [role='button'], [data-cursor]"
+const NON_TEXT_INPUTS = [
+    "button",
+    "submit",
+    "reset",
+    "checkbox",
+    "radio",
+    "range",
+    "color",
+    "file",
+    "image",
+    "hidden",
+]
+const TEXT_ENTRY_SELECTOR = [
+    "textarea",
+    `input:not(${NON_TEXT_INPUTS.map((type) => `[type="${type}"]`).join(", ")})`,
+    "[contenteditable]:not([contenteditable='false'])",
+].join(", ")
 const NO_OFFSET = { left: 0, top: 0 } as DOMRect
+
+function rate(value: number | undefined, fallback: number): number {
+    return clamp(finite(value, fallback), 0.01, 1)
+}
+
+function scaleOf(value: number | undefined): number {
+    return clamp(finite(value, 1), 0, 10)
+}
+
+function approach(factor: number, dt: number): number {
+    return factor >= 1 ? 1 : 1 - Math.pow(1 - factor, dt * 60)
+}
 
 export function TrailingCursor({
     container,
@@ -49,7 +83,11 @@ export function TrailingCursor({
     ringHoverSize = 52,
     ringPressSize = 26,
     ease = 0.16,
+    dotEase = 1,
+    dotHoverScale = 1,
+    dotPressScale = 1,
     hideNativeCursor = true,
+    preserveTextCursor = true,
     interactiveSelector = DEFAULT_SELECTOR,
     mixBlendMode,
     zIndex = 2147483000,
@@ -64,13 +102,16 @@ export function TrailingCursor({
     const shapeRef = useRef<HTMLDivElement>(null)
     const labelRef = useRef<HTMLSpanElement>(null)
     const resizeRef = useRef<(() => void) | null>(null)
+    const wakeRef = useRef<(() => void) | null>(null)
 
     const enabled = usePointerFxEnabled({ disabled, enableOnTouch, respectReducedMotion })
     const scoped = Boolean(container)
 
     const tokens = pointerFxTokens(preset)
     const settings = useLatestRef({
-        ease,
+        variant,
+        ease: rate(ease, 0.16),
+        dotEase: rate(dotEase, 1),
         ringSize,
         ringHoverSize,
         ringPressSize,
@@ -112,7 +153,9 @@ export function TrailingCursor({
         }
         let ringX = targetX
         let ringY = targetY
-        let loop: number | null = null
+        let dotX = targetX
+        let dotY = targetY
+        let placed = false
         let scale = 1
         let pressed = false
         let hovering = false
@@ -128,25 +171,49 @@ export function TrailingCursor({
             shape.style.height = `${base * scale}px`
         }
 
-        const render = () => {
-            const factor = Math.min(Math.max(settings.current.ease, 0.01), 1)
-            ringX += (targetX - ringX) * factor
-            ringY += (targetY - ringY) * factor
+        const loop = wakeLoop((dt) => {
+            const config = settings.current
+            const showRing = config.variant !== "dot-only"
+            const showDot = config.variant !== "ring-only"
+            let settled = true
 
-            if (dot) dot.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`
-            ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`
-
-            const settled =
-                Math.abs(targetX - ringX) < SETTLE_PX && Math.abs(targetY - ringY) < SETTLE_PX
-
-            loop = settled ? null : requestAnimationFrame(render)
-        }
-
-        const wake = () => {
-            if (loop === null && document.visibilityState !== "hidden") {
-                loop = requestAnimationFrame(render)
+            if (showRing) {
+                const step = approach(config.ease, dt)
+                ringX += (targetX - ringX) * step
+                ringY += (targetY - ringY) * step
+                if (
+                    Math.abs(targetX - ringX) < SETTLE_PX &&
+                    Math.abs(targetY - ringY) < SETTLE_PX
+                ) {
+                    ringX = targetX
+                    ringY = targetY
+                } else {
+                    settled = false
+                }
+                ring.style.translate = `${ringX}px ${ringY}px`
+            } else {
+                ringX = targetX
+                ringY = targetY
             }
-        }
+
+            if (showDot && dot) {
+                const step = approach(config.dotEase, dt)
+                dotX += (targetX - dotX) * step
+                dotY += (targetY - dotY) * step
+                if (Math.abs(targetX - dotX) < SETTLE_PX && Math.abs(targetY - dotY) < SETTLE_PX) {
+                    dotX = targetX
+                    dotY = targetY
+                } else {
+                    settled = false
+                }
+                dot.style.translate = `${dotX}px ${dotY}px`
+            } else {
+                dotX = targetX
+                dotY = targetY
+            }
+
+            return !settled
+        })
 
         const onMove = (event: PointerEvent) => {
             if (!enableOnTouch && event.pointerType !== "mouse") return
@@ -154,8 +221,13 @@ export function TrailingCursor({
             const rect = box()
             targetX = event.clientX - rect.left
             targetY = event.clientY - rect.top
+            if (!placed) {
+                placed = true
+                dotX = targetX
+                dotY = targetY
+            }
             root.dataset.visible = "true"
-            wake()
+            loop.wake()
         }
 
         const onOver = (event: PointerEvent) => {
@@ -166,7 +238,8 @@ export function TrailingCursor({
                 "[data-cursor], [data-cursor-scale], [data-cursor-color], [data-cursor-label]",
             )
             const mode = scoped?.getAttribute("data-cursor") ?? ""
-            root.dataset.hidden = mode === "hidden" ? "true" : "false"
+            const editing = preserveTextCursor && target.closest(TEXT_ENTRY_SELECTOR) !== null
+            root.dataset.hidden = mode === "hidden" || editing ? "true" : "false"
 
             const rawScale = scoped?.getAttribute("data-cursor-scale")
             const parsedScale = rawScale === null || rawScale === undefined ? 1 : Number(rawScale)
@@ -184,16 +257,26 @@ export function TrailingCursor({
             root.dataset.labelled = text ? "true" : "false"
 
             hovering = target.closest(settings.current.interactiveSelector) !== null
+            root.dataset.hovering = hovering ? "true" : "false"
+            applyRingSize()
+        }
+
+        const release = () => {
+            window.removeEventListener("pointerup", release)
+            window.removeEventListener("pointercancel", release)
+            window.removeEventListener("blur", release)
+            if (!pressed) return
+            pressed = false
+            root.dataset.pressed = "false"
             applyRingSize()
         }
 
         const onDown = () => {
+            window.addEventListener("pointerup", release, { passive: true })
+            window.addEventListener("pointercancel", release, { passive: true })
+            window.addEventListener("blur", release)
             pressed = true
-            applyRingSize()
-        }
-
-        const onUp = () => {
-            pressed = false
+            root.dataset.pressed = "true"
             applyRingSize()
         }
 
@@ -201,48 +284,51 @@ export function TrailingCursor({
             root.dataset.visible = "false"
         }
 
-        const onVisibility = () => {
-            if (document.visibilityState === "hidden" && loop !== null) {
-                cancelAnimationFrame(loop)
-                loop = null
-            }
-        }
-
         applyRingSize()
         resizeRef.current = applyRingSize
+        wakeRef.current = () => {
+            if (placed) loop.wake()
+        }
 
         const surface: EventTarget = host ?? window
         const leaveOn: EventTarget = host ?? document
         const hideOn = host ?? document.body
 
-        if (hideNativeCursor) hideOn.classList.add(HIDE_CLASS)
+        if (hideNativeCursor) {
+            hideOn.classList.add(HIDE_CLASS)
+            if (preserveTextCursor) hideOn.classList.add(KEEP_TEXT_CLASS)
+        }
         surface.addEventListener("pointermove", onMove as EventListener, { passive: true })
         surface.addEventListener("pointerover", onOver as EventListener, { passive: true })
         surface.addEventListener("pointerdown", onDown, { passive: true })
-        surface.addEventListener("pointerup", onUp, { passive: true })
         leaveOn.addEventListener("pointerleave", onLeave, { passive: true })
-        document.addEventListener("visibilitychange", onVisibility)
         window.addEventListener("scroll", forget, { passive: true, capture: true })
         window.addEventListener("resize", forget, { passive: true })
 
         return () => {
             resizeRef.current = null
-            hideOn.classList.remove(HIDE_CLASS)
+            wakeRef.current = null
+            hideOn.classList.remove(HIDE_CLASS, KEEP_TEXT_CLASS)
             surface.removeEventListener("pointermove", onMove as EventListener)
             surface.removeEventListener("pointerover", onOver as EventListener)
             surface.removeEventListener("pointerdown", onDown)
-            surface.removeEventListener("pointerup", onUp)
             leaveOn.removeEventListener("pointerleave", onLeave)
-            document.removeEventListener("visibilitychange", onVisibility)
             window.removeEventListener("scroll", forget, { capture: true })
             window.removeEventListener("resize", forget)
-            if (loop !== null) cancelAnimationFrame(loop)
+            window.removeEventListener("pointerup", release)
+            window.removeEventListener("pointercancel", release)
+            window.removeEventListener("blur", release)
+            loop.sleep()
         }
-    }, [enabled, hideNativeCursor, enableOnTouch, settings, container])
+    }, [enabled, hideNativeCursor, preserveTextCursor, enableOnTouch, settings, container])
 
     useEffect(() => {
         resizeRef.current?.()
     }, [enabled, ringSize, ringHoverSize, ringPressSize])
+
+    useEffect(() => {
+        wakeRef.current?.()
+    }, [enabled, variant, ease, dotEase])
 
     if (!enabled) return null
 
@@ -252,6 +338,8 @@ export function TrailingCursor({
         "--tc-ring": ringColor ?? tokens.ring,
         "--tc-border": ringBorderColor ?? tokens.ringBorder,
         "--tc-dot-size": `${dotSize}px`,
+        "--tc-dot-hover-scale": scaleOf(dotHoverScale),
+        "--tc-dot-press-scale": scaleOf(dotPressScale),
         ...(mixBlendMode ? { mixBlendMode } : null),
     } as CSSProperties
 
@@ -265,6 +353,8 @@ export function TrailingCursor({
             data-visible="false"
             data-hidden="false"
             data-labelled="false"
+            data-hovering="false"
+            data-pressed="false"
             style={style}
         >
             <div ref={ringRef} className="trailing-cursor-ring">

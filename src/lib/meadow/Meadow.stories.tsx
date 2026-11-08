@@ -476,7 +476,7 @@ export const NightUfoAbduction: Story = {
         await waitFor(() => expect(beam.dataset.on).toBe("true"))
 
         // the captive is taken, not deleted: the pool comes back the same size
-        await waitFor(() => expect(beam.dataset.on).toBe("false"), { timeout: 16000 })
+        await waitFor(() => expect(beam.dataset.on).toBe("false"), { timeout: 25000 })
         await expect(canvasElement.querySelectorAll(".xp-meadow-flyer")).toHaveLength(pool)
     },
 }

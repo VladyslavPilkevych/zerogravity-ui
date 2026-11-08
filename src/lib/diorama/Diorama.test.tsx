@@ -87,4 +87,56 @@ describe("Diorama", () => {
             0,
         )
     })
+
+    it("drops the blur filter entirely when a plane's blur works out to zero", () => {
+        const { container } = render(
+            <Diorama
+                background={<p>Far</p>}
+                planes={[
+                    { content: <span>Explicit</span>, blur: 0 },
+                    { content: <span>Soft</span>, depth: 1 },
+                    { content: <span>At rest</span>, depth: 0 },
+                ]}
+            />,
+        )
+        const near = container.querySelectorAll<HTMLElement>(".xp-diorama-near")
+
+        expect(near[0].dataset.sharp).toBe("")
+        expect(near[1].dataset.sharp).toBeUndefined()
+        expect(near[2].dataset.sharp).toBe("")
+
+        const crisp = render(<Diorama background={<p>Far</p>} planes={planes} blur={0} />)
+        for (const plane of crisp.container.querySelectorAll<HTMLElement>(".xp-diorama-near")) {
+            expect(plane.dataset.sharp).toBe("")
+        }
+    })
+
+    it("passes a negative depth through, so a plane moves against the pointer", () => {
+        const { container } = render(
+            <Diorama
+                background={<p>Far</p>}
+                planes={[{ content: <span>Back</span>, depth: -0.5 }]}
+            />,
+        )
+        const plane = container.querySelector(".xp-diorama-near") as HTMLElement
+
+        expect(plane.style.getPropertyValue("--depth")).toBe("-0.5")
+        expect(plane.dataset.sharp).toBeUndefined()
+    })
+
+    it("keeps the composition flat unless a tilt is asked for, and clamps it", () => {
+        const flat = render(<Diorama background={<p>Far</p>} />)
+        const tilted = render(<Diorama background={<p>Far</p>} tilt={90} />)
+
+        expect(
+            (flat.container.querySelector(".xp-diorama") as HTMLElement).style.getPropertyValue(
+                "--diorama-tilt",
+            ),
+        ).toBe("0")
+        expect(
+            (tilted.container.querySelector(".xp-diorama") as HTMLElement).style.getPropertyValue(
+                "--diorama-tilt",
+            ),
+        ).toBe("30")
+    })
 })

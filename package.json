@@ -41,6 +41,10 @@
             "types": "./dist/aperture/index.d.ts",
             "import": "./dist/aperture/index.js"
         },
+        "./ascender": {
+            "types": "./dist/ascender/index.d.ts",
+            "import": "./dist/ascender/index.js"
+        },
         "./bezel": {
             "types": "./dist/bezel/index.d.ts",
             "import": "./dist/bezel/index.js"
@@ -52,6 +56,10 @@
         "./chroma": {
             "types": "./dist/chroma/index.d.ts",
             "import": "./dist/chroma/index.js"
+        },
+        "./detent": {
+            "types": "./dist/detent/index.d.ts",
+            "import": "./dist/detent/index.js"
         },
         "./diorama": {
             "types": "./dist/diorama/index.d.ts",
@@ -69,6 +77,14 @@
             "types": "./dist/elemental/index.d.ts",
             "import": "./dist/elemental/index.js"
         },
+        "./folio": {
+            "types": "./dist/folio/index.d.ts",
+            "import": "./dist/folio/index.js"
+        },
+        "./frost": {
+            "types": "./dist/frost/index.d.ts",
+            "import": "./dist/frost/index.js"
+        },
         "./gantry": {
             "types": "./dist/gantry/index.d.ts",
             "import": "./dist/gantry/index.js"
@@ -80,6 +96,10 @@
         "./grid-trail": {
             "types": "./dist/grid-trail/index.d.ts",
             "import": "./dist/grid-trail/index.js"
+        },
+        "./halo": {
+            "types": "./dist/halo/index.d.ts",
+            "import": "./dist/halo/index.js"
         },
         "./kern": {
             "types": "./dist/kern/index.d.ts",
@@ -137,6 +157,10 @@
             "types": "./dist/ricochet/index.d.ts",
             "import": "./dist/ricochet/index.js"
         },
+        "./sash": {
+            "types": "./dist/sash/index.d.ts",
+            "import": "./dist/sash/index.js"
+        },
         "./scroll-stack": {
             "types": "./dist/scroll-stack/index.d.ts",
             "import": "./dist/scroll-stack/index.js"
@@ -164,6 +188,10 @@
         "./tessera": {
             "types": "./dist/tessera/index.d.ts",
             "import": "./dist/tessera/index.js"
+        },
+        "./tether": {
+            "types": "./dist/tether/index.d.ts",
+            "import": "./dist/tether/index.js"
         },
         "./tide": {
             "types": "./dist/tide/index.d.ts",

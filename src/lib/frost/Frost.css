@@ -1,0 +1,58 @@
+.zg-frost {
+    --zg-frost-tint: #ffffff;
+    --zg-frost-amount: 14%;
+    --zg-frost-edge: rgba(255, 255, 255, 0.28);
+    --zg-frost-shine: rgba(255, 255, 255, 0.32);
+    --zg-frost-shadow: rgba(0, 0, 0, 0.45);
+    position: relative;
+    border-radius: var(--zg-frost-radius);
+    background: rgba(255, 255, 255, 0.14);
+    background: color-mix(in srgb, var(--zg-frost-tint) var(--zg-frost-amount), transparent);
+}
+
+.zg-frost[data-tone="dark"] {
+    --zg-frost-tint: #0c0e13;
+    --zg-frost-amount: 40%;
+    --zg-frost-edge: rgba(255, 255, 255, 0.12);
+    --zg-frost-shine: rgba(255, 255, 255, 0.1);
+    --zg-frost-shadow: rgba(0, 0, 0, 0.55);
+    background: rgba(12, 14, 19, 0.4);
+    background: color-mix(in srgb, var(--zg-frost-tint) var(--zg-frost-amount), transparent);
+}
+
+.zg-frost[data-variant="blur"] {
+    -webkit-backdrop-filter: blur(var(--zg-frost-blur));
+    backdrop-filter: blur(var(--zg-frost-blur));
+}
+
+.zg-frost[data-variant="tint"] {
+    --zg-frost-amount: 72%;
+    background: rgba(255, 255, 255, 0.72);
+    background: color-mix(in srgb, var(--zg-frost-tint) var(--zg-frost-amount), transparent);
+}
+
+.zg-frost[data-tone="dark"][data-variant="tint"] {
+    --zg-frost-amount: 82%;
+    background: rgba(12, 14, 19, 0.82);
+    background: color-mix(in srgb, var(--zg-frost-tint) var(--zg-frost-amount), transparent);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .zg-frost[data-variant="blur"] {
+        --zg-frost-amount: 72%;
+    }
+
+    .zg-frost[data-tone="dark"][data-variant="blur"] {
+        --zg-frost-amount: 82%;
+    }
+}
+
+.zg-frost[data-border] {
+    border: 1px solid var(--zg-frost-edge);
+}
+
+.zg-frost[data-shadow] {
+    box-shadow:
+        inset 0 1px 0 0 var(--zg-frost-shine),
+        0 18px 40px -24px var(--zg-frost-shadow);
+}

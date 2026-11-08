@@ -2,7 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, type CSSProperties } from "react"
 
-import { cssUrl, cx, useIsomorphicLayoutEffect, usePrefersReducedMotion } from "../internal"
+import {
+    cssUrl,
+    cx,
+    useIsomorphicLayoutEffect,
+    usePauseOffscreen,
+    usePrefersReducedMotion,
+} from "../internal"
+import "../internal/offscreen.css"
 import { buildPattern, type StencilFill } from "./patterns"
 import "./Stencil.css"
 
@@ -79,6 +86,7 @@ export function Stencil({
     const maskSigRef = useRef<string[]>([])
 
     const reducedMotion = usePrefersReducedMotion()
+    usePauseOffscreen(rootRef, animate > 0 && !reducedMotion)
 
     const characters = useMemo(() => Array.from(text), [text])
 

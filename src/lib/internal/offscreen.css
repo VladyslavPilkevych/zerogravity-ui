@@ -1,0 +1,8 @@
+[data-zg-offscreen],
+[data-zg-offscreen]::before,
+[data-zg-offscreen]::after,
+[data-zg-offscreen] *,
+[data-zg-offscreen] *::before,
+[data-zg-offscreen] *::after {
+    animation-play-state: paused !important;
+}
