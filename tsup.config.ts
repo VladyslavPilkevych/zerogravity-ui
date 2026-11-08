@@ -23,7 +23,15 @@ export default defineConfig({
      * and when something is wrong it says which line.
      */
     dts: false,
-    sourcemap: true,
+    /*
+     * No source maps. Output is one unminified file per source module with the
+     * same names, so stack traces and devtools already read like the source,
+     * while maps that embed their sources doubled the tarball (485 kB to 217
+     * kB without them). Maps without sources would point at files we do not
+     * ship, and leaving `.map` out of `files` would strand the
+     * sourceMappingURL comments that make bundlers warn.
+     */
+    sourcemap: false,
     clean: true,
     tsconfig: "tsconfig.build.json",
     loader: { ".css": "copy" },

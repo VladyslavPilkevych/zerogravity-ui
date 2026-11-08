@@ -372,10 +372,12 @@ Do not run `pnpm build` while `pnpm dev` is running — both write to `.next`.
 `pnpm build:lib` is three steps:
 
 1. [tsup](https://tsup.egoist.dev/) in preserved-module mode — every source file
-   becomes one ESM file in `dist/`, with source maps. Nothing is bundled, which
+   becomes one unminified ESM file in `dist/`. Nothing is bundled, which
    is what keeps `"use client"` attached to the individual client modules
    instead of collapsing the whole library into one client boundary. CSS files
-   are copied next to the modules that import them.
+   are copied next to the modules that import them. No source maps ship: each
+   output file already reads like its source, with the same names, so stack
+   traces stay legible at half the tarball size.
 2. `tsc -p tsconfig.build.json` for the declarations, one per module.
 3. `scripts/declaration-extensions.mjs`, which gives the relative specifiers in
    those declarations explicit `.js` paths and drops the stylesheet imports TypeScript

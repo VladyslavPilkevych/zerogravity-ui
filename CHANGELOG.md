@@ -58,6 +58,11 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The package no longer ships source maps. Each module is already one
+  unminified file with its original names, so stack traces read like the
+  source; the maps embedded every source file and made up more than half of
+  the package. The tarball drops from about 485 kB to 219 kB (1.96 MB to 0.85
+  MB unpacked). Declarations and the code itself are unchanged.
 - Compared with their experimental versions on the documentation site, the four
   styled components (Sash, Detent, Tether and Folio) now default to a pixel-first presentation, with the
   previous look kept as `variant="classic"`, and `Folio` moves far more

@@ -92,6 +92,20 @@ step("no cloud-sync duplicate copies in the build output or the tarball", () => 
     return `source, dist and ${entries.length} tarball entries clean`
 })
 
+step("no source maps ship, and no module points at one", () => {
+    const maps = entries.filter((entry) => entry.endsWith(".map"))
+    if (maps.length) throw new Error(`source maps in the tarball: ${maps.slice(0, 5).join(", ")}`)
+    const pointing = entries
+        .filter((entry) => entry.endsWith(".js"))
+        .map((entry) => entry.replace(/^package\//, ""))
+        .filter((file) =>
+            readFileSync(path.join(REPO_ROOT, file), "utf8").includes("sourceMappingURL"),
+        )
+    if (pointing.length)
+        throw new Error(`dangling sourceMappingURL: ${pointing.slice(0, 5).join(", ")}`)
+    return "none shipped, none referenced"
+})
+
 step("tarball ships declarations and stylesheets", () => {
     const declarations = entries.filter((entry) => entry.endsWith(".d.ts")).length
     const styles = entries.filter((entry) => entry.endsWith(".css")).length
@@ -162,20 +176,11 @@ step("the package declares no runtime dependencies", () => {
 step("package size stays within the tracked baseline", () => {
     const bytes = statSync(tarball).size
     const kb = bytes / 1024
-    // Raised from 250 kB when nine prototypes were promoted, then from 320 kB
-    // when six more graduated and six Interface components landed (17 to 29
-    // entry points, 276 kB to 340 kB), then from 350 kB when Wake, Chroma,
-    // Wash, Peel, Gantry, Tide, Lenticular and Gnomon graduated (29 to 37
-    // components, 337 kB to 418 kB; about 10 kB each, three fifths of it
-    // source maps), then from 430 kB when Ascender, Frost, Halo, Sash, Detent,
-    // Tether and Folio graduated (37 to 44 components, 419 kB to 448 kB; about
-    // 3.5 kB each, half of it source maps; no experimental, test or duplicated
-    // code ships), then from 460 kB when Calendar, Task, Checklist, Progress and
-    // Clock arrived (44 to 49 components, 448 kB to 489 kB; Calendar is about
-    // 30 kB of it, more than half source maps, which embed their sources and
-    // are 56% of the whole package). Headroom for polish, not for more
-    // components.
-    if (kb > 500) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 500 kB)`)
+    // 217 kB with 49 components once source maps stopped shipping (they
+    // embedded their sources and were 56% of a 485 kB tarball). About 10%
+    // headroom: a new component is roughly 4 kB, so growth past this is a
+    // decision to record here, not drift.
+    if (kb > 240) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 240 kB)`)
     return `${kb.toFixed(0)} kB tarball`
 })
 
