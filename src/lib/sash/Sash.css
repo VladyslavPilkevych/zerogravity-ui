@@ -48,6 +48,11 @@
     row-gap: 0.5em;
 }
 
+/* a run that cannot shrink is as wide as all its items and never wraps */
+.zg-sash[data-still] .zg-sash-run {
+    flex-shrink: 1;
+}
+
 .zg-sash[data-variant="pixel"] {
     --zg-sash-accent: currentColor;
     position: relative;
@@ -119,6 +124,7 @@
 
     .zg-sash:not([data-motion="always"]) .zg-sash-run {
         flex-wrap: wrap;
+        flex-shrink: 1;
         row-gap: 0.5em;
     }
 

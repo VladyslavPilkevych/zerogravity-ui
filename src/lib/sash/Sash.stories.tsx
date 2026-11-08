@@ -44,6 +44,13 @@ export const Reversed: Story = { args: { direction: "right", fade: true } }
 export const Static: Story = {
     args: { disabled: true },
     parameters: { chromatic: { disableSnapshot: false } },
+    decorators: [
+        (Story) => (
+            <div style={{ width: 320 }}>
+                <Story />
+            </div>
+        ),
+    ],
     play: async ({ canvasElement }) => {
         const runs = canvasElement.querySelectorAll(".zg-sash-run")
         await expect(runs).toHaveLength(1)
