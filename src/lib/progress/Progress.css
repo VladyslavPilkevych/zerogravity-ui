@@ -1,0 +1,109 @@
+.zg-progress {
+    --zg-progress-accent: #c6f24e;
+    --zg-progress-track: color-mix(in srgb, currentColor 14%, transparent);
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.zg-progress-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.86em;
+}
+
+.zg-progress-value {
+    color: color-mix(in srgb, currentColor 66%, transparent);
+    font-variant-numeric: tabular-nums;
+}
+
+.zg-progress-track {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    height: 8px;
+    overflow: hidden;
+    background: var(--zg-progress-track);
+}
+
+.zg-progress-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--zg-progress-accent);
+    transform: scaleX(var(--zg-progress-ratio));
+    transform-origin: left;
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.zg-progress-track[data-segments] {
+    background: transparent;
+}
+
+.zg-progress-block {
+    flex: 1 1 0;
+    background: var(--zg-progress-track);
+    transition: background-color 0.2s ease;
+}
+
+.zg-progress-block[data-on] {
+    background: var(--zg-progress-accent);
+}
+
+.zg-progress[data-variant="pixel"] .zg-progress-head {
+    font-family: var(--zg-font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.zg-progress[data-variant="pixel"] .zg-progress-track {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent);
+    background-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 6px,
+        color-mix(in srgb, currentColor 10%, transparent) 6px 8px
+    );
+}
+
+.zg-progress[data-variant="pixel"] .zg-progress-fill {
+    inset: 2px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--zg-progress-accent) 0 6px,
+        transparent 6px 8px
+    );
+    transition-timing-function: steps(8, end);
+}
+
+.zg-progress[data-variant="pixel"] .zg-progress-track[data-segments] {
+    padding: 0;
+    box-shadow: none;
+    background-image: none;
+}
+
+.zg-progress[data-variant="pixel"] .zg-progress-block[data-on] {
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.zg-progress[data-variant="classic"] .zg-progress-track {
+    border-radius: 999px;
+}
+
+.zg-progress[data-variant="classic"] .zg-progress-fill {
+    border-radius: 999px;
+}
+
+.zg-progress[data-variant="classic"] .zg-progress-block:first-child {
+    border-radius: 999px 0 0 999px;
+}
+
+.zg-progress[data-variant="classic"] .zg-progress-block:last-child {
+    border-radius: 0 999px 999px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-progress .zg-progress-fill,
+    .zg-progress .zg-progress-block {
+        transition: none;
+    }
+}

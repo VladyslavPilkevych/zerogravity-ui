@@ -39,6 +39,33 @@ import { resolveColor as directResolveColor } from "zerogravity/pointer-fx"
 import { Meadow, type MeadowTheme } from "zerogravity/meadow"
 import { Elemental, type ElementalVariant } from "zerogravity/elemental"
 import { TesseraProvider } from "zerogravity/tessera"
+import { Ascender, type AscenderProps } from "zerogravity/ascender"
+import { Detent, type DetentProps } from "zerogravity/detent"
+import { Folio, FolioPanel, type FolioProps } from "zerogravity/folio"
+import { Frost, type FrostProps } from "zerogravity/frost"
+import { Halo, type HaloProps } from "zerogravity/halo"
+import { Sash, type SashProps } from "zerogravity/sash"
+import { Tether, type TetherProps } from "zerogravity/tether"
+import {
+    Calendar,
+    CalendarEvent,
+    useCalendar,
+    type CalendarItem,
+    type CalendarProps,
+} from "zerogravity/calendar"
+import { Checklist, type ChecklistProps } from "zerogravity/checklist"
+import { Clock, type ClockProps } from "zerogravity/clock"
+import { Progress, type ProgressProps } from "zerogravity/progress"
+import { Task, type TaskProps } from "zerogravity/task"
+import {
+    Ascender as RootAscender,
+    Detent as RootDetent,
+    Folio as RootFolio,
+    Frost as RootFrost,
+    Halo as RootHalo,
+    Sash as RootSash,
+    Tether as RootTether,
+} from "zerogravity"
 
 const direct = [
     DirectReel,
@@ -111,6 +138,74 @@ handle.next()
 handle.prev()
 handle.go(2)
 
+const promoted = [
+    Ascender,
+    Detent,
+    Folio,
+    FolioPanel,
+    Frost,
+    Halo,
+    Sash,
+    Tether,
+    RootAscender,
+    RootDetent,
+    RootFolio,
+    RootFrost,
+    RootHalo,
+    RootSash,
+    RootTether,
+]
+void promoted
+
+const ascender: AscenderProps = { text: "Rise", trigger: "mount", replay: true }
+const detent: DetentProps<number> = {
+    label: "Count",
+    options: [{ value: 1, label: "One" }],
+    onChange: (value: number) => void value,
+}
+const folio: FolioProps = { children: null, variant: "pixel", grow: 3 }
+const frost: FrostProps = { variant: "tint", tintOpacity: 0.8, as: "section" }
+const halo: HaloProps = { text: "Turn", separator: " / ", direction: "counterclockwise" }
+const sash: SashProps = { children: null, variant: "classic", direction: "right" }
+const tether: TetherProps = { d: "M0 0 L1 1", variant: "pixel", fit: "stretch" }
+void [ascender, detent, folio, frost, halo, sash, tether]
+
+const planning = [
+    Calendar,
+    Calendar.Month,
+    Calendar.Week,
+    CalendarEvent,
+    useCalendar,
+    Checklist,
+    Clock,
+    Progress,
+    Task,
+]
+void planning
+
+interface Meeting extends CalendarItem {
+    room: string
+}
+const meetingCalendar: CalendarProps<Meeting> = {
+    events: [{ id: "1", title: "Sync", start: new Date(), end: new Date(), room: "A" }],
+    renderEvent: (event) => event.room,
+    variant: "classic",
+    weekStartsOn: 0,
+}
+const checklist: ChecklistProps = { label: "Steps", items: [{ id: "a", label: "A" }] }
+const clock: ClockProps = { show: "time", timeZone: "Asia/Tokyo", seconds: true }
+const progress: ProgressProps = { label: "Done", value: 1, max: 4, segments: true }
+const task: TaskProps = { title: "Ship", progress: { value: 1 }, as: "li" }
+void [meetingCalendar, checklist, clock, progress, task]
+
+// @ts-expect-error calendar views are month, week or day
+const badView: CalendarProps = { view: "year" }
+void badView
+
+// @ts-expect-error a progress bar needs an accessible name
+const unnamedProgress: ProgressProps = { value: 1 }
+void unnamedProgress
+
 // Negative cases: each line must remain a type error for the public API to be sound.
 
 // @ts-expect-error invalid formation name
@@ -156,3 +251,19 @@ void DistReel
 // @ts-expect-error a component entry point exports only its own component
 import { Stencil as WrongEntry } from "zerogravity/reel"
 void WrongEntry
+
+// @ts-expect-error the styled components take only the two documented styles
+const badStyle: SashProps = { children: null, variant: "retro" }
+
+// @ts-expect-error Halo and Ascender have a single look and no style prop
+const styledHalo: HaloProps = { text: "Turn", variant: "pixel" }
+void styledHalo
+void badStyle
+
+// @ts-expect-error Frost stays glass: blur or tint, never pixel
+const pixelFrost: FrostProps = { variant: "pixel" }
+void pixelFrost
+
+// @ts-expect-error Detent needs an accessible name
+const unnamed: DetentProps<string> = { options: [] }
+void unnamed

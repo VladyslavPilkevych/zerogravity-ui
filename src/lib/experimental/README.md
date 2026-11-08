@@ -26,7 +26,9 @@ Gaze is ever promoted, `three` has to become a peer dependency at the same time.
 Graduated and now living directly under `src/lib`: Lodestone, Vellum, Diorama,
 Elemental, Kern, Overprint, Meadow, Tessera and Ricochet in `0.1.0`; Louvre,
 Eclipse, Lattice, Sonar, Palimpsest and Phosphor after the first review; and
-Wake, Gnomon, Chroma, Wash, Peel, Gantry, Tide and Lenticular after the second.
+Wake, Gnomon, Chroma, Wash, Peel, Gantry, Tide and Lenticular after the second. Ascender, Frost,
+Halo, Sash, Detent, Tether and Folio, rebuilt from the NOURI project audit,
+graduated after the third.
 
 Each has a documentation page under `/docs/<name>` and stories under
 `Experimental/*`. Deleting a rejected prototype means deleting its folder and its

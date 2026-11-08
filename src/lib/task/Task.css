@@ -1,0 +1,183 @@
+.zg-task {
+    --zg-task-accent: #c6f24e;
+    --zg-task-line: color-mix(in srgb, currentColor 14%, transparent);
+    --zg-task-muted: color-mix(in srgb, currentColor 60%, transparent);
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--zg-task-line);
+    list-style: none;
+}
+
+.zg-task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+}
+
+.zg-task-check {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin: 2px 0 0;
+    border: 2px solid color-mix(in srgb, currentColor 34%, transparent);
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+}
+
+.zg-task-check::before {
+    content: "";
+    width: 10px;
+    height: 6px;
+    border-bottom: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    transform: translateY(-1px) rotate(-45deg) scale(0);
+    transition: transform 0.16s ease;
+}
+
+.zg-task-check:checked {
+    border-color: var(--zg-task-accent);
+    background: var(--zg-task-accent);
+    color: #0b0d10;
+}
+
+.zg-task-check:checked::before {
+    transform: translateY(-1px) rotate(-45deg) scale(1);
+}
+
+.zg-task-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 8px;
+    row-gap: 3px;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+}
+
+button.zg-task-summary {
+    cursor: pointer;
+}
+
+.zg-task-title {
+    grid-column: 1;
+    overflow-wrap: anywhere;
+    font-weight: 600;
+}
+
+.zg-task[data-done] .zg-task-title {
+    color: var(--zg-task-muted);
+    text-decoration: line-through;
+}
+
+.zg-task-meta {
+    grid-column: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 0;
+    color: var(--zg-task-muted);
+    font-size: 0.86em;
+}
+
+.zg-task-meta > * + *::before {
+    content: "·";
+    margin-inline: 7px;
+    opacity: 0.7;
+}
+
+.zg-task-chevron {
+    grid-column: 2;
+    grid-row: 1;
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+    border-right: 2px solid var(--zg-task-muted);
+    border-bottom: 2px solid var(--zg-task-muted);
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+}
+
+.zg-task[data-expanded] .zg-task-chevron {
+    transform: translateY(3px) rotate(-135deg);
+}
+
+.zg-task-actions {
+    display: flex;
+    flex: none;
+    gap: 6px;
+}
+
+.zg-task-panel {
+    display: grid;
+    gap: 12px;
+    padding: 4px 0 2px 30px;
+}
+
+.zg-task-panel[hidden] {
+    display: none;
+}
+
+.zg-task :focus-visible {
+    outline: 2px solid var(--zg-task-accent);
+    outline-offset: 2px;
+}
+
+.zg-task[data-variant="pixel"] .zg-task-check::before {
+    width: 8px;
+    height: 8px;
+    border: 0;
+    background: currentColor;
+    transform: scale(0);
+    transition: transform 0.12s steps(2, end);
+}
+
+.zg-task[data-variant="pixel"] .zg-task-check:checked::before {
+    transform: scale(1);
+}
+
+.zg-task[data-variant="pixel"] .zg-task-meta {
+    font-family: var(--zg-font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+    font-size: 0.78em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.zg-task[data-variant="pixel"] .zg-task-meta > * + *::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin: 0 8px 1px;
+    background: currentColor;
+}
+
+.zg-task[data-variant="pixel"][data-expanded] {
+    box-shadow: inset 2px 0 0 var(--zg-task-accent);
+}
+
+.zg-task[data-variant="classic"] {
+    border-radius: 12px;
+}
+
+.zg-task[data-variant="classic"] .zg-task-check {
+    border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-task .zg-task-check::before,
+    .zg-task .zg-task-chevron {
+        transition: none;
+    }
+}

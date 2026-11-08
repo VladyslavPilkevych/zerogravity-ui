@@ -1,0 +1,62 @@
+.zg-ascender {
+    --zg-ascender-travel: 110%;
+}
+
+.zg-ascender-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.zg-ascender-mask {
+    display: inline-block;
+    overflow: hidden;
+    padding-block: 0.12em;
+    margin-block: -0.12em;
+    vertical-align: top;
+}
+
+.zg-ascender-word {
+    display: inline-block;
+    transition: transform var(--zg-ascender-duration) var(--zg-ascender-easing);
+    transition-delay: calc(
+        var(--zg-ascender-delay) + var(--zg-ascender-index) * var(--zg-ascender-stagger)
+    );
+}
+
+.zg-ascender[data-state="hidden"] .zg-ascender-word {
+    transform: translate3d(0, var(--zg-ascender-travel), 0);
+}
+
+.zg-ascender[data-trigger="mount"] .zg-ascender-word {
+    animation: zg-ascender-rise var(--zg-ascender-duration) var(--zg-ascender-easing) both;
+    animation-delay: calc(
+        var(--zg-ascender-delay) + var(--zg-ascender-index) * var(--zg-ascender-stagger)
+    );
+}
+
+@keyframes zg-ascender-rise {
+    from {
+        transform: translate3d(0, var(--zg-ascender-travel), 0);
+    }
+}
+
+@media (scripting: none) {
+    .zg-ascender[data-state="hidden"] .zg-ascender-word {
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zg-ascender:not([data-motion="always"]) .zg-ascender-word {
+        transform: none;
+        transition: none;
+        animation: none;
+    }
+}

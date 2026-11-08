@@ -8,7 +8,7 @@ import { getPath } from "@/playground/panel/path"
 import "@/playground/playground.css"
 import "@/playground/experimental/experimental.css"
 
-import { PREVIEWS } from "../previews"
+import { PRELOADS, PREVIEWS } from "../previews"
 import { propsFor } from "../props"
 import { snippetFor } from "../snippet"
 import type { DocEntry } from "../types"
@@ -34,6 +34,7 @@ export function ComponentDocs({ entry }: { entry: DocEntry }) {
     const code = useMemo(() => snippetFor(entry, state.config), [entry, state.config])
 
     const Preview = PREVIEWS[entry.slug]
+    const Preload = PRELOADS[entry.slug]
     const preview = entry.preview ?? {}
     const hasControls = entry.controls.some((group) => group.controls.length > 0)
 
@@ -167,6 +168,7 @@ export function ComponentDocs({ entry }: { entry: DocEntry }) {
                     </p>
                 ) : null}
             </section>
+            {Preload ? <Preload /> : null}
         </article>
     )
 }

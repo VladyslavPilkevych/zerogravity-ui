@@ -2,7 +2,8 @@
 
 import { useRef, type CSSProperties, type ReactNode } from "react"
 
-import { cx, useMediaQuery, usePrefersReducedMotion } from "../internal"
+import { cx, useMediaQuery, usePauseOffscreen, usePrefersReducedMotion } from "../internal"
+import "../internal/offscreen.css"
 import { Flyers } from "./Flyers"
 import { useLocalHour } from "./clock"
 import {
@@ -135,6 +136,7 @@ export function Meadow({
     const look = MEADOW_THEMES[active] ?? MEADOW_THEMES.day
     const arc = look.arc && local !== null ? orbSpot(local, bounds) : (look.orbAt ?? null)
     const still = !animated || (respectReducedMotion && reduced)
+    usePauseOffscreen(rootRef, !still)
     const shows = (part: MeadowScenePart) =>
         !look.forbid.includes(part) && (scene?.[part] ?? !look.quiet.includes(part))
 

@@ -26,7 +26,7 @@
     top: 0;
     left: 0;
     pointer-events: none;
-    will-change: transform;
+    will-change: translate;
 }
 
 .trailing-cursor-dot {
@@ -35,6 +35,17 @@
     margin: calc(var(--tc-dot-size, 6px) / -2) 0 0 calc(var(--tc-dot-size, 6px) / -2);
     border-radius: 50%;
     background: var(--tc-dot);
+    scale: 1;
+    transition: scale 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: translate, scale;
+}
+
+.trailing-cursor[data-hovering="true"] .trailing-cursor-dot {
+    scale: var(--tc-dot-hover-scale, 1);
+}
+
+.trailing-cursor[data-pressed="true"] .trailing-cursor-dot {
+    scale: var(--tc-dot-press-scale, 1);
 }
 
 .trailing-cursor-ring-shape {
@@ -75,9 +86,31 @@
     cursor: none !important;
 }
 
+.trailing-cursor-keep-text
+    :is(
+        textarea,
+        input:not(
+            [type="button"],
+            [type="submit"],
+            [type="reset"],
+            [type="checkbox"],
+            [type="radio"],
+            [type="range"],
+            [type="color"],
+            [type="file"],
+            [type="image"],
+            [type="hidden"]
+        ),
+        [contenteditable]:not([contenteditable="false"]),
+        [contenteditable]:not([contenteditable="false"]) *
+    ) {
+    cursor: auto !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .trailing-cursor-ring-shape,
     .trailing-cursor-label,
+    .trailing-cursor-dot,
     .trailing-cursor {
         transition: none;
     }

@@ -66,6 +66,8 @@ jobs:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: pnpm
             - run: pnpm install --frozen-lockfile
+            # the React 18 consumer hydrates its page in a real browser
+            - run: pnpm exec playwright install chromium --with-deps
             - run: pnpm test:consumer
 
     playground:

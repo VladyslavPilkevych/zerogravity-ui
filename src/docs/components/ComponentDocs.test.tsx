@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest"
 import { findComponent } from "../registry"
 import { ComponentDocs } from "./ComponentDocs"
 
-vi.mock("../previews", () => ({ PREVIEWS: {} }))
+vi.mock("../previews", () => ({ PREVIEWS: {}, PRELOADS: {} }))
 
 const raster = findComponent("raster")!
 const reel = findComponent("reel")!

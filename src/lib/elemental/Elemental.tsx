@@ -2,7 +2,8 @@
 
 import { useId, useMemo, useRef, type CSSProperties, type ReactNode } from "react"
 
-import { cx, useMediaQuery, usePrefersReducedMotion } from "../internal"
+import { cx, useMediaQuery, usePauseOffscreen, usePrefersReducedMotion } from "../internal"
+import "../internal/offscreen.css"
 import { useEdgeCursor } from "./useEdgeCursor"
 import { useEdgeBox, type EdgeBox } from "./useEdgeBox"
 import { clamp, specFor, type ElementalVariant, type VariantSpec } from "./variants"
@@ -391,6 +392,7 @@ export function Elemental({
     const fine = useMediaQuery("(pointer: fine)")
 
     const still = disabled || (respectReducedMotion && reduced)
+    usePauseOffscreen(rootRef, !still)
     const spec = specFor(variant)
     const power = clamp(intensity, 0, 2)
     const rate = clamp(speed, 0.1, 4)

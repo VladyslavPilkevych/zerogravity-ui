@@ -1,8 +1,9 @@
 "use client"
 
-import type { CSSProperties } from "react"
+import { useRef, type CSSProperties } from "react"
 
-import { cx } from "../../internal"
+import { cx, usePauseOffscreen } from "../../internal"
+import "../../internal/offscreen.css"
 import { HEART_COLS, HEART_PIXELS } from "./heartMap"
 import { beatOf, gapOf, loaderAria, useLoaderStill, type LoaderCommon } from "./shared"
 import "./loaders.css"
@@ -26,10 +27,13 @@ export function PixelHeart({
     className,
     style,
 }: PixelHeartProps) {
+    const rootRef = useRef<HTMLDivElement>(null)
     const still = useLoaderStill(paused, respectReducedMotion)
+    usePauseOffscreen(rootRef, !still)
 
     return (
         <div
+            ref={rootRef}
             className={cx("xp-loader", "xp-heart", still && "xp-loader-still", className)}
             data-variant={variant}
             style={

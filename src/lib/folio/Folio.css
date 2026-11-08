@@ -1,0 +1,196 @@
+@property --zg-folio-at {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+}
+
+.zg-folio {
+    --zg-folio-stack-height: 200px;
+    --zg-folio-accent: currentColor;
+    --zg-folio-share: calc((var(--zg-folio-grow) - 1) / var(--zg-folio-grow));
+    width: 100%;
+    transition: --zg-folio-at var(--zg-folio-duration) var(--zg-folio-easing);
+}
+
+.zg-folio[data-still] {
+    transition: none;
+}
+
+.zg-folio-list {
+    --zg-folio-at: inherit;
+    position: relative;
+    height: var(--zg-folio-height);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+}
+
+/*
+ * Every panel is as wide as the open one. One animated number, the open
+ * position, decides how far each panel sits and how much of it shows, so the
+ * gaps cannot drift apart however often the pointer changes its mind. Lengths
+ * are percentages of the panel's own width, which keeps every frame free of
+ * layout work.
+ */
+.zg-folio-panel {
+    --zg-folio-at: inherit;
+    --zg-folio-near: max(
+        var(--zg-folio-index) - var(--zg-folio-at),
+        var(--zg-folio-at) - var(--zg-folio-index)
+    );
+    --zg-folio-open: clamp(0, 1 - var(--zg-folio-near), 1);
+    --zg-folio-hide: calc(100% * var(--zg-folio-share) * (1 - var(--zg-folio-open)));
+    --zg-folio-visible: calc(100% - var(--zg-folio-hide));
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: calc(
+        (100% - var(--zg-folio-gap) * (var(--zg-folio-count) - 1)) * var(--zg-folio-grow) /
+            (var(--zg-folio-count) - 1 + var(--zg-folio-grow))
+    );
+    outline: none;
+    translate: calc(
+            var(--zg-folio-index) * (100% / var(--zg-folio-grow) + var(--zg-folio-gap)) + 100% *
+                var(--zg-folio-share) * clamp(0, var(--zg-folio-index) - var(--zg-folio-at), 1)
+        )
+        0;
+    clip-path: inset(0 var(--zg-folio-hide) 0 0 round var(--zg-folio-radius));
+}
+
+.zg-folio-media {
+    position: absolute;
+    inset: 0;
+    translate: calc(var(--zg-folio-hide) / -2) 0;
+}
+
+.zg-folio-media > img,
+.zg-folio-media > video,
+.zg-folio-media > picture,
+.zg-folio-media > div {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.zg-folio-media > picture > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.zg-folio-content {
+    position: absolute;
+    inset: 0;
+}
+
+.zg-folio-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0 var(--zg-folio-hide) 0 0;
+    display: none;
+    border-radius: var(--zg-folio-radius);
+    box-shadow: inset 0 0 0 2px currentColor;
+    pointer-events: none;
+}
+
+.zg-folio-panel:focus-visible::after {
+    display: block;
+}
+
+.zg-folio[data-variant="pixel"] .zg-folio-panel {
+    --zg-folio-n: var(--zg-folio-radius);
+    --zg-folio-r: calc(100% - var(--zg-folio-hide));
+    clip-path: polygon(
+        calc(var(--zg-folio-n) * 2) 0,
+        calc(var(--zg-folio-r) - var(--zg-folio-n) * 2) 0,
+        calc(var(--zg-folio-r) - var(--zg-folio-n) * 2) var(--zg-folio-n),
+        calc(var(--zg-folio-r) - var(--zg-folio-n)) var(--zg-folio-n),
+        calc(var(--zg-folio-r) - var(--zg-folio-n)) calc(var(--zg-folio-n) * 2),
+        var(--zg-folio-r) calc(var(--zg-folio-n) * 2),
+        var(--zg-folio-r) calc(100% - var(--zg-folio-n) * 2),
+        calc(var(--zg-folio-r) - var(--zg-folio-n)) calc(100% - var(--zg-folio-n) * 2),
+        calc(var(--zg-folio-r) - var(--zg-folio-n)) calc(100% - var(--zg-folio-n)),
+        calc(var(--zg-folio-r) - var(--zg-folio-n) * 2) calc(100% - var(--zg-folio-n)),
+        calc(var(--zg-folio-r) - var(--zg-folio-n) * 2) 100%,
+        calc(var(--zg-folio-n) * 2) 100%,
+        calc(var(--zg-folio-n) * 2) calc(100% - var(--zg-folio-n)),
+        var(--zg-folio-n) calc(100% - var(--zg-folio-n)),
+        var(--zg-folio-n) calc(100% - var(--zg-folio-n) * 2),
+        0 calc(100% - var(--zg-folio-n) * 2),
+        0 calc(var(--zg-folio-n) * 2),
+        var(--zg-folio-n) calc(var(--zg-folio-n) * 2),
+        var(--zg-folio-n) var(--zg-folio-n),
+        calc(var(--zg-folio-n) * 2) var(--zg-folio-n)
+    );
+}
+
+.zg-folio[data-variant="pixel"] .zg-folio-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--zg-folio-accent);
+    opacity: var(--zg-folio-open);
+    pointer-events: none;
+    clip-path: polygon(
+        evenodd,
+        0 0,
+        var(--zg-folio-r) 0,
+        var(--zg-folio-r) 100%,
+        0 100%,
+        0 0,
+        2px 2px,
+        2px calc(100% - 2px),
+        calc(var(--zg-folio-r) - 2px) calc(100% - 2px),
+        calc(var(--zg-folio-r) - 2px) 2px,
+        2px 2px
+    );
+}
+
+.zg-folio[data-variant="pixel"] .zg-folio-panel::after {
+    border-radius: 0;
+    box-shadow:
+        inset 0 0 0 2px currentColor,
+        inset 0 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.zg-folio[data-layout="stack"] .zg-folio-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--zg-folio-gap);
+    height: auto;
+    overflow: visible;
+}
+
+.zg-folio[data-layout="stack"] .zg-folio-panel {
+    --zg-folio-hide: 0%;
+    --zg-folio-open: 1;
+    position: relative;
+    width: auto;
+    height: var(--zg-folio-stack-height);
+    translate: none;
+}
+
+.zg-folio[data-variant="pixel"][data-layout="stack"] .zg-folio-panel::before {
+    opacity: 0;
+}
+
+@media (max-width: 599px) {
+    .zg-folio:not([data-layout]) .zg-folio-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--zg-folio-gap);
+        height: auto;
+        overflow: visible;
+    }
+
+    .zg-folio:not([data-layout]) .zg-folio-panel {
+        --zg-folio-hide: 0%;
+        position: relative;
+        width: auto;
+        height: var(--zg-folio-stack-height);
+        translate: none;
+    }
+}

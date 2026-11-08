@@ -20,14 +20,39 @@ export type {
 export { Aperture } from "./aperture"
 export type { ApertureDirection, ApertureProps } from "./aperture"
 
+export { Ascender } from "./ascender"
+export type { AscenderElement, AscenderProps, AscenderTrigger } from "./ascender"
+
 export { Bezel } from "./bezel"
 export type { BezelElement, BezelProps } from "./bezel"
 
 export { Bitmap, BITMAP_CHARACTERS } from "./bitmap"
 export type { BitmapEffect, BitmapElement, BitmapProps } from "./bitmap"
 
+export { Calendar, CalendarEvent, useCalendar } from "./calendar"
+export type {
+    CalendarDayInfo,
+    CalendarEventProps,
+    CalendarHeaderProps,
+    CalendarItem,
+    CalendarProps,
+    CalendarRenderInfo,
+    CalendarVariant,
+    CalendarView,
+    UseCalendar,
+} from "./calendar"
+
+export { Checklist } from "./checklist"
+export type { ChecklistItem, ChecklistProps, ChecklistVariant } from "./checklist"
+
 export { Chroma, CHROMA_COLORS } from "./chroma"
 export type { ChromaProps } from "./chroma"
+
+export { Clock } from "./clock"
+export type { ClockProps, ClockShow, ClockVariant } from "./clock"
+
+export { Detent } from "./detent"
+export type { DetentOption, DetentProps, DetentVariant } from "./detent"
 
 export { Diorama } from "./diorama"
 export type { DioramaPlane, DioramaProps } from "./diorama"
@@ -47,11 +72,20 @@ export type { EclipseFrom, EclipseProps, EclipseSectionProps } from "./eclipse"
 export { Elemental, ELEMENTAL_VARIANTS } from "./elemental"
 export type { ElementalProps, ElementalVariant } from "./elemental"
 
+export { Folio, FolioPanel } from "./folio"
+export type { FolioPanelProps, FolioProps, FolioVariant } from "./folio"
+
+export { Frost } from "./frost"
+export type { FrostElement, FrostProps, FrostTone, FrostVariant } from "./frost"
+
 export { Gantry } from "./gantry"
 export type { GantryEasing, GantryProps } from "./gantry"
 
 export { Gnomon } from "./gnomon"
 export type { GnomonProps } from "./gnomon"
+
+export { Halo } from "./halo"
+export type { HaloDirection, HaloProps } from "./halo"
 
 export { GridTrail, GRID_TRAIL_DEFAULTS } from "./grid-trail"
 export type { GridTrailOptions, GridTrailProps, GridTrailShape } from "./grid-trail"
@@ -111,6 +145,9 @@ export type { PeelCorner, PeelProps } from "./peel"
 export { Phosphor } from "./phosphor"
 export type { PhosphorProps } from "./phosphor"
 
+export { Progress } from "./progress"
+export type { ProgressFormat, ProgressProps, ProgressVariant } from "./progress"
+
 export { Reel } from "./reel"
 export type { ReelHandle, ReelProps } from "./reel"
 
@@ -119,6 +156,9 @@ export type { RicochetMode, RicochetProps, RicochetVariant } from "./ricochet"
 
 export { ScrollStack } from "./scroll-stack"
 export type { ScrollStackProps, StackEasing } from "./scroll-stack"
+
+export { Sash } from "./sash"
+export type { SashDirection, SashProps, SashVariant } from "./sash"
 
 export { Seam } from "./seam"
 export type { SeamPattern, SeamProps } from "./seam"
@@ -134,6 +174,12 @@ export type { StencilFill, StencilHover, StencilProps } from "./stencil"
 
 export { Tag, TAG_STATUSES } from "./tag"
 export type { TagProps, TagStatus } from "./tag"
+
+export { Tether } from "./tether"
+export type { TetherFit, TetherLinecap, TetherProps, TetherVariant } from "./tether"
+
+export { Task } from "./task"
+export type { TaskElement, TaskProps, TaskVariant } from "./task"
 
 export { TesseraProvider, useTessera, useTesseraPhase } from "./tessera"
 export type {

@@ -1,7 +1,9 @@
+import { readFileSync } from "node:fs"
+
 import { describe, expect, it } from "vitest"
 
 import { COMPONENT_SLUGS } from "../../e2e/routes.data"
-import { PREVIEWS } from "./previews"
+import { PRELOADS, PREVIEWS } from "./previews"
 import { COMPONENTS, groupByCategory, REPOSITORY_URL, sidebarIndex } from "./registry"
 import { DOC_CATEGORIES } from "./types"
 
@@ -31,6 +33,15 @@ describe("the component registry", () => {
                 slug,
             ).toBe(true)
         }
+    })
+
+    it("renders previews through React.lazy and preloads the same chunks", () => {
+        const source = readFileSync("src/docs/previews.tsx", "utf8")
+        const previews = source.slice(source.indexOf("PREVIEWS"), source.indexOf("PRELOADS"))
+
+        expect(previews).not.toMatch(/dynamic\(/)
+        expect(previews.match(/lazy\(/g)).toHaveLength(Object.keys(PREVIEWS).length)
+        expect(Object.keys(PRELOADS)).toEqual(Object.keys(PREVIEWS))
     })
 
     it("only uses declared categories", () => {

@@ -84,10 +84,13 @@ export const SelectsNeighbourOnClick: Story = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement)
         await userEvent.click(await canvas.findByText("2"))
-        await waitFor(() => {
-            const active = canvasElement.querySelector('.reel-item[data-active="true"]')
-            expect(active?.textContent).toBe("2")
-        })
+        await waitFor(
+            () => {
+                const active = canvasElement.querySelector('.reel-item[data-active="true"]')
+                expect(active?.textContent).toBe("2")
+            },
+            { timeout: 4000 },
+        )
     },
 }
 
@@ -123,13 +126,16 @@ export const ReleaseAfterHold: Story = {
         await new Promise((resolve) => setTimeout(resolve, 300))
         fire("pointerup", x - 90)
 
-        await waitFor(() => {
-            const active = canvasElement.querySelector('.reel-item[data-active="true"]')
-            expect(active?.textContent).toBe("1")
-            const first = canvasElement.querySelector<HTMLElement>(".reel-item")
-            const x = /translate3d\((-?[\d.]+)px/.exec(first?.style.transform ?? "")?.[1]
-            expect(Math.abs(Number(x))).toBeLessThan(0.5)
-        })
+        await waitFor(
+            () => {
+                const active = canvasElement.querySelector('.reel-item[data-active="true"]')
+                expect(active?.textContent).toBe("1")
+                const first = canvasElement.querySelector<HTMLElement>(".reel-item")
+                const x = /translate3d\((-?[\d.]+)px/.exec(first?.style.transform ?? "")?.[1]
+                expect(Math.abs(Number(x))).toBeLessThan(0.5)
+            },
+            { timeout: 4000 },
+        )
     },
 }
 

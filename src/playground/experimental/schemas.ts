@@ -350,6 +350,7 @@ export const DIORAMA_DEFAULTS = {
     parallax: 46,
     blur: 7,
     perspective: 1200,
+    tilt: 0,
     ease: 0.11,
 }
 
@@ -365,7 +366,7 @@ export const DIORAMA_EXAMPLES: { id: DioramaExample; label: string; hint: string
 export const DIORAMA_PRESET_VALUES: Record<DioramaExample, Record<string, unknown>> = {
     product: { example: "product" },
     editorial: { example: "editorial", parallax: 32, blur: 5 },
-    poster: { example: "poster", parallax: 64, blur: 4 },
+    poster: { example: "poster", parallax: 64, blur: 4, tilt: 6 },
     frame: { example: "frame", parallax: 56, blur: 10 },
 }
 
@@ -403,6 +404,7 @@ export const DIORAMA_CONTROLS: ControlGroup[] = [
                 step: 50,
                 unit: "px",
             },
+            { kind: "number", path: "tilt", label: "Tilt", min: 0, max: 20, step: 1, unit: "°" },
             { kind: "number", path: "ease", label: "Ease", min: 0.02, max: 1, step: 0.02 },
         ],
     },
@@ -1970,5 +1972,340 @@ export const MENISCUS_CONTROLS: ControlGroup[] = [
             { kind: "colorNullable", path: "colorTo", label: "Gradient to" },
             { kind: "boolean", path: "showValue", label: "Show the number" },
         ],
+    },
+]
+
+export const ASCENDER_DEFAULTS = {
+    text: "Every word arrives on its own beat",
+    trigger: "view",
+    replay: false,
+    stagger: 60,
+    duration: 900,
+    delay: 0,
+}
+
+export const ASCENDER_CONTROLS: ControlGroup[] = [
+    {
+        id: "line",
+        title: "Line",
+        hint: "split into words on ordinary spaces",
+        open: true,
+        controls: [
+            { kind: "text", path: "text", label: "Text", maxLength: 90 },
+            { kind: "select", path: "trigger", label: "Trigger", options: ["view", "mount"] },
+            { kind: "boolean", path: "replay", label: "Replay on re-entry" },
+        ],
+    },
+    {
+        id: "timing",
+        title: "Timing",
+        hint: "per word, then between words",
+        open: true,
+        controls: [
+            {
+                kind: "number",
+                path: "duration",
+                label: "Rise",
+                min: 200,
+                max: 2000,
+                step: 50,
+                unit: "ms",
+            },
+            {
+                kind: "number",
+                path: "stagger",
+                label: "Stagger",
+                min: 0,
+                max: 300,
+                step: 10,
+                unit: "ms",
+            },
+            {
+                kind: "number",
+                path: "delay",
+                label: "Delay",
+                min: 0,
+                max: 1500,
+                step: 50,
+                unit: "ms",
+            },
+        ],
+    },
+]
+
+export const FROST_DEFAULTS = {
+    tone: "light",
+    variant: "blur",
+    blur: 12,
+    radius: 20,
+    border: true,
+    shadow: true,
+}
+
+export const FROST_CONTROLS: ControlGroup[] = [
+    {
+        id: "glass",
+        title: "Glass",
+        hint: "blur only, never saturate",
+        open: true,
+        controls: [
+            { kind: "select", path: "tone", label: "Tone", options: ["light", "dark"] },
+            { kind: "select", path: "variant", label: "Variant", options: ["blur", "tint"] },
+            { kind: "number", path: "blur", label: "Blur", min: 0, max: 40, step: 1, unit: "px" },
+        ],
+    },
+    {
+        id: "shape",
+        title: "Shape",
+        hint: "edge, corners and lift",
+        open: true,
+        controls: [
+            {
+                kind: "number",
+                path: "radius",
+                label: "Radius",
+                min: 0,
+                max: 48,
+                step: 1,
+                unit: "px",
+            },
+            { kind: "boolean", path: "border", label: "Light edge" },
+            { kind: "boolean", path: "shadow", label: "Shadow" },
+        ],
+    },
+]
+
+export const HALO_DEFAULTS = {
+    text: "Scroll to explore",
+    repeat: 2,
+    separator: " • ",
+    size: 200,
+    spin: true,
+    duration: 20,
+    direction: "clockwise",
+    paused: false,
+    pauseOnHover: false,
+}
+
+export const HALO_CONTROLS: ControlGroup[] = [
+    {
+        id: "ring",
+        title: "Ring",
+        hint: "an equal slice of the turn per character",
+        open: true,
+        controls: [
+            { kind: "text", path: "text", label: "Text", maxLength: 40 },
+            { kind: "number", path: "repeat", label: "Repeat", min: 1, max: 6, step: 1 },
+            { kind: "text", path: "separator", label: "Separator", maxLength: 6 },
+            {
+                kind: "number",
+                path: "size",
+                label: "Size",
+                min: 120,
+                max: 360,
+                step: 10,
+                unit: "px",
+            },
+        ],
+    },
+    {
+        id: "turn",
+        title: "Turn",
+        hint: "one compositor rotation",
+        open: true,
+        controls: [
+            { kind: "boolean", path: "spin", label: "Spin" },
+            {
+                kind: "number",
+                path: "duration",
+                label: "Seconds per turn",
+                min: 4,
+                max: 60,
+                step: 1,
+                unit: "s",
+            },
+            {
+                kind: "select",
+                path: "direction",
+                label: "Direction",
+                options: ["clockwise", "counterclockwise"],
+            },
+            { kind: "boolean", path: "paused", label: "Paused" },
+            { kind: "boolean", path: "pauseOnHover", label: "Pause on hover" },
+        ],
+    },
+]
+
+export const SASH_DEFAULTS = {
+    variant: "pixel",
+    speed: 60,
+    direction: "left",
+    gap: 40,
+    pauseOnHover: true,
+    fade: false,
+    paused: false,
+}
+
+export const SASH_CONTROLS: ControlGroup[] = [
+    {
+        id: "band",
+        title: "Band",
+        hint: "constant speed, whatever the content",
+        open: true,
+        controls: [
+            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            {
+                kind: "number",
+                path: "speed",
+                label: "Speed",
+                min: 10,
+                max: 240,
+                step: 5,
+                unit: "px/s",
+            },
+            { kind: "select", path: "direction", label: "Direction", options: ["left", "right"] },
+            { kind: "number", path: "gap", label: "Gap", min: 0, max: 120, step: 4, unit: "px" },
+            { kind: "boolean", path: "fade", label: "Fade the edges" },
+        ],
+    },
+    {
+        id: "pausing",
+        title: "Pausing",
+        hint: "keyboard focus always pauses",
+        open: true,
+        controls: [
+            { kind: "boolean", path: "pauseOnHover", label: "Pause on hover" },
+            { kind: "boolean", path: "paused", label: "Paused" },
+        ],
+    },
+]
+
+export const DETENT_DEFAULTS = {
+    variant: "pixel",
+    fullWidth: false,
+    disabled: false,
+}
+
+export const DETENT_CONTROLS: ControlGroup[] = [
+    {
+        id: "layout",
+        title: "Layout",
+        hint: "equal segments, native radios",
+        open: true,
+        controls: [
+            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            { kind: "boolean", path: "fullWidth", label: "Full width" },
+            { kind: "boolean", path: "disabled", label: "Disabled" },
+        ],
+    },
+]
+
+export const TETHER_DEFAULTS = {
+    variant: "pixel",
+    fit: "contain",
+    start: 0.9,
+    end: 0.5,
+    strokeWidth: 2,
+}
+
+export const TETHER_CONTROLS: ControlGroup[] = [
+    {
+        id: "path",
+        title: "Path",
+        hint: "a non-scaling stroke, measured on screen",
+        open: true,
+        controls: [
+            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            { kind: "select", path: "fit", label: "Fit", options: ["contain", "stretch"] },
+            {
+                kind: "number",
+                path: "strokeWidth",
+                label: "Stroke",
+                min: 1,
+                max: 10,
+                step: 0.5,
+                unit: "px",
+            },
+        ],
+    },
+    {
+        id: "scroll",
+        title: "Scroll window",
+        hint: "fractions of the viewport height",
+        open: true,
+        controls: [
+            { kind: "number", path: "start", label: "Starts at", min: 0.2, max: 1.2, step: 0.05 },
+            { kind: "number", path: "end", label: "Ends at", min: -0.2, max: 0.9, step: 0.05 },
+        ],
+    },
+]
+
+export const FOLIO_DEFAULTS = {
+    variant: "pixel",
+    height: 420,
+    gap: 12,
+    grow: 3,
+    duration: 650,
+    disabled: false,
+}
+
+export const FOLIO_CONTROLS: ControlGroup[] = [
+    {
+        id: "strip",
+        title: "Strip",
+        hint: "panels keep their size; they only move",
+        open: true,
+        controls: [
+            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            {
+                kind: "number",
+                path: "height",
+                label: "Height",
+                min: 240,
+                max: 600,
+                step: 10,
+                unit: "px",
+            },
+            { kind: "number", path: "gap", label: "Gap", min: 0, max: 32, step: 1, unit: "px" },
+            { kind: "number", path: "grow", label: "Open width", min: 1.5, max: 6, step: 0.1 },
+        ],
+    },
+    {
+        id: "motion",
+        title: "Motion",
+        hint: "translate and clip, never width",
+        open: true,
+        controls: [
+            {
+                kind: "number",
+                path: "duration",
+                label: "Duration",
+                min: 150,
+                max: 1500,
+                step: 50,
+                unit: "ms",
+            },
+            { kind: "boolean", path: "disabled", label: "Hold the open panel" },
+        ],
+    },
+]
+
+export const STYLE_PRESETS = [
+    {
+        id: "pixel",
+        label: "Pixel",
+        hint: "square, stepped, block accents",
+        values: { variant: "pixel" },
+    },
+    { id: "classic", label: "Classic", hint: "smooth and rounded", values: { variant: "classic" } },
+]
+
+export const FROST_PRESETS = [
+    { id: "blur", label: "Blur", hint: "a backdrop blur pass", values: { variant: "blur" } },
+    {
+        id: "tint",
+        label: "Tint",
+        hint: "no backdrop pass, denser fill",
+        values: { variant: "tint" },
     },
 ]

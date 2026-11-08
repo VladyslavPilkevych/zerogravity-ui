@@ -7,6 +7,7 @@ export type DocCategory =
     | "Scroll"
     | "Typography"
     | "Media"
+    | "Planning"
     | "Interface"
     | "Loading & transitions"
 
@@ -18,6 +19,7 @@ export const DOC_CATEGORIES: readonly DocCategory[] = [
     "Scroll",
     "Typography",
     "Media",
+    "Planning",
     "Interface",
     "Loading & transitions",
 ]

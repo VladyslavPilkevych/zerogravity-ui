@@ -41,6 +41,10 @@
             "types": "./dist/aperture/index.d.ts",
             "import": "./dist/aperture/index.js"
         },
+        "./ascender": {
+            "types": "./dist/ascender/index.d.ts",
+            "import": "./dist/ascender/index.js"
+        },
         "./bezel": {
             "types": "./dist/bezel/index.d.ts",
             "import": "./dist/bezel/index.js"
@@ -49,9 +53,25 @@
             "types": "./dist/bitmap/index.d.ts",
             "import": "./dist/bitmap/index.js"
         },
+        "./calendar": {
+            "types": "./dist/calendar/index.d.ts",
+            "import": "./dist/calendar/index.js"
+        },
+        "./checklist": {
+            "types": "./dist/checklist/index.d.ts",
+            "import": "./dist/checklist/index.js"
+        },
         "./chroma": {
             "types": "./dist/chroma/index.d.ts",
             "import": "./dist/chroma/index.js"
+        },
+        "./clock": {
+            "types": "./dist/clock/index.d.ts",
+            "import": "./dist/clock/index.js"
+        },
+        "./detent": {
+            "types": "./dist/detent/index.d.ts",
+            "import": "./dist/detent/index.js"
         },
         "./diorama": {
             "types": "./dist/diorama/index.d.ts",
@@ -69,6 +89,14 @@
             "types": "./dist/elemental/index.d.ts",
             "import": "./dist/elemental/index.js"
         },
+        "./folio": {
+            "types": "./dist/folio/index.d.ts",
+            "import": "./dist/folio/index.js"
+        },
+        "./frost": {
+            "types": "./dist/frost/index.d.ts",
+            "import": "./dist/frost/index.js"
+        },
         "./gantry": {
             "types": "./dist/gantry/index.d.ts",
             "import": "./dist/gantry/index.js"
@@ -80,6 +108,10 @@
         "./grid-trail": {
             "types": "./dist/grid-trail/index.d.ts",
             "import": "./dist/grid-trail/index.js"
+        },
+        "./halo": {
+            "types": "./dist/halo/index.d.ts",
+            "import": "./dist/halo/index.js"
         },
         "./kern": {
             "types": "./dist/kern/index.d.ts",
@@ -129,6 +161,10 @@
             "types": "./dist/pointer-fx/index.d.ts",
             "import": "./dist/pointer-fx/index.js"
         },
+        "./progress": {
+            "types": "./dist/progress/index.d.ts",
+            "import": "./dist/progress/index.js"
+        },
         "./reel": {
             "types": "./dist/reel/index.d.ts",
             "import": "./dist/reel/index.js"
@@ -136,6 +172,10 @@
         "./ricochet": {
             "types": "./dist/ricochet/index.d.ts",
             "import": "./dist/ricochet/index.js"
+        },
+        "./sash": {
+            "types": "./dist/sash/index.d.ts",
+            "import": "./dist/sash/index.js"
         },
         "./scroll-stack": {
             "types": "./dist/scroll-stack/index.d.ts",
@@ -161,9 +201,17 @@
             "types": "./dist/tag/index.d.ts",
             "import": "./dist/tag/index.js"
         },
+        "./task": {
+            "types": "./dist/task/index.d.ts",
+            "import": "./dist/task/index.js"
+        },
         "./tessera": {
             "types": "./dist/tessera/index.d.ts",
             "import": "./dist/tessera/index.js"
+        },
+        "./tether": {
+            "types": "./dist/tether/index.d.ts",
+            "import": "./dist/tether/index.js"
         },
         "./tide": {
             "types": "./dist/tide/index.d.ts",
@@ -235,9 +283,9 @@
         "@arethetypeswrong/cli": "^0.18.5",
         "@eslint/js": "^9.39.5",
         "@playwright/test": "^1.62.1",
-        "@storybook/addon-a11y": "^10.5.8",
-        "@storybook/addon-vitest": "^10.5.8",
-        "@storybook/react-vite": "^10.5.8",
+        "@storybook/addon-a11y": "^10.6.6",
+        "@storybook/addon-vitest": "^10.6.6",
+        "@storybook/react-vite": "^10.6.6",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/jest-dom": "^7.0.0",
         "@testing-library/react": "^16.3.2",
@@ -247,26 +295,26 @@
         "@types/react-dom": "^19.1.7",
         "@types/three": "^0.185.4",
         "@vitejs/plugin-react": "^6.0.5",
-        "@vitest/browser": "^4.1.10",
-        "@vitest/browser-playwright": "^4.1.10",
+        "@vitest/browser": "^4.1.12",
+        "@vitest/browser-playwright": "^4.1.12",
         "chromatic": "^18.2.0",
         "eslint": "^9.39.5",
         "eslint-plugin-react-hooks": "^6.1.1",
         "jsdom": "^30.0.1",
         "lefthook": "^2.1.10",
-        "next": "^15.5.27",
+        "next": "^15.5.29",
         "playwright": "^1.62.1",
         "prettier": "^3.9.6",
         "publint": "^0.3.23",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
-        "storybook": "^10.5.8",
+        "storybook": "^10.6.6",
         "three": "^0.185.1",
         "tsup": "^8.5.1",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.67.0",
-        "vite": "^7.3.6",
-        "vitest": "^4.1.10"
+        "vite": "^7.3.7",
+        "vitest": "^4.1.12"
     },
     "pnpm": {
         "onlyBuiltDependencies": [
@@ -283,7 +331,9 @@
             "undici@>=8 <8.10.2": "^8.10.2",
             "brace-expansion@<1.1.20": "^1.1.20",
             "brace-expansion@>=5 <5.0.11": "^5.0.11",
-            "source-map-js@<1.2.2": "^1.2.2"
+            "source-map-js@<1.2.2": "^1.2.2",
+            "glob@>=9 <14.0.2": "^14.0.2",
+            "minimatch@>=7 <11.0.1": "^11.0.1"
         }
     }
 }

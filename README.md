@@ -119,6 +119,7 @@ last column, as well as a named export from the root.
 | ---------------------------------------- | ------------------------- | ----------------------- |
 | [Diorama](src/lib/diorama/README.md)     | Layered parallax          | `zerogravity/diorama`   |
 | [Elemental](src/lib/elemental/README.md) | Electric and fire border  | `zerogravity/elemental` |
+| [Frost](src/lib/frost/README.md)         | Glass surface             | `zerogravity/frost`     |
 | [Gnomon](src/lib/gnomon/README.md)       | Pointer light and shadows | `zerogravity/gnomon`    |
 | [Tide](src/lib/tide/README.md)           | Wavy edge                 | `zerogravity/tide`      |
 | [Vellum](src/lib/vellum/README.md)       | Flexible tilt card        | `zerogravity/vellum`    |
@@ -143,17 +144,21 @@ last column, as well as a named export from the root.
 | [Louvre](src/lib/louvre/README.md)            | Rotating blinds reveal | `zerogravity/louvre`       |
 | [Peel](src/lib/peel/README.md)                | Page peel reveal       | `zerogravity/peel`         |
 | [ScrollStack](src/lib/scroll-stack/README.md) | Stacking sections      | `zerogravity/scroll-stack` |
+| [Tether](src/lib/tether/README.md)            | Scroll-drawn path      | `zerogravity/tether`       |
 
 ### Typography
 
 | Component                                  | What it is                | Import                   |
 | ------------------------------------------ | ------------------------- | ------------------------ |
+| [Ascender](src/lib/ascender/README.md)     | Scroll text reveal        | `zerogravity/ascender`   |
 | [Bitmap](src/lib/bitmap/README.md)         | Pixel text                | `zerogravity/bitmap`     |
+| [Halo](src/lib/halo/README.md)             | Circular text             | `zerogravity/halo`       |
 | [Kern](src/lib/kern/README.md)             | Variable font hover       | `zerogravity/kern`       |
 | [Overprint](src/lib/overprint/README.md)   | Misregistered print text  | `zerogravity/overprint`  |
 | [Palimpsest](src/lib/palimpsest/README.md) | Layered draft text        | `zerogravity/palimpsest` |
 | [Phosphor](src/lib/phosphor/README.md)     | CRT text                  | `zerogravity/phosphor`   |
 | [Ricochet](src/lib/ricochet/README.md)     | Breakable pixel text game | `zerogravity/ricochet`   |
+| [Sash](src/lib/sash/README.md)             | Marquee band              | `zerogravity/sash`       |
 | [SplitFlap](src/lib/split-flap/README.md)  | Flip board text           | `zerogravity/split-flap` |
 | [Stencil](src/lib/stencil/README.md)       | Pattern-filled text       | `zerogravity/stencil`    |
 
@@ -161,18 +166,30 @@ last column, as well as a named export from the root.
 
 | Component                                  | What it is          | Import                   |
 | ------------------------------------------ | ------------------- | ------------------------ |
+| [Folio](src/lib/folio/README.md)           | Expanding panels    | `zerogravity/folio`      |
 | [Lenticular](src/lib/lenticular/README.md) | Two-image lens flip | `zerogravity/lenticular` |
 | [Reel](src/lib/reel/README.md)             | Carousel            | `zerogravity/reel`       |
 
+### Planning
+
+| Component                                | What it is                   | Import                  |
+| ---------------------------------------- | ---------------------------- | ----------------------- |
+| [Calendar](src/lib/calendar/README.md)   | Month, week and day calendar | `zerogravity/calendar`  |
+| [Checklist](src/lib/checklist/README.md) | Checklist with progress      | `zerogravity/checklist` |
+| [Task](src/lib/task/README.md)           | Expandable task row          | `zerogravity/task`      |
+
 ### Interface
 
-| Component                          | What it is            | Import               |
-| ---------------------------------- | --------------------- | -------------------- |
-| [Bezel](src/lib/bezel/README.md)   | Pixel frame           | `zerogravity/bezel`  |
-| [Dither](src/lib/dither/README.md) | Pixel hover highlight | `zerogravity/dither` |
-| [Keycap](src/lib/keycap/README.md) | Pixel button          | `zerogravity/keycap` |
-| [Seam](src/lib/seam/README.md)     | Pixel divider         | `zerogravity/seam`   |
-| [Tag](src/lib/tag/README.md)       | Status tag            | `zerogravity/tag`    |
+| Component                              | What it is            | Import                 |
+| -------------------------------------- | --------------------- | ---------------------- |
+| [Bezel](src/lib/bezel/README.md)       | Pixel frame           | `zerogravity/bezel`    |
+| [Clock](src/lib/clock/README.md)       | Date and time display | `zerogravity/clock`    |
+| [Detent](src/lib/detent/README.md)     | Segmented control     | `zerogravity/detent`   |
+| [Dither](src/lib/dither/README.md)     | Pixel hover highlight | `zerogravity/dither`   |
+| [Keycap](src/lib/keycap/README.md)     | Pixel button          | `zerogravity/keycap`   |
+| [Progress](src/lib/progress/README.md) | Progress bar          | `zerogravity/progress` |
+| [Seam](src/lib/seam/README.md)         | Pixel divider         | `zerogravity/seam`     |
+| [Tag](src/lib/tag/README.md)           | Status tag            | `zerogravity/tag`      |
 
 ### Loading & transitions
 
@@ -355,10 +372,12 @@ Do not run `pnpm build` while `pnpm dev` is running — both write to `.next`.
 `pnpm build:lib` is three steps:
 
 1. [tsup](https://tsup.egoist.dev/) in preserved-module mode — every source file
-   becomes one ESM file in `dist/`, with source maps. Nothing is bundled, which
+   becomes one unminified ESM file in `dist/`. Nothing is bundled, which
    is what keeps `"use client"` attached to the individual client modules
    instead of collapsing the whole library into one client boundary. CSS files
-   are copied next to the modules that import them.
+   are copied next to the modules that import them. No source maps ship: each
+   output file already reads like its source, with the same names, so stack
+   traces stay legible at half the tarball size.
 2. `tsc -p tsconfig.build.json` for the declarations, one per module.
 3. `scripts/declaration-extensions.mjs`, which gives the relative specifiers in
    those declarations explicit `.js` paths and drops the stylesheet imports TypeScript

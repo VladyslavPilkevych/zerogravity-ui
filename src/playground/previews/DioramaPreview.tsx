@@ -174,6 +174,7 @@ export function DioramaPreview({ config, setPreset }: PreviewApi) {
         parallax: number
         blur: number
         perspective: number
+        tilt: number
         ease: number
     }
     const scene = SCENES[c.example] ?? SCENES.product
@@ -198,6 +199,7 @@ export function DioramaPreview({ config, setPreset }: PreviewApi) {
                 parallax={c.parallax}
                 blur={c.blur}
                 perspective={c.perspective}
+                tilt={c.tilt}
                 ease={c.ease}
                 className="xpg-dio-scene"
                 background={scene.background}

@@ -46,6 +46,9 @@ export default defineConfig({
                 },
                 test: {
                     name: "storybook",
+                    // Meadow's abduction story plays a full 11 s sequence; under the
+                    // parallel suite's load it needs more than the 15 s default
+                    testTimeout: 30_000,
                     browser: {
                         enabled: true,
                         headless: true,
