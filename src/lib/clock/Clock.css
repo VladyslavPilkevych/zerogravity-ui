@@ -1,0 +1,48 @@
+.zg-clock {
+    --zg-clock-accent: #4ee1f2;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.zg-clock[data-pending] {
+    min-width: 8ch;
+}
+
+.zg-clock-date {
+    color: color-mix(in srgb, currentColor 66%, transparent);
+}
+
+.zg-clock-time {
+    font-weight: 600;
+}
+
+.zg-clock[data-variant="pixel"] {
+    padding: 4px 10px;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent);
+    font-family: var(--zg-font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+    letter-spacing: 0.06em;
+}
+
+.zg-clock[data-variant="pixel"] .zg-clock-date {
+    text-transform: uppercase;
+}
+
+.zg-clock[data-variant="pixel"] .zg-clock-separator[data-mark] {
+    width: 4px;
+    height: 4px;
+    overflow: hidden;
+    align-self: center;
+    background: var(--zg-clock-accent);
+    color: transparent;
+}
+
+.zg-clock[data-variant="pixel"] .zg-clock-time {
+    color: var(--zg-clock-accent);
+}
+
+.zg-clock[data-variant="classic"] .zg-clock-separator {
+    opacity: 0.5;
+}

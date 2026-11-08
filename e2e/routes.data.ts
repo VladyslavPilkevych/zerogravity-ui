@@ -64,4 +64,9 @@ export const COMPONENT_SLUGS = [
     "detent",
     "tether",
     "folio",
+    "calendar",
+    "task",
+    "checklist",
+    "progress",
+    "clock",
 ] as const

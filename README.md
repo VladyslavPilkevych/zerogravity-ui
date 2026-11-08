@@ -170,16 +170,26 @@ last column, as well as a named export from the root.
 | [Lenticular](src/lib/lenticular/README.md) | Two-image lens flip | `zerogravity/lenticular` |
 | [Reel](src/lib/reel/README.md)             | Carousel            | `zerogravity/reel`       |
 
+### Planning
+
+| Component                                | What it is                   | Import                  |
+| ---------------------------------------- | ---------------------------- | ----------------------- |
+| [Calendar](src/lib/calendar/README.md)   | Month, week and day calendar | `zerogravity/calendar`  |
+| [Checklist](src/lib/checklist/README.md) | Checklist with progress      | `zerogravity/checklist` |
+| [Task](src/lib/task/README.md)           | Expandable task row          | `zerogravity/task`      |
+
 ### Interface
 
-| Component                          | What it is            | Import               |
-| ---------------------------------- | --------------------- | -------------------- |
-| [Bezel](src/lib/bezel/README.md)   | Pixel frame           | `zerogravity/bezel`  |
-| [Detent](src/lib/detent/README.md) | Segmented control     | `zerogravity/detent` |
-| [Dither](src/lib/dither/README.md) | Pixel hover highlight | `zerogravity/dither` |
-| [Keycap](src/lib/keycap/README.md) | Pixel button          | `zerogravity/keycap` |
-| [Seam](src/lib/seam/README.md)     | Pixel divider         | `zerogravity/seam`   |
-| [Tag](src/lib/tag/README.md)       | Status tag            | `zerogravity/tag`    |
+| Component                              | What it is            | Import                 |
+| -------------------------------------- | --------------------- | ---------------------- |
+| [Bezel](src/lib/bezel/README.md)       | Pixel frame           | `zerogravity/bezel`    |
+| [Clock](src/lib/clock/README.md)       | Date and time display | `zerogravity/clock`    |
+| [Detent](src/lib/detent/README.md)     | Segmented control     | `zerogravity/detent`   |
+| [Dither](src/lib/dither/README.md)     | Pixel hover highlight | `zerogravity/dither`   |
+| [Keycap](src/lib/keycap/README.md)     | Pixel button          | `zerogravity/keycap`   |
+| [Progress](src/lib/progress/README.md) | Progress bar          | `zerogravity/progress` |
+| [Seam](src/lib/seam/README.md)         | Pixel divider         | `zerogravity/seam`     |
+| [Tag](src/lib/tag/README.md)           | Status tag            | `zerogravity/tag`      |
 
 ### Loading & transitions
 

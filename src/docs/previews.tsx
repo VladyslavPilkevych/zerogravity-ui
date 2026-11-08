@@ -10,6 +10,17 @@ import type { PreviewApi } from "./useDocsConfig"
  * Keys match `slug` in the registry.
  */
 export const PREVIEWS: Record<string, ComponentType<PreviewApi>> = {
+    calendar: dynamic(() =>
+        import("@/playground/previews/CalendarPreview").then((m) => m.CalendarPreview),
+    ),
+    checklist: dynamic(() =>
+        import("@/playground/previews/ChecklistPreview").then((m) => m.ChecklistPreview),
+    ),
+    clock: dynamic(() => import("@/playground/previews/ClockPreview").then((m) => m.ClockPreview)),
+    progress: dynamic(() =>
+        import("@/playground/previews/ProgressPreview").then((m) => m.ProgressPreview),
+    ),
+    task: dynamic(() => import("@/playground/previews/TaskPreview").then((m) => m.TaskPreview)),
     ascender: dynamic(() =>
         import("@/playground/previews/AscenderPreview").then((m) => m.AscenderPreview),
     ),

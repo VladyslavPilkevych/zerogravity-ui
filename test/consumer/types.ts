@@ -47,6 +47,17 @@ import { Halo, type HaloProps } from "zerogravity/halo"
 import { Sash, type SashProps } from "zerogravity/sash"
 import { Tether, type TetherProps } from "zerogravity/tether"
 import {
+    Calendar,
+    CalendarEvent,
+    useCalendar,
+    type CalendarItem,
+    type CalendarProps,
+} from "zerogravity/calendar"
+import { Checklist, type ChecklistProps } from "zerogravity/checklist"
+import { Clock, type ClockProps } from "zerogravity/clock"
+import { Progress, type ProgressProps } from "zerogravity/progress"
+import { Task, type TaskProps } from "zerogravity/task"
+import {
     Ascender as RootAscender,
     Detent as RootDetent,
     Folio as RootFolio,
@@ -158,6 +169,42 @@ const halo: HaloProps = { text: "Turn", separator: " / ", direction: "counterclo
 const sash: SashProps = { children: null, variant: "classic", direction: "right" }
 const tether: TetherProps = { d: "M0 0 L1 1", variant: "pixel", fit: "stretch" }
 void [ascender, detent, folio, frost, halo, sash, tether]
+
+const planning = [
+    Calendar,
+    Calendar.Month,
+    Calendar.Week,
+    CalendarEvent,
+    useCalendar,
+    Checklist,
+    Clock,
+    Progress,
+    Task,
+]
+void planning
+
+interface Meeting extends CalendarItem {
+    room: string
+}
+const meetingCalendar: CalendarProps<Meeting> = {
+    events: [{ id: "1", title: "Sync", start: new Date(), end: new Date(), room: "A" }],
+    renderEvent: (event) => event.room,
+    variant: "classic",
+    weekStartsOn: 0,
+}
+const checklist: ChecklistProps = { label: "Steps", items: [{ id: "a", label: "A" }] }
+const clock: ClockProps = { show: "time", timeZone: "Asia/Tokyo", seconds: true }
+const progress: ProgressProps = { label: "Done", value: 1, max: 4, segments: true }
+const task: TaskProps = { title: "Ship", progress: { value: 1 }, as: "li" }
+void [meetingCalendar, checklist, clock, progress, task]
+
+// @ts-expect-error calendar views are month, week or day
+const badView: CalendarProps = { view: "year" }
+void badView
+
+// @ts-expect-error a progress bar needs an accessible name
+const unnamedProgress: ProgressProps = { value: 1 }
+void unnamedProgress
 
 // Negative cases: each line must remain a type error for the public API to be sound.
 

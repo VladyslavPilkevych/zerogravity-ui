@@ -53,9 +53,21 @@
             "types": "./dist/bitmap/index.d.ts",
             "import": "./dist/bitmap/index.js"
         },
+        "./calendar": {
+            "types": "./dist/calendar/index.d.ts",
+            "import": "./dist/calendar/index.js"
+        },
+        "./checklist": {
+            "types": "./dist/checklist/index.d.ts",
+            "import": "./dist/checklist/index.js"
+        },
         "./chroma": {
             "types": "./dist/chroma/index.d.ts",
             "import": "./dist/chroma/index.js"
+        },
+        "./clock": {
+            "types": "./dist/clock/index.d.ts",
+            "import": "./dist/clock/index.js"
         },
         "./detent": {
             "types": "./dist/detent/index.d.ts",
@@ -149,6 +161,10 @@
             "types": "./dist/pointer-fx/index.d.ts",
             "import": "./dist/pointer-fx/index.js"
         },
+        "./progress": {
+            "types": "./dist/progress/index.d.ts",
+            "import": "./dist/progress/index.js"
+        },
         "./reel": {
             "types": "./dist/reel/index.d.ts",
             "import": "./dist/reel/index.js"
@@ -184,6 +200,10 @@
         "./tag": {
             "types": "./dist/tag/index.d.ts",
             "import": "./dist/tag/index.js"
+        },
+        "./task": {
+            "types": "./dist/task/index.d.ts",
+            "import": "./dist/task/index.js"
         },
         "./tessera": {
             "types": "./dist/tessera/index.d.ts",

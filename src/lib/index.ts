@@ -29,8 +29,27 @@ export type { BezelElement, BezelProps } from "./bezel"
 export { Bitmap, BITMAP_CHARACTERS } from "./bitmap"
 export type { BitmapEffect, BitmapElement, BitmapProps } from "./bitmap"
 
+export { Calendar, CalendarEvent, useCalendar } from "./calendar"
+export type {
+    CalendarDayInfo,
+    CalendarEventProps,
+    CalendarHeaderProps,
+    CalendarItem,
+    CalendarProps,
+    CalendarRenderInfo,
+    CalendarVariant,
+    CalendarView,
+    UseCalendar,
+} from "./calendar"
+
+export { Checklist } from "./checklist"
+export type { ChecklistItem, ChecklistProps, ChecklistVariant } from "./checklist"
+
 export { Chroma, CHROMA_COLORS } from "./chroma"
 export type { ChromaProps } from "./chroma"
+
+export { Clock } from "./clock"
+export type { ClockProps, ClockShow, ClockVariant } from "./clock"
 
 export { Detent } from "./detent"
 export type { DetentOption, DetentProps, DetentVariant } from "./detent"
@@ -126,6 +145,9 @@ export type { PeelCorner, PeelProps } from "./peel"
 export { Phosphor } from "./phosphor"
 export type { PhosphorProps } from "./phosphor"
 
+export { Progress } from "./progress"
+export type { ProgressFormat, ProgressProps, ProgressVariant } from "./progress"
+
 export { Reel } from "./reel"
 export type { ReelHandle, ReelProps } from "./reel"
 
@@ -155,6 +177,9 @@ export type { TagProps, TagStatus } from "./tag"
 
 export { Tether } from "./tether"
 export type { TetherFit, TetherLinecap, TetherProps, TetherVariant } from "./tether"
+
+export { Task } from "./task"
+export type { TaskElement, TaskProps, TaskVariant } from "./task"
 
 export { TesseraProvider, useTessera, useTesseraPhase } from "./tessera"
 export type {

@@ -35,6 +35,23 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 - `Folio` (`zerogravity/folio`) — expanding panels that never resize: one
   animated position moves and clips every panel, so the motion does no layout
   work and the gaps never drift. Stacks below 560 px.
+- `Calendar` (`zerogravity/calendar`) — a composable month, week and day
+  calendar: a six-week month grid with `+N more`, week and day time grids with
+  data-driven overlap layout, an all-day row and a now line. Controlled or
+  uncontrolled view, date and selection; `renderEvent` and `renderDay`; and
+  `Calendar.Header`, `Calendar.Month`, `Calendar.Week`, `Calendar.Day`,
+  `CalendarEvent` and `useCalendar()` for building your own. Locale, time zone
+  and week start are props; there is no date library.
+- `Task` (`zerogravity/task`) — a task row with a done checkbox, a summary line,
+  optional progress and an expandable detail region.
+- `Checklist` (`zerogravity/checklist`) — native checkboxes in a named group,
+  with optional progress and form submission.
+- `Progress` (`zerogravity/progress`) — a progress bar that reads as `1 of 4` or
+  `25%`, with a segmented mode. A server component.
+- `Clock` (`zerogravity/clock`) — a live or fixed date and time formatted with
+  `Intl` in any locale and time zone, waking only when the display changes.
+- Calendar, Task, Checklist, Progress and Clock come in `pixel` (default) and
+  `classic` styles through `variant`.
 - Sash, Detent, Tether and Folio take `variant`: `"pixel"`, the
   default, in the library's stepped, square, block-accented style, or
   `"classic"` for a smooth, rounded look.

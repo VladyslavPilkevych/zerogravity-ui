@@ -170,8 +170,12 @@ step("package size stays within the tracked baseline", () => {
     // source maps), then from 430 kB when Ascender, Frost, Halo, Sash, Detent,
     // Tether and Folio graduated (37 to 44 components, 419 kB to 448 kB; about
     // 3.5 kB each, half of it source maps; no experimental, test or duplicated
-    // code ships). Headroom for polish, not for more components.
-    if (kb > 460) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 460 kB)`)
+    // code ships), then from 460 kB when Calendar, Task, Checklist, Progress and
+    // Clock arrived (44 to 49 components, 448 kB to 489 kB; Calendar is about
+    // 30 kB of it, more than half source maps, which embed their sources and
+    // are 56% of the whole package). Headroom for polish, not for more
+    // components.
+    if (kb > 500) throw new Error(`tarball grew to ${kb.toFixed(0)} kB (baseline ceiling 500 kB)`)
     return `${kb.toFixed(0)} kB tarball`
 })
 

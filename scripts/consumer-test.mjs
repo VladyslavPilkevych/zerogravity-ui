@@ -190,6 +190,11 @@ const MARKERS = {
     Sash: "zg-sash",
     Tether: "zg-tether",
     Tag: "zg-tag",
+    Calendar: "zg-calendar",
+    Checklist: "zg-checklist",
+    Clock: "zg-clock",
+    Progress: "zg-progress",
+    Task: "zg-task",
     SplitFlap: "split-flap",
 }
 
@@ -210,6 +215,12 @@ const SHAKE_SCENARIOS = [
         jsx: '<Folio label="Work"><FolioPanel label="One" /><FolioPanel label="Two" /></Folio>',
     },
     { label: "subpath Frost", entry: `${PKG}/frost`, name: "Frost", jsx: "<Frost>Glass</Frost>" },
+    {
+        label: "subpath Calendar",
+        entry: `${PKG}/calendar`,
+        name: "Calendar",
+        jsx: '<Calendar events={[]} defaultView="month" />',
+    },
     {
         label: "subpath Ascender",
         entry: `${PKG}/ascender`,
