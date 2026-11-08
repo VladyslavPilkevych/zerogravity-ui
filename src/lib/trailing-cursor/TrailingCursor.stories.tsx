@@ -113,6 +113,20 @@ function centreOf(element: Element) {
     return { x: box.left + box.width / 2, y: box.top + box.height / 2, size: box.width }
 }
 
+/**
+ * Size once the scale transition reaches its end. A throttled test frame can
+ * hold a CSS transition at its start value; the scale it is heading for is
+ * what the story checks.
+ */
+function settledSize(element: Element) {
+    for (const animation of element.getAnimations()) {
+        if (animation instanceof CSSTransition && animation.transitionProperty === "scale") {
+            animation.finish()
+        }
+    }
+    return centreOf(element).size
+}
+
 /** The dot trails the pointer instead of sitting on it. */
 export const DotOnlyTrailing: Story = {
     args: { variant: "dot-only", dotEase: 0.15, dotSize: 12 },
@@ -161,18 +175,18 @@ export const DotInteraction: Story = {
         pointer("pointermove", x, y)
         pointer("pointerover", x, y, button)
         await expect(root).toHaveAttribute("data-hovering", "true")
-        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(30, 0), { timeout: 3000 })
-        await expect(centreOf(dot).x).toBeCloseTo(x, 0)
-        await expect(centreOf(dot).y).toBeCloseTo(y, 0)
+        await waitFor(() => expect(settledSize(dot)).toBeCloseTo(30, 0))
+        await waitFor(() => expect(centreOf(dot).x).toBeCloseTo(x, 0))
+        await waitFor(() => expect(centreOf(dot).y).toBeCloseTo(y, 0))
 
         pointer("pointerdown", x, y, button)
         await expect(root).toHaveAttribute("data-pressed", "true")
-        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(6, 0), { timeout: 3000 })
-        await expect(centreOf(dot).x).toBeCloseTo(x, 0)
+        await waitFor(() => expect(settledSize(dot)).toBeCloseTo(6, 0))
+        await waitFor(() => expect(centreOf(dot).x).toBeCloseTo(x, 0))
 
         pointer("pointerup", x, y, button)
         await expect(root).toHaveAttribute("data-pressed", "false")
-        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(30, 0), { timeout: 3000 })
+        await waitFor(() => expect(settledSize(dot)).toBeCloseTo(30, 0))
     },
 }
 
