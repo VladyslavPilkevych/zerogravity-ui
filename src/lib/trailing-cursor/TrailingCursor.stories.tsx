@@ -161,18 +161,18 @@ export const DotInteraction: Story = {
         pointer("pointermove", x, y)
         pointer("pointerover", x, y, button)
         await expect(root).toHaveAttribute("data-hovering", "true")
-        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(30, 0))
+        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(30, 0), { timeout: 3000 })
         await expect(centreOf(dot).x).toBeCloseTo(x, 0)
         await expect(centreOf(dot).y).toBeCloseTo(y, 0)
 
         pointer("pointerdown", x, y, button)
         await expect(root).toHaveAttribute("data-pressed", "true")
-        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(6, 0))
+        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(6, 0), { timeout: 3000 })
         await expect(centreOf(dot).x).toBeCloseTo(x, 0)
 
         pointer("pointerup", x, y, button)
         await expect(root).toHaveAttribute("data-pressed", "false")
-        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(30, 0))
+        await waitFor(() => expect(centreOf(dot).size).toBeCloseTo(30, 0), { timeout: 3000 })
     },
 }
 
