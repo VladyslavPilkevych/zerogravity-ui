@@ -79,6 +79,26 @@ root, so you override them with ordinary CSS:
 }
 ```
 
+### Visual styles
+
+Interface components come in up to four looks, and `pixel` is always the
+default:
+
+- **pixel**: crisp geometry, stepped corners, block accents, the library's own
+  voice.
+- **classic**: rounded, smooth, conventional, the easiest to drop into an app.
+- **minimal**: almost no chrome; state shows through small precise marks.
+- **glass**: translucent surfaces with fine edges, tinted toward the opposite of
+  the text colour so text stays legible on any background.
+
+A component offers only the looks that suit it, and its README says which. The
+prop is `variant`, except on `Tag`, where `variant` already meant outline or
+solid, so the look is `appearance`. Switching looks changes paint, never layout.
+Glass blurs only small, still controls that stand alone; large, repeating and
+moving surfaces use the tint, which keeps contrast without depending on what is
+behind them. Effects, backgrounds and scroll pieces have no look to choose:
+their effect is their identity.
+
 ### Next.js App Router
 
 Interactive components keep their `"use client"` boundaries in the published

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, within } from "storybook/test"
 
 import { Tag, TAG_STATUSES } from "./Tag"
+import { StyleBoards } from "../../../.storybook/StyleBoards"
 
 const meta = {
     title: "Components/Tag",
@@ -76,4 +77,32 @@ export const OnLight: Story = {
         </div>
     ),
     parameters: { chromatic: { pauseAnimationAtEnd: true } },
+}
+
+/** Each appearance, outline and solid, for every status. */
+export const Appearances: Story = {
+    render: () => (
+        <StyleBoards
+            styles={["pixel", "classic", "minimal", "glass"] as const}
+            render={(appearance) => (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {TAG_STATUSES.map((status) => (
+                        <Tag key={status} status={status} appearance={appearance}>
+                            {status}
+                        </Tag>
+                    ))}
+                    {TAG_STATUSES.map((status) => (
+                        <Tag
+                            key={`solid-${status}`}
+                            status={status}
+                            variant="solid"
+                            appearance={appearance}
+                        >
+                            {status}
+                        </Tag>
+                    ))}
+                </div>
+            )}
+        />
+    ),
 }

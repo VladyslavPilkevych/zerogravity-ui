@@ -14,22 +14,22 @@ while the others narrow — without ever changing a panel's size.
 </Folio>
 ```
 
-| Prop                   | Type                  | Default                          |                                               |
-| ---------------------- | --------------------- | -------------------------------- | --------------------------------------------- |
-| `children`             | `FolioPanel` elements | —                                |                                               |
-| `variant`              | `pixel \| classic`    | `pixel`                          | Visual style                                  |
-| `active`               | number                | —                                | Controlled open panel                         |
-| `defaultActive`        | number                | `0`                              |                                               |
-| `onActiveChange`       | `(index) => void`     | —                                |                                               |
-| `height`               | number \| string      | `420`                            | px or any CSS length                          |
-| `gap`                  | number                | `12`                             | px between panels; real space, any background |
-| `radius`               | number                | `4` pixel, `20` classic          | Corner step (pixel) or radius (classic), px   |
-| `grow`                 | number                | `3`                              | How many times wider the open panel is        |
-| `duration`             | number                | `650`                            | ms                                            |
-| `easing`               | string                | `cubic-bezier(0.32, 0.72, 0, 1)` |                                               |
-| `label`                | string                | —                                | Accessible name of the list                   |
-| `disabled`             | boolean               | `false`                          | Keep the current panel open                   |
-| `respectReducedMotion` | boolean               | `true`                           |                                               |
+| Prop                   | Type                                   | Default                                          |                                               |
+| ---------------------- | -------------------------------------- | ------------------------------------------------ | --------------------------------------------- |
+| `children`             | `FolioPanel` elements                  | —                                                |                                               |
+| `variant`              | `pixel \| classic \| minimal \| glass` | `pixel`                                          | Visual style                                  |
+| `active`               | number                                 | —                                                | Controlled open panel                         |
+| `defaultActive`        | number                                 | `0`                                              |                                               |
+| `onActiveChange`       | `(index) => void`                      | —                                                |                                               |
+| `height`               | number \| string                       | `420`                                            | px or any CSS length                          |
+| `gap`                  | number                                 | `12`                                             | px between panels; real space, any background |
+| `radius`               | number                                 | `4` pixel, `20` classic, `6` minimal, `18` glass | Corner step (pixel) or radius (classic), px   |
+| `grow`                 | number                                 | `3`                                              | How many times wider the open panel is        |
+| `duration`             | number                                 | `650`                                            | ms                                            |
+| `easing`               | string                                 | `cubic-bezier(0.32, 0.72, 0, 1)`                 |                                               |
+| `label`                | string                                 | —                                                | Accessible name of the list                   |
+| `disabled`             | boolean                                | `false`                                          | Keep the current panel open                   |
+| `respectReducedMotion` | boolean                                | `true`                                           |                                               |
 
 `FolioPanel` takes `media` (fills the panel and stays centred in its visible
 window), `children` (overlay content, or a function of `open`), `label` and
@@ -37,7 +37,7 @@ window), `children` (overlay content, or a function of `open`), `label` and
 `--zg-folio-visible`, its visible width, for content that should track the
 right edge.
 
-**Styles.** **Pixel** (default) cuts each panel's corners in steps of `radius` and frames the open panel in `--zg-folio-accent`, fading the frame with the panel's openness. **Classic** rounds the corners with `radius`.
+**Styles.** **Pixel** (default) cuts each panel's corners in steps of `radius` and frames the open panel in `--zg-folio-accent`, fading the frame with the panel's openness. **Classic** rounds the corners with `radius`. **Minimal** keeps the content first, with small corners and a hairline under the open panel. **Glass** lays a fine inner edge and a top sheen over the open panel, fading with it; nothing blurs. Every style repaints only the frame, so the motion still does no layout work.
 
 **No width animation, and no drift.** Every panel is as wide as the open one.
 A single animated number — the open position — decides how far each panel sits,

@@ -4,6 +4,8 @@ import {
     type NimbusPreset,
 } from "@/lib/experimental/nimbus/presets"
 
+import { styleControl } from "@/docs/styles"
+
 import type { ControlGroup } from "../panel/types"
 
 export const PALETTES = {
@@ -2153,7 +2155,7 @@ export const SASH_CONTROLS: ControlGroup[] = [
         hint: "constant speed, whatever the content",
         open: true,
         controls: [
-            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            styleControl("sash"),
             {
                 kind: "number",
                 path: "speed",
@@ -2193,7 +2195,7 @@ export const DETENT_CONTROLS: ControlGroup[] = [
         hint: "equal segments, native radios",
         open: true,
         controls: [
-            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            styleControl("detent"),
             { kind: "boolean", path: "fullWidth", label: "Full width" },
             { kind: "boolean", path: "disabled", label: "Disabled" },
         ],
@@ -2215,7 +2217,7 @@ export const TETHER_CONTROLS: ControlGroup[] = [
         hint: "a non-scaling stroke, measured on screen",
         open: true,
         controls: [
-            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            styleControl("tether"),
             { kind: "select", path: "fit", label: "Fit", options: ["contain", "stretch"] },
             {
                 kind: "number",
@@ -2256,7 +2258,7 @@ export const FOLIO_CONTROLS: ControlGroup[] = [
         hint: "panels keep their size; they only move",
         open: true,
         controls: [
-            { kind: "select", path: "variant", label: "Style", options: ["pixel", "classic"] },
+            styleControl("folio"),
             {
                 kind: "number",
                 path: "height",
@@ -2288,16 +2290,6 @@ export const FOLIO_CONTROLS: ControlGroup[] = [
             { kind: "boolean", path: "disabled", label: "Hold the open panel" },
         ],
     },
-]
-
-export const STYLE_PRESETS = [
-    {
-        id: "pixel",
-        label: "Pixel",
-        hint: "square, stepped, block accents",
-        values: { variant: "pixel" },
-    },
-    { id: "classic", label: "Classic", hint: "smooth and rounded", values: { variant: "classic" } },
 ]
 
 export const FROST_PRESETS = [

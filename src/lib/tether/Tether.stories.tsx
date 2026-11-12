@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, waitFor } from "storybook/test"
 
 import { Tether } from "./Tether"
+import { StyleBoards } from "../../../.storybook/StyleBoards"
 
 const CURVE = "M 4 50 C 30 0, 45 100, 70 50 S 90 20, 96 50"
 
@@ -69,3 +70,21 @@ export const Timeline: Story = {
 
 /** The original, smoother look, kept as the second style. */
 export const Classic: Story = { args: { variant: "classic" } }
+
+/** Pixel, classic and the bare minimal path at the same progress. */
+export const Styles: Story = {
+    render: (args) => (
+        <StyleBoards
+            styles={["pixel", "classic", "minimal"] as const}
+            render={(style) => (
+                <Tether
+                    {...args}
+                    style={{ height: 140 }}
+                    progress={0.6}
+                    track="color-mix(in srgb, currentColor 25%, transparent)"
+                    variant={style}
+                />
+            )}
+        />
+    ),
+}

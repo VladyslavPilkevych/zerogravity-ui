@@ -12,6 +12,7 @@ import {
 } from "zerogravity"
 import { Aperture } from "zerogravity/aperture"
 import { Elemental } from "zerogravity/elemental"
+import { Folio, FolioPanel } from "zerogravity/folio"
 
 export default function Page() {
     const config = resolveAntigravityConfig(ANTIGRAVITY_PRESETS[0].options)
@@ -41,6 +42,10 @@ export default function Page() {
                 <p>Promoted component through a subpath</p>
             </Elemental>
             <Meadow theme="night" />
+            <Folio label="Rendered by a server component" height={200}>
+                <FolioPanel label="One">One</FolioPanel>
+                <FolioPanel label="Two">Two</FolioPanel>
+            </Folio>
         </main>
     )
 }

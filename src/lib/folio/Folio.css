@@ -156,6 +156,37 @@
         inset 0 0 0 4px rgba(0, 0, 0, 0.6);
 }
 
+/*
+ * minimal and glass paint one static overlay per panel and fade it with the
+ * open position. The panel's own clip trims it, so no frame does layout work.
+ */
+
+.zg-folio[data-variant="minimal"] .zg-folio-panel::before,
+.zg-folio[data-variant="glass"] .zg-folio-panel::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    opacity: var(--zg-folio-open);
+    pointer-events: none;
+}
+
+/* minimal: content first, with a hairline under the open panel */
+.zg-folio[data-variant="minimal"] .zg-folio-panel::before {
+    inset: auto 0 0;
+    height: 2px;
+    background: var(--zg-folio-accent);
+}
+
+/* glass: an inner edge and a top sheen over the open panel, no blur */
+.zg-folio[data-variant="glass"] .zg-folio-panel::before {
+    inset: 0;
+    border-radius: var(--zg-folio-radius);
+    background: linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 34%);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
 .zg-folio[data-layout="stack"] .zg-folio-list {
     display: flex;
     flex-direction: column;

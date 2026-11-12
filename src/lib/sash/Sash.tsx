@@ -12,10 +12,11 @@ import {
     usePrefersReducedMotion,
 } from "../internal"
 import "../internal/offscreen.css"
+import "../internal/styles.css"
 import "./Sash.css"
 
 export type SashDirection = "left" | "right"
-export type SashVariant = "pixel" | "classic"
+export type SashVariant = "pixel" | "classic" | "glass"
 
 export interface SashProps {
     children: ReactNode

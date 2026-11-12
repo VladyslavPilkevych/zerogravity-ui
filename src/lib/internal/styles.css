@@ -1,0 +1,38 @@
+/*
+ * Tokens for the minimal and glass styles, shared by every component that
+ * offers them. A component imports this file beside its own stylesheet and
+ * reads the tokens on its own elements; nothing here paints by itself. Pixel
+ * keeps pixel.css, and classic needs nothing shared.
+ */
+
+[data-variant="minimal"],
+[data-appearance="minimal"] {
+    --zg-minimal-rule: color-mix(in srgb, currentColor 10%, transparent);
+    --zg-minimal-muted: color-mix(in srgb, currentColor 64%, transparent);
+}
+
+/*
+ * Glass tints toward the opposite of the text colour: smoky on a dark page,
+ * frosted on a light one. At 60% the fill keeps text legible whatever lies
+ * behind it, so contrast never rests on the backdrop or on blur. `veil` is for
+ * surfaces without text, `solid` for sticky surfaces that must hide what
+ * scrolls beneath them. Blur is opt-in per surface: small and still ones only.
+ */
+[data-variant="glass"],
+[data-appearance="glass"] {
+    --zg-glass-fill: color-mix(in srgb, currentColor 12%, transparent);
+    --zg-glass-veil: color-mix(in srgb, currentColor 7%, transparent);
+    --zg-glass-solid: Canvas;
+    --zg-glass-edge: color-mix(in srgb, currentColor 20%, transparent);
+    --zg-glass-shine: rgba(255, 255, 255, 0.14);
+    --zg-glass-blur: 12px;
+}
+
+@supports (color: rgb(from red r g b)) {
+    [data-variant="glass"],
+    [data-appearance="glass"] {
+        --zg-glass-fill: rgb(from currentColor calc(255 - r) calc(255 - g) calc(255 - b) / 0.6);
+        --zg-glass-veil: rgb(from currentColor calc(255 - r) calc(255 - g) calc(255 - b) / 0.3);
+        --zg-glass-solid: rgb(from currentColor calc(255 - r) calc(255 - g) calc(255 - b) / 0.92);
+    }
+}

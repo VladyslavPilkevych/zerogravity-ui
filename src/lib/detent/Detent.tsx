@@ -3,9 +3,10 @@
 import { useId, useState, type CSSProperties, type ReactNode } from "react"
 
 import { cx } from "../internal"
+import "../internal/styles.css"
 import "./Detent.css"
 
-export type DetentVariant = "pixel" | "classic"
+export type DetentVariant = "pixel" | "classic" | "minimal" | "glass"
 
 export interface DetentOption<T extends string | number> {
     value: T

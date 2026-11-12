@@ -90,7 +90,7 @@
 }
 
 .zg-checklist li[data-checked] .zg-checklist-text {
-    color: color-mix(in srgb, currentColor 55%, transparent);
+    color: color-mix(in srgb, currentColor 64%, transparent);
     text-decoration: line-through;
 }
 
@@ -120,6 +120,44 @@
 
 .zg-checklist[data-variant="classic"] .zg-checklist-box {
     border-radius: 5px;
+}
+
+/* minimal: outlined boxes and a hairline strike */
+
+.zg-checklist[data-variant="minimal"] .zg-checklist-box {
+    border-color: color-mix(in srgb, currentColor 26%, transparent);
+    border-radius: 4px;
+}
+
+.zg-checklist[data-variant="minimal"] .zg-checklist-box:checked {
+    border-color: currentColor;
+    background: transparent;
+    color: inherit;
+}
+
+.zg-checklist[data-variant="minimal"] .zg-checklist-legend {
+    color: var(--zg-minimal-muted);
+}
+
+.zg-checklist[data-variant="minimal"] li[data-checked] .zg-checklist-text {
+    color: var(--zg-minimal-muted);
+    text-decoration-thickness: 1px;
+}
+
+/* glass */
+
+.zg-checklist[data-variant="glass"] .zg-checklist-box {
+    border-color: var(--zg-glass-edge);
+    border-radius: 6px;
+    background: var(--zg-glass-veil);
+    box-shadow: inset 0 1px 0 var(--zg-glass-shine);
+}
+
+.zg-checklist[data-variant="glass"] .zg-checklist-box:checked {
+    border-color: color-mix(in srgb, var(--zg-checklist-accent) 70%, #000);
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 70%),
+        var(--zg-checklist-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

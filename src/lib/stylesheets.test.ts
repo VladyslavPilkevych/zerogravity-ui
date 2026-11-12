@@ -37,6 +37,34 @@ export function unsafeBackdropOrder(css: string): number {
     return unsafe
 }
 
+/** Every selector whose rule declares a backdrop-filter, with the file it lives in. */
+export function blurredSelectors(css: string): string[] {
+    const found: string[] = []
+    for (const match of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        if (!declarations(match[2]).includes("backdrop-filter")) continue
+        found.push(
+            match[1]
+                .replace(/\/\*[\s\S]*?\*\//g, "")
+                .replace(/\s+/g, " ")
+                .trim(),
+        )
+    }
+    return found
+}
+
+/**
+ * Backdrop blur is reserved for small, still surfaces that sit alone: Frost,
+ * whose concept is glass, and single glass controls. Anything large, anything
+ * that repeats in a list and anything that moves uses the tint instead, so a
+ * new blur has to be added here on purpose.
+ */
+const BLUR_ALLOWED = [
+    'clock/Clock.css .zg-clock[data-variant="glass"]',
+    'detent/Detent.css .zg-detent[data-variant="glass"]',
+    'frost/Frost.css .zg-frost[data-variant="blur"]',
+    "reel/Reel.css .reel-arrow",
+]
+
 describe("stylesheets", () => {
     it("detects a standard backdrop-filter declared before the prefixed one", () => {
         expect(
@@ -54,5 +82,18 @@ describe("stylesheets", () => {
             .map((file) => path.relative(LIB, file))
 
         expect(offenders).toEqual([])
+    })
+
+    it("blurs only the surfaces the glass policy allows", () => {
+        expect(
+            blurredSelectors(".a{color:red}.b , .c{-webkit-backdrop-filter:x;backdrop-filter:x}"),
+        ).toEqual([".b , .c"])
+        const blurred = stylesheets(LIB).flatMap((file) =>
+            blurredSelectors(readFileSync(file, "utf8")).map(
+                (selector) => `${path.relative(LIB, file)} ${selector}`,
+            ),
+        )
+
+        expect(blurred.sort()).toEqual(BLUR_ALLOWED)
     })
 })

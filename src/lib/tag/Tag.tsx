@@ -1,15 +1,20 @@
 import type { CSSProperties, HTMLAttributes } from "react"
 
 import { cx } from "../internal"
+import "../internal/styles.css"
 import "./Tag.css"
 
 export const TAG_STATUSES = ["neutral", "info", "success", "warning", "danger", "live"] as const
 
 export type TagStatus = (typeof TAG_STATUSES)[number]
 
+export type TagAppearance = "pixel" | "classic" | "minimal" | "glass"
+
 export interface TagProps extends HTMLAttributes<HTMLSpanElement> {
     status?: TagStatus
     variant?: "outline" | "solid"
+    /** the visual style; `variant` already chooses outline or solid */
+    appearance?: TagAppearance
     tone?: string
 }
 
@@ -31,6 +36,7 @@ function cells(status: TagStatus): { x: number; y: number; ring: boolean }[] {
 export function Tag({
     status = "neutral",
     variant = "outline",
+    appearance = "pixel",
     tone,
     className,
     style,
@@ -45,6 +51,7 @@ export function Tag({
             className={cx("zg-tag", className)}
             data-status={status}
             data-variant={variant}
+            data-appearance={appearance}
             style={rootStyle}
         >
             <svg className="zg-tag-glyph" viewBox="0 0 5 5" aria-hidden="true" focusable="false">

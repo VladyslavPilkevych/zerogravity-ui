@@ -18,7 +18,7 @@ import "./Tether.css"
 
 export type TetherFit = "contain" | "stretch"
 export type TetherLinecap = "round" | "butt" | "square"
-export type TetherVariant = "pixel" | "classic"
+export type TetherVariant = "pixel" | "classic" | "minimal"
 
 export interface TetherProps {
     d: string

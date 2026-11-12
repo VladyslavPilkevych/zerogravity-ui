@@ -80,8 +80,88 @@
     filter: none;
 }
 
+/* classic, minimal and glass trade the pixel glyph for a round status dot */
+
+.zg-tag:not([data-appearance="pixel"]) {
+    gap: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.2;
+    text-transform: none;
+}
+
+.zg-tag:not([data-appearance="pixel"]) .zg-tag-glyph {
+    display: none;
+}
+
+.zg-tag:not([data-appearance="pixel"])::before {
+    content: "";
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--zg-tag-c) 80%, currentColor);
+}
+
+.zg-tag[data-status="live"]:not([data-appearance="pixel"])::before {
+    animation: zg-tag-pulse 1.6s ease-in-out infinite;
+}
+
+.zg-tag[data-variant="solid"]:not([data-appearance="pixel"])::before {
+    background: currentColor;
+}
+
+.zg-tag[data-appearance="classic"] {
+    padding: 3px 9px 3px 8px;
+    border-radius: 999px;
+}
+
+.zg-tag[data-appearance="minimal"] {
+    padding: 3px 0;
+    border-color: transparent;
+    background: transparent;
+}
+
+.zg-tag[data-appearance="minimal"][data-variant="solid"] {
+    padding-inline: 7px;
+    border-color: transparent;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--zg-tag-c) 18%, transparent);
+    color: inherit;
+}
+
+.zg-tag[data-appearance="minimal"][data-variant="solid"]::before {
+    background: color-mix(in srgb, var(--zg-tag-c) 80%, currentColor);
+}
+
+/* glass: tint only, since tags repeat */
+
+.zg-tag[data-appearance="glass"] {
+    padding: 3px 9px 3px 8px;
+    border-color: var(--zg-glass-edge);
+    border-radius: 999px;
+    background: var(--zg-glass-fill);
+    box-shadow: inset 0 1px 0 var(--zg-glass-shine);
+}
+
+.zg-tag[data-appearance="glass"][data-variant="solid"] {
+    border-color: color-mix(in srgb, var(--zg-tag-c) 70%, #000);
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 70%),
+        color-mix(in srgb, var(--zg-tag-c) 82%, transparent);
+}
+
+@keyframes zg-tag-pulse {
+    50% {
+        opacity: 0.35;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .zg-tag-ring {
-        animation: none;
+    .zg-tag-ring,
+    .zg-tag::before {
+        animation: none !important;
     }
 }

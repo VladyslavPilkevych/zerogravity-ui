@@ -46,7 +46,7 @@ function MyHeader() {
 | `locale`                                                        | device                  | Any BCP 47 locale                           |
 | `timeZone`                                                      | device                  | The wall clock events are placed on         |
 | `now`                                                           | live                    | A fixed now, for tests and server rendering |
-| `variant`                                                       | `pixel`                 | `pixel` or `classic`                        |
+| `variant`                                                       | `pixel`                 | `pixel`, `classic`, `minimal` or `glass`    |
 | `renderEvent`                                                   | `CalendarEvent`         | `(event, info) => ReactNode`                |
 | `renderDay`                                                     | —                       | Extra content in each month cell            |
 | `onEventClick`                                                  | —                       | Makes the default chips buttons             |
@@ -60,7 +60,12 @@ function MyHeader() {
 
 **Styles.** **Pixel** (default) draws a crisp grid, square chips with a block
 accent bar, a notched selected day, a block now-marker and monospaced labels.
-**Classic** is rounded and quiet, for ordinary product UI. Colours are custom
+**Classic** is rounded and quiet, for ordinary product UI. **Minimal** keeps the
+grid but lightens its lines, drops fills and half-hour rules, and marks
+selection with a 2px underline. **Glass** gives the controls translucent pills,
+the grid a tinted frame and the events translucent chips; nothing blurs, because
+the grid is large and scrolls. Every style keeps the same layout, so switching
+never moves an event. Colours are custom
 properties: `--zg-calendar-accent`, `--zg-calendar-surface` (behind sticky
 headers), `--zg-calendar-now`, and `--zg-calendar-event-accent` per chip.
 

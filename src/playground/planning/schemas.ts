@@ -1,21 +1,6 @@
+import { styleControl } from "@/docs/styles"
+
 import type { ControlGroup } from "../panel/types"
-
-const STYLE = {
-    kind: "select",
-    path: "variant",
-    label: "Style",
-    options: ["pixel", "classic"],
-} as const
-
-export const STYLE_PRESETS = [
-    {
-        id: "pixel",
-        label: "Pixel",
-        hint: "square, stepped, block accents",
-        values: { variant: "pixel" },
-    },
-    { id: "classic", label: "Classic", hint: "smooth and rounded", values: { variant: "classic" } },
-]
 
 export const CALENDAR_DEFAULTS = {
     variant: "pixel",
@@ -34,7 +19,7 @@ export const CALENDAR_CONTROLS: ControlGroup[] = [
         hint: "style and first view",
         open: true,
         controls: [
-            STYLE,
+            styleControl("calendar"),
             {
                 kind: "select",
                 path: "defaultView",
@@ -83,7 +68,13 @@ export const CALENDAR_CONTROLS: ControlGroup[] = [
 export const TASK_DEFAULTS = { variant: "pixel" }
 
 export const TASK_CONTROLS: ControlGroup[] = [
-    { id: "look", title: "Look", hint: "one structure, two styles", open: true, controls: [STYLE] },
+    {
+        id: "look",
+        title: "Look",
+        hint: "one structure, four styles",
+        open: true,
+        controls: [styleControl("task")],
+    },
 ]
 
 export const CHECKLIST_DEFAULTS = { variant: "pixel", showProgress: false, disabled: false }
@@ -95,7 +86,7 @@ export const CHECKLIST_CONTROLS: ControlGroup[] = [
         hint: "native checkboxes",
         open: true,
         controls: [
-            STYLE,
+            styleControl("checklist"),
             { kind: "boolean", path: "showProgress", label: "Show progress" },
             { kind: "boolean", path: "disabled", label: "Disabled" },
         ],
@@ -117,7 +108,7 @@ export const PROGRESS_CONTROLS: ControlGroup[] = [
         hint: "fraction under 100, percentage at 100",
         open: true,
         controls: [
-            STYLE,
+            styleControl("progress"),
             { kind: "number", path: "value", label: "Value", min: 0, max: 100, step: 1 },
             { kind: "number", path: "max", label: "Max", min: 1, max: 100, step: 1 },
             { kind: "boolean", path: "segments", label: "Segmented" },
@@ -149,7 +140,7 @@ export const CLOCK_CONTROLS: ControlGroup[] = [
         hint: "Intl formatting, no date library",
         open: true,
         controls: [
-            STYLE,
+            styleControl("clock"),
             { kind: "select", path: "show", label: "Show", options: ["datetime", "date", "time"] },
             { kind: "boolean", path: "seconds", label: "Seconds" },
             {

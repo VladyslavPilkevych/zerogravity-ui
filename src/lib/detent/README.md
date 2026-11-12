@@ -17,19 +17,19 @@ const [billing, setBilling] = useState("monthly")
 />
 ```
 
-| Prop                            | Type                            | Default              |                                             |
-| ------------------------------- | ------------------------------- | -------------------- | ------------------------------------------- |
-| `options`                       | `{ value, label, disabled? }[]` | —                    | `variant`                                   | `pixel \| classic` | `pixel` | Visual style |
-| `value` is a string or a number |
-| `label`                         | string                          | —                    | Accessible name of the group                |
-| `value`                         | `T`                             | —                    | Controlled selection                        |
-| `defaultValue`                  | `T`                             | first enabled option | Uncontrolled starting selection             |
-| `onChange`                      | `(value: T) => void`            | —                    | Receives the option's own value, typed      |
-| `name`                          | string                          | generated            | Submitted with a surrounding form           |
-| `disabled`                      | boolean                         | `false`              |                                             |
-| `fullWidth`                     | boolean                         | `false`              | Stretch to the container instead of content |
+| Prop           | Type                                   | Default              |                                             |
+| -------------- | -------------------------------------- | -------------------- | ------------------------------------------- |
+| `options`      | `{ value, label, disabled? }[]`        | —                    | `value` is a string or a number             |
+| `variant`      | `pixel \| classic \| minimal \| glass` | `pixel`              | Visual style                                |
+| `label`        | string                                 | —                    | Accessible name of the group                |
+| `value`        | `T`                                    | —                    | Controlled selection                        |
+| `defaultValue` | `T`                                    | first enabled option | Uncontrolled starting selection             |
+| `onChange`     | `(value: T) => void`                   | —                    | Receives the option's own value, typed      |
+| `name`         | string                                 | generated            | Submitted with a surrounding form           |
+| `disabled`     | boolean                                | `false`              |                                             |
+| `fullWidth`    | boolean                                | `false`              | Stretch to the container instead of content |
 
-**Styles.** **Pixel** (default) uses square segments, a 1px track frame, a square thumb with a hard offset shadow that slides in six steps, and monospaced uppercase labels. **Classic** keeps rounded segments and a springy slide. Native radio behaviour is identical in both.
+**Styles.** **Pixel** (default) uses square segments, a 1px track frame, a square thumb with a hard offset shadow that slides in six steps, and monospaced uppercase labels. **Classic** keeps rounded segments and a springy slide. **Minimal** drops the track and marks the choice with a 2px line beneath it. **Glass** is a translucent track with a lighter thumb; as a single small control it blurs what lies behind it. Native radio behaviour is identical in every style.
 
 **Native radios.** Each option is a real `<input type="radio">` inside its
 `<label>`, so the keyboard model, focus, form submission and right-to-left

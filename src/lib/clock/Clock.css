@@ -40,9 +40,26 @@
 }
 
 .zg-clock[data-variant="pixel"] .zg-clock-time {
-    color: var(--zg-clock-accent);
+    color: color-mix(in srgb, var(--zg-clock-accent) 45%, currentColor);
 }
 
 .zg-clock[data-variant="classic"] .zg-clock-separator {
     opacity: 0.5;
+}
+
+/* glass: one small still chip, so it may blur what sits behind it */
+
+.zg-clock[data-variant="glass"] {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--zg-glass-fill);
+    box-shadow:
+        inset 0 0 0 1px var(--zg-glass-edge),
+        inset 0 1px 0 var(--zg-glass-shine);
+    -webkit-backdrop-filter: blur(var(--zg-glass-blur));
+    backdrop-filter: blur(var(--zg-glass-blur));
+}
+
+.zg-clock[data-variant="glass"] .zg-clock-separator {
+    opacity: 0.45;
 }

@@ -130,6 +130,43 @@
     border-radius: 0;
 }
 
+/* minimal: no track, quiet labels and a 2px mark under the chosen option */
+
+.zg-detent[data-variant="minimal"] {
+    --zg-detent-track: transparent;
+    --zg-detent-ink: var(--zg-minimal-muted);
+    --zg-detent-ink-active: currentColor;
+}
+
+.zg-detent[data-variant="minimal"] .zg-detent-indicator {
+    top: auto;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+    box-shadow: none;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* glass: a small still control, so the track may blur what sits behind it */
+
+.zg-detent[data-variant="glass"] {
+    --zg-detent-track: var(--zg-glass-fill);
+    --zg-detent-thumb: color-mix(in srgb, currentColor 14%, transparent);
+    --zg-detent-ink-active: currentColor;
+    box-shadow:
+        inset 0 0 0 1px var(--zg-glass-edge),
+        inset 0 1px 0 var(--zg-glass-shine);
+    -webkit-backdrop-filter: blur(var(--zg-glass-blur));
+    backdrop-filter: blur(var(--zg-glass-blur));
+}
+
+.zg-detent[data-variant="glass"] .zg-detent-indicator {
+    box-shadow:
+        inset 0 0 0 1px var(--zg-glass-edge),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .zg-detent .zg-detent-indicator,
     .zg-detent .zg-detent-option {

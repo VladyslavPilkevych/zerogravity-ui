@@ -1,7 +1,7 @@
 .zg-task {
     --zg-task-accent: #c6f24e;
     --zg-task-line: color-mix(in srgb, currentColor 14%, transparent);
-    --zg-task-muted: color-mix(in srgb, currentColor 60%, transparent);
+    --zg-task-muted: color-mix(in srgb, currentColor 64%, transparent);
     display: grid;
     gap: 8px;
     min-width: 0;
@@ -173,6 +173,60 @@ button.zg-task-summary {
 
 .zg-task[data-variant="classic"] .zg-task-check {
     border-radius: 50%;
+}
+
+/* minimal: a flat row; the 1px border stays, transparent, so nothing moves */
+
+.zg-task[data-variant="minimal"] {
+    border-color: transparent transparent var(--zg-minimal-rule);
+}
+
+.zg-task[data-variant="minimal"] .zg-task-check {
+    border-color: color-mix(in srgb, currentColor 26%, transparent);
+    border-radius: 6px;
+}
+
+.zg-task[data-variant="minimal"] .zg-task-check:checked {
+    border-color: currentColor;
+    background: transparent;
+    color: inherit;
+}
+
+.zg-task[data-variant="minimal"] .zg-task-chevron {
+    border-color: var(--zg-minimal-muted);
+    opacity: 0.7;
+}
+
+.zg-task[data-variant="minimal"] .zg-task-meta > * + *::before {
+    opacity: 0.4;
+}
+
+/* glass: tint only, since tasks repeat down a list */
+
+.zg-task[data-variant="glass"] {
+    border-color: var(--zg-glass-edge);
+    border-radius: 14px;
+    background: var(--zg-glass-fill);
+    box-shadow: inset 0 1px 0 var(--zg-glass-shine);
+}
+
+.zg-task[data-variant="glass"][data-expanded] {
+    box-shadow:
+        inset 0 1px 0 var(--zg-glass-shine),
+        0 14px 32px -22px rgba(0, 0, 0, 0.5);
+}
+
+.zg-task[data-variant="glass"] .zg-task-check {
+    border-color: var(--zg-glass-edge);
+    border-radius: 7px;
+    background: var(--zg-glass-veil);
+}
+
+.zg-task[data-variant="glass"] .zg-task-check:checked {
+    border-color: color-mix(in srgb, var(--zg-task-accent) 70%, #000);
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 70%),
+        var(--zg-task-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

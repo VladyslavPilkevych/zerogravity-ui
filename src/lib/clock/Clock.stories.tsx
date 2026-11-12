@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect } from "storybook/test"
 
 import { Clock } from "./Clock"
+import { StyleBoards } from "../../../.storybook/StyleBoards"
 
 const meta = {
     title: "Components/Clock",
@@ -27,3 +28,17 @@ export const Pixel: Story = {
 export const Classic: Story = { args: { variant: "classic" } }
 
 export const WithSeconds: Story = { args: { seconds: true, show: "time" } }
+
+/** Pixel and glass add a frame; classic stays plain text. */
+export const Styles: Story = {
+    render: (args) => (
+        <StyleBoards
+            styles={["pixel", "classic", "glass"] as const}
+            render={(style) => (
+                <div>
+                    <Clock {...args} style={undefined} variant={style} />
+                </div>
+            )}
+        />
+    ),
+}

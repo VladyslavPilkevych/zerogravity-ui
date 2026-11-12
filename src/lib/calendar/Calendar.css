@@ -3,7 +3,9 @@
     --zg-calendar-event-accent: var(--zg-calendar-accent);
     --zg-calendar-line: color-mix(in srgb, currentColor 13%, transparent);
     --zg-calendar-faint: color-mix(in srgb, currentColor 6%, transparent);
-    --zg-calendar-muted: color-mix(in srgb, currentColor 58%, transparent);
+    --zg-calendar-muted: color-mix(in srgb, currentColor 64%, transparent);
+    /* accent used as text, mixed with the text colour so it reads on light and dark */
+    --zg-calendar-accent-ink: color-mix(in srgb, var(--zg-calendar-accent) 45%, currentColor);
     --zg-calendar-surface: Canvas;
     --zg-calendar-mono: var(
         --zg-font-mono,
@@ -130,7 +132,7 @@
 }
 
 .zg-calendar-date[aria-current="date"] {
-    color: var(--zg-calendar-accent);
+    color: var(--zg-calendar-accent-ink);
 }
 
 .zg-calendar-date[aria-pressed="true"] {
@@ -225,7 +227,7 @@
 }
 
 .zg-calendar-day-head[data-today] .zg-calendar-day-number {
-    color: var(--zg-calendar-accent);
+    color: var(--zg-calendar-accent-ink);
 }
 
 .zg-calendar-day-head[data-selected] {
@@ -377,7 +379,7 @@ button.zg-calendar-event:hover {
 
 .zg-calendar-event-time {
     flex: none;
-    color: var(--zg-calendar-muted, color-mix(in srgb, currentColor 58%, transparent));
+    color: var(--zg-calendar-muted, color-mix(in srgb, currentColor 64%, transparent));
     font-size: 0.88em;
     white-space: nowrap;
 }
@@ -472,6 +474,177 @@ button.zg-calendar-event:hover {
 
 .zg-calendar[data-variant="classic"] .zg-calendar-scroll {
     border-radius: 10px;
+}
+
+/* minimal: the same grid with lighter lines, no fills and small precise marks */
+
+.zg-calendar[data-variant="minimal"] {
+    --zg-calendar-line: var(--zg-minimal-rule);
+    --zg-calendar-faint: color-mix(in srgb, currentColor 4%, transparent);
+    --zg-calendar-muted: var(--zg-minimal-muted);
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-button {
+    border-color: transparent;
+    border-radius: 6px;
+    color: var(--zg-calendar-muted);
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-button:hover {
+    color: inherit;
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-button[aria-pressed="true"],
+.zg-calendar[data-variant="minimal"] .zg-calendar-date[aria-pressed="true"] {
+    border-color: transparent;
+    background: transparent;
+    color: inherit;
+    box-shadow: inset 0 -2px 0 currentColor;
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-scroll,
+.zg-calendar[data-variant="minimal"] .zg-calendar-day-head,
+.zg-calendar[data-variant="minimal"] .zg-calendar-all-day > .zg-calendar-day-events {
+    border-color: transparent;
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-month td {
+    border-right-color: transparent;
+    border-left-color: transparent;
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-month td[data-weekend],
+.zg-calendar[data-variant="minimal"] .zg-calendar-column[data-today] {
+    background-color: transparent;
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-column {
+    background-image: linear-gradient(var(--zg-calendar-line) 1px, transparent 1px);
+    background-size: 100% var(--zg-calendar-hour);
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-day-head[data-selected] {
+    box-shadow: inset 0 -2px 0 currentColor;
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-now {
+    height: 1px;
+}
+
+.zg-calendar[data-variant="minimal"] .zg-calendar-now::before {
+    top: -2.5px;
+    left: -3px;
+    width: 6px;
+    height: 6px;
+}
+
+.zg-calendar-event[data-variant="minimal"] {
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--zg-calendar-event-accent, #4ee1f2) 10%, transparent);
+    box-shadow: inset 2px 0 0 var(--zg-calendar-event-accent, #4ee1f2);
+}
+
+button.zg-calendar-event[data-variant="minimal"]:hover {
+    background: color-mix(in srgb, var(--zg-calendar-event-accent, #4ee1f2) 18%, transparent);
+}
+
+.zg-calendar-event[data-variant="minimal"][data-selected] {
+    box-shadow:
+        inset 2px 0 0 var(--zg-calendar-event-accent, #4ee1f2),
+        inset 0 0 0 1px color-mix(in srgb, currentColor 40%, transparent);
+}
+
+.zg-calendar-event[data-variant="minimal"] .zg-calendar-event-title {
+    font-weight: 500;
+}
+
+/*
+ * glass: tint only. The grid is large and scrolls, so nothing here blurs; the
+ * sticky header and hour column take the near-opaque glass so content scrolling
+ * beneath them stays hidden.
+ */
+
+.zg-calendar[data-variant="glass"] {
+    --zg-calendar-surface: var(--zg-glass-solid);
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-button {
+    border-color: var(--zg-glass-edge);
+    border-radius: 999px;
+    background: var(--zg-glass-fill);
+    box-shadow: inset 0 1px 0 var(--zg-glass-shine);
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-button:hover {
+    background: color-mix(in srgb, currentColor 10%, var(--zg-glass-fill));
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-button[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--zg-calendar-accent) 60%, transparent);
+    background: color-mix(in srgb, var(--zg-calendar-accent) 26%, var(--zg-glass-fill));
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-date {
+    border-radius: 999px;
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-scroll {
+    border-color: var(--zg-glass-edge);
+    border-radius: 16px;
+    background: var(--zg-glass-veil);
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-month-wrap {
+    position: relative;
+    overflow: clip;
+    border-radius: 16px;
+    background: var(--zg-glass-veil);
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-month-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow:
+        inset 0 0 0 1px var(--zg-glass-edge),
+        inset 0 1px 0 var(--zg-glass-shine);
+    pointer-events: none;
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-month td:first-child {
+    border-left-color: transparent;
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-month td:last-child {
+    border-right-color: transparent;
+}
+
+.zg-calendar[data-variant="glass"] .zg-calendar-month tbody tr:last-child td {
+    border-bottom-color: transparent;
+}
+
+.zg-calendar-event[data-variant="glass"] {
+    border-radius: 8px;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 60%),
+        color-mix(in srgb, var(--zg-calendar-event-accent, #4ee1f2) 24%, transparent);
+    box-shadow:
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--zg-calendar-event-accent, #4ee1f2) 42%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+button.zg-calendar-event[data-variant="glass"]:hover {
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%),
+        color-mix(in srgb, var(--zg-calendar-event-accent, #4ee1f2) 34%, transparent);
+}
+
+.zg-calendar-event[data-variant="glass"][data-selected] {
+    box-shadow:
+        inset 0 0 0 2px var(--zg-calendar-event-accent, #4ee1f2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 /* narrow */

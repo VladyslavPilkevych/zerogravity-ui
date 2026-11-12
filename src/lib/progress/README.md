@@ -17,9 +17,13 @@ percentages.
 | `hideLabel` | `false` |                                                                 |
 | `format`    | `auto`  | `percent`, `fraction`, or `(value, max) => string`              |
 | `segments`  | `false` | `true` for one block per step, or a number of blocks (up to 40) |
-| `variant`   | `pixel` | `pixel` or `classic`                                            |
+| `variant`   | `pixel` | `pixel`, `classic`, `minimal` or `glass`                        |
 
 `auto` reads as a percentage when `max` is 100 and as a fraction otherwise. The
 bar is `role="progressbar"` with `aria-valuetext`, so assistive tech hears
 "1 of 4" rather than a bare number. The fill moves with `transform`. A server
 component.
+
+**Styles.** **Pixel** draws blocks; **classic** a rounded bar; **minimal** a 2px
+rail inside the same 8px track, so the height never changes; **glass** a
+translucent track with a highlighted fill.

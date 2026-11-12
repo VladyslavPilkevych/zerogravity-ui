@@ -17,14 +17,12 @@ import {
     CLOCK_DEFAULTS,
     PROGRESS_CONTROLS,
     PROGRESS_DEFAULTS,
-    STYLE_PRESETS as PLANNING_STYLE_PRESETS,
     TASK_CONTROLS,
     TASK_DEFAULTS,
 } from "@/playground/planning/schemas"
 import {
     ASCENDER_CONTROLS,
     ASCENDER_DEFAULTS,
-    STYLE_PRESETS,
     FROST_PRESETS,
     DETENT_CONTROLS,
     DETENT_DEFAULTS,
@@ -181,6 +179,7 @@ import {
 } from "@/playground/interface/schemas"
 import type { PanelPreset } from "@/playground/panel/types"
 
+import { stylePresets } from "./styles"
 import { DOC_CATEGORIES, type DocCategory, type DocEntry, type DocPreset } from "./types"
 
 /** Bridges the older `PanelPreset[]` + values map onto one preset shape. */
@@ -2234,6 +2233,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["tag", "badge", "status", "label", "chip", "pill", "live", "pixel"],
         defaults: TAG_DEFAULTS,
         controls: TAG_CONTROLS,
+        presets: stylePresets("tag"),
         children: "Release",
         extraProps: [
             {
@@ -2417,7 +2417,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["marquee", "ticker", "scrolling text", "band", "logos", "loop", "carousel"],
         defaults: SASH_DEFAULTS,
         controls: SASH_CONTROLS,
-        presets: STYLE_PRESETS,
+        presets: stylePresets("sash"),
         children: "<span>Pointer</span>\n    <span>Scroll</span>\n    <span>Typography</span>",
         extraProps: [
             {
@@ -2459,7 +2459,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["segmented control", "radio", "selector", "tabs", "toggle", "switch", "form"],
         defaults: DETENT_DEFAULTS,
         controls: DETENT_CONTROLS,
-        presets: STYLE_PRESETS,
+        presets: stylePresets("detent"),
         fixedProps: [
             'label="View"',
             'options={[\n        { value: "grid", label: "Grid" },\n        { value: "list", label: "List" },\n        { value: "board", label: "Board" },\n    ]}',
@@ -2516,7 +2516,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["timeline", "path", "scroll", "progress", "svg", "draw", "line"],
         defaults: TETHER_DEFAULTS,
         controls: TETHER_CONTROLS,
-        presets: STYLE_PRESETS,
+        presets: stylePresets("tether"),
         fixedProps: ['d="M 50 0 C 80 60, 20 90, 50 150"', 'viewBox="0 0 100 150"'],
         extraProps: [
             {
@@ -2594,7 +2594,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["gallery", "panels", "expand", "portfolio", "categories", "accordion", "showcase"],
         defaults: FOLIO_DEFAULTS,
         controls: FOLIO_CONTROLS,
-        presets: STYLE_PRESETS,
+        presets: stylePresets("folio"),
         children:
             '<FolioPanel label="Harbour" media={<img src="/harbour.jpg" alt="" />} />\n    <FolioPanel label="Field" media={<img src="/field.jpg" alt="" />} />',
         extraProps: [
@@ -2666,7 +2666,7 @@ export const COMPONENTS: DocEntry[] = [
         ],
         defaults: CALENDAR_DEFAULTS,
         controls: CALENDAR_CONTROLS,
-        presets: PLANNING_STYLE_PRESETS,
+        presets: stylePresets("calendar"),
         fixedProps: ["events={events}"],
         extraProps: [
             {
@@ -2727,7 +2727,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["task", "todo", "checkbox", "subtasks", "expand", "planner", "productivity"],
         defaults: TASK_DEFAULTS,
         controls: TASK_CONTROLS,
-        presets: PLANNING_STYLE_PRESETS,
+        presets: stylePresets("task"),
         fixedProps: ['title="Quarterly report"'],
         extraProps: [
             {
@@ -2787,7 +2787,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["checklist", "subtasks", "checkbox", "todo", "list", "form", "progress"],
         defaults: CHECKLIST_DEFAULTS,
         controls: CHECKLIST_CONTROLS,
-        presets: PLANNING_STYLE_PRESETS,
+        presets: stylePresets("checklist"),
         fixedProps: ['label="Conference prep"', "items={items}"],
         extraProps: [
             {
@@ -2829,7 +2829,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["progress", "progress bar", "meter", "completion", "segmented", "loading"],
         defaults: PROGRESS_DEFAULTS,
         controls: PROGRESS_CONTROLS,
-        presets: PLANNING_STYLE_PRESETS,
+        presets: stylePresets("progress"),
         fixedProps: ['label="Subtasks"'],
         extraProps: [
             {
@@ -2859,7 +2859,7 @@ export const COMPONENTS: DocEntry[] = [
         tags: ["clock", "time", "date", "datetime", "timezone", "now", "header"],
         defaults: CLOCK_DEFAULTS,
         controls: CLOCK_CONTROLS,
-        presets: PLANNING_STYLE_PRESETS,
+        presets: stylePresets("clock"),
         omit: ["timeZone"],
         extraProps: [
             {

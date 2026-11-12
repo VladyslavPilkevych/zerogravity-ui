@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, waitFor } from "storybook/test"
 
 import { Sash } from "./Sash"
+import { StyleBoards } from "../../../.storybook/StyleBoards"
 
 const words = ["Motion", "Pointer", "Scroll", "Typography", "Surfaces"]
 
@@ -61,3 +62,21 @@ export const Static: Story = {
 
 /** The original, smoother look, kept as the second style. */
 export const Classic: Story = { args: { variant: "classic" } }
+
+/** Pixel, classic and the tinted glass band, held still for review. */
+export const Styles: Story = {
+    render: (args) => (
+        <StyleBoards
+            styles={["pixel", "classic", "glass"] as const}
+            render={(style, tone) => (
+                <Sash
+                    {...args}
+                    label={`Topics, ${style} on ${tone}`}
+                    style={{ font: "600 20px/1.2 system-ui, sans-serif" }}
+                    disabled
+                    variant={style}
+                />
+            )}
+        />
+    ),
+}

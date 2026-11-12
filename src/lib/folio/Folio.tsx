@@ -20,7 +20,9 @@ import {
 } from "../internal"
 import "./Folio.css"
 
-export type FolioVariant = "pixel" | "classic"
+export type FolioVariant = "pixel" | "classic" | "minimal" | "glass"
+
+const FOLIO_CORNERS: Record<FolioVariant, number> = { pixel: 4, classic: 20, minimal: 6, glass: 18 }
 
 export interface FolioPanelProps {
     media?: ReactNode
@@ -82,13 +84,17 @@ export function Folio({
     const [layout, setLayout] = useState<"rail" | "stack" | undefined>(undefined)
     const [inner, setInner] = useState(defaultActive)
 
+    /*
+     * Every element child is a panel, read through its props. From a server
+     * component each FolioPanel arrives as a client reference, not the
+     * function itself, so matching on the type would drop them all.
+     */
     const panels = Children.toArray(children).filter(
-        (child): child is ReactElement<FolioPanelProps> =>
-            isValidElement(child) && child.type === FolioPanel,
+        (child): child is ReactElement<FolioPanelProps> => isValidElement(child),
     )
     const count = panels.length
     const current = clamp(Math.round(finite(active ?? inner, 0)), 0, Math.max(count - 1, 0))
-    const corner = clamp(finite(radius, variant === "pixel" ? 4 : 20), 0, 200)
+    const corner = clamp(finite(radius, FOLIO_CORNERS[variant] ?? 20), 0, 200)
 
     const stacked = layout === "stack"
     const reduced = usePrefersReducedMotion()

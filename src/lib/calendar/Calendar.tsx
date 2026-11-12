@@ -36,10 +36,11 @@ import {
     type CalendarItemBase,
     type Placed,
 } from "./layout"
+import "../internal/styles.css"
 import "./Calendar.css"
 
 export type CalendarView = "month" | "week" | "day"
-export type CalendarVariant = "pixel" | "classic"
+export type CalendarVariant = "pixel" | "classic" | "minimal" | "glass"
 
 export interface CalendarItem extends CalendarItemBase {
     /** any CSS colour, used for the item's accent */

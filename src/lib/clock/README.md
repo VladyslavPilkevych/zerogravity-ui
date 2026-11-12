@@ -9,17 +9,17 @@ time zone, with nothing but `Intl`.
 <Clock value={meeting.start} />
 ```
 
-| Prop         | Default                         |                              |
-| ------------ | ------------------------------- | ---------------------------- |
-| `value`      | live                            | A fixed instant              |
-| `show`       | `datetime`                      | `datetime`, `date` or `time` |
-| `locale`     | device                          |                              |
-| `timeZone`   | device                          | Any IANA zone                |
-| `hour12`     | from the locale                 |                              |
-| `seconds`    | `false`                         |                              |
-| `dateFormat` | `{ weekday, day, month }` short | Date part options            |
-| `separator`  | `"·"`                           |                              |
-| `variant`    | `pixel`                         | `pixel` or `classic`         |
+| Prop         | Default                         |                               |
+| ------------ | ------------------------------- | ----------------------------- |
+| `value`      | live                            | A fixed instant               |
+| `show`       | `datetime`                      | `datetime`, `date` or `time`  |
+| `locale`     | device                          |                               |
+| `timeZone`   | device                          | Any IANA zone                 |
+| `hour12`     | from the locale                 |                               |
+| `seconds`    | `false`                         |                               |
+| `dateFormat` | `{ weekday, day, month }` short | Date part options             |
+| `separator`  | `"·"`                           |                               |
+| `variant`    | `pixel`                         | `pixel`, `classic` or `glass` |
 
 **Updates.** A live clock wakes exactly when the display changes — on the next
 whole minute, or second when `seconds` is on — and stops when it unmounts.
@@ -30,3 +30,8 @@ renders everywhere.
 
 **Semantics.** A `<time>` element with a machine-readable `dateTime` and the
 full date and time as its accessible name.
+
+**Styles.** **Pixel** frames monospaced text with a block separator; **classic**
+is plain text; **glass** sets the same text in a small translucent pill, which
+blurs what sits behind it. There is no minimal style: classic already is the
+bare typography.

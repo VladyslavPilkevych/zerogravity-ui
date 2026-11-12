@@ -101,6 +101,58 @@
     border-radius: 0 999px 999px 0;
 }
 
+/* minimal: a 2px rail drawn inside the same 8px track, so the height never changes */
+
+.zg-progress[data-variant="minimal"] .zg-progress-track,
+.zg-progress[data-variant="minimal"] .zg-progress-block {
+    background: linear-gradient(var(--zg-minimal-rule), var(--zg-minimal-rule)) center / 100% 2px
+        no-repeat;
+}
+
+.zg-progress[data-variant="minimal"] .zg-progress-track[data-segments] {
+    background: transparent;
+}
+
+.zg-progress[data-variant="minimal"] .zg-progress-fill {
+    inset: 3px 0;
+}
+
+.zg-progress[data-variant="minimal"] .zg-progress-block[data-on] {
+    background: linear-gradient(var(--zg-progress-accent), var(--zg-progress-accent)) center / 100%
+        2px no-repeat;
+}
+
+.zg-progress[data-variant="minimal"] .zg-progress-value {
+    color: var(--zg-minimal-muted);
+}
+
+/* glass */
+
+.zg-progress[data-variant="glass"] .zg-progress-track,
+.zg-progress[data-variant="glass"] .zg-progress-block {
+    border-radius: 999px;
+    background: var(--zg-glass-veil);
+    box-shadow: inset 0 0 0 1px var(--zg-glass-edge);
+}
+
+.zg-progress[data-variant="glass"] .zg-progress-track[data-segments] {
+    background: transparent;
+    box-shadow: none;
+}
+
+.zg-progress[data-variant="glass"] .zg-progress-fill,
+.zg-progress[data-variant="glass"] .zg-progress-block[data-on] {
+    border-radius: 999px;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 70%),
+        var(--zg-progress-accent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--zg-progress-accent) 70%, #000);
+}
+
+.zg-progress[data-variant="glass"] .zg-progress-fill {
+    inset: 1px;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .zg-progress .zg-progress-fill,
     .zg-progress .zg-progress-block {
