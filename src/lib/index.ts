@@ -173,7 +173,7 @@ export { Stencil, FILL_DEFAULT_COLORS } from "./stencil"
 export type { StencilFill, StencilHover, StencilProps } from "./stencil"
 
 export { Tag, TAG_STATUSES } from "./tag"
-export type { TagProps, TagStatus } from "./tag"
+export type { TagAppearance, TagProps, TagStatus } from "./tag"
 
 export { Tether } from "./tether"
 export type { TetherFit, TetherLinecap, TetherProps, TetherVariant } from "./tether"

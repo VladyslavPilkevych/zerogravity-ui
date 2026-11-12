@@ -4,9 +4,10 @@ import { useId, useState, type CSSProperties, type ReactNode } from "react"
 
 import { cx } from "../internal"
 import { Progress } from "../progress/Progress"
+import "../internal/styles.css"
 import "./Checklist.css"
 
-export type ChecklistVariant = "pixel" | "classic"
+export type ChecklistVariant = "pixel" | "classic" | "minimal" | "glass"
 
 export interface ChecklistItem {
     id: string

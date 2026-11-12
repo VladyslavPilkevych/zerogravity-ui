@@ -4,9 +4,10 @@ import { useId, useState, type CSSProperties, type ReactNode } from "react"
 
 import { cx } from "../internal"
 import { Progress } from "../progress/Progress"
+import "../internal/styles.css"
 import "./Task.css"
 
-export type TaskVariant = "pixel" | "classic"
+export type TaskVariant = "pixel" | "classic" | "minimal" | "glass"
 export type TaskElement = "div" | "li" | "article"
 
 export interface TaskProps {

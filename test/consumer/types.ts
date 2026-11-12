@@ -57,6 +57,7 @@ import { Checklist, type ChecklistProps } from "zerogravity/checklist"
 import { Clock, type ClockProps } from "zerogravity/clock"
 import { Progress, type ProgressProps } from "zerogravity/progress"
 import { Task, type TaskProps } from "zerogravity/task"
+import { Tag, type TagAppearance, type TagProps } from "zerogravity/tag"
 import {
     Ascender as RootAscender,
     Detent as RootDetent,
@@ -198,6 +199,35 @@ const progress: ProgressProps = { label: "Done", value: 1, max: 4, segments: tru
 const task: TaskProps = { title: "Ship", progress: { value: 1 }, as: "li" }
 void [meetingCalendar, checklist, clock, progress, task]
 
+// Visual styles: four where they fit, fewer where one would be forced.
+const glassCalendar: CalendarProps = { variant: "glass" }
+const minimalTask: TaskProps = { title: "Ship", variant: "minimal" }
+const glassDetent: DetentProps<string> = { label: "View", options: [], variant: "glass" }
+const minimalFolio: FolioProps = { label: "Work", children: null, variant: "minimal" }
+const glassClock: ClockProps = { variant: "glass" }
+const glassSash: SashProps = { children: null, variant: "glass" }
+const minimalTether: TetherProps = { d: "M 0 0 L 1 1", variant: "minimal" }
+const appearance: TagAppearance = "glass"
+const solidGlassTag: TagProps = { variant: "solid", appearance }
+void [glassCalendar, minimalTask, glassDetent, minimalFolio, glassClock, glassSash, minimalTether]
+void [solidGlassTag, Tag]
+
+// @ts-expect-error Clock's classic is already bare text, so it has no minimal
+const minimalClock: ClockProps = { variant: "minimal" }
+void minimalClock
+
+// @ts-expect-error Sash's classic is already the bare band, so it has no minimal
+const minimalSash: SashProps = { children: null, variant: "minimal" }
+void minimalSash
+
+// @ts-expect-error a line has no surface to be glass
+const glassTether: TetherProps = { d: "M 0 0 L 1 1", variant: "glass" }
+void glassTether
+
+// @ts-expect-error Tag's style is its appearance; variant stays outline or solid
+const glassVariantTag: TagProps = { variant: "glass" }
+void glassVariantTag
+
 // @ts-expect-error calendar views are month, week or day
 const badView: CalendarProps = { view: "year" }
 void badView
@@ -252,7 +282,7 @@ void DistReel
 import { Stencil as WrongEntry } from "zerogravity/reel"
 void WrongEntry
 
-// @ts-expect-error the styled components take only the two documented styles
+// @ts-expect-error the styled components take only their documented styles
 const badStyle: SashProps = { children: null, variant: "retro" }
 
 // @ts-expect-error Halo and Ascender have a single look and no style prop

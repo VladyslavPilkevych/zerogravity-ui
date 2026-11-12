@@ -1,9 +1,10 @@
 import { useId, type CSSProperties, type HTMLAttributes } from "react"
 
 import { clamp, cx, finite } from "../internal"
+import "../internal/styles.css"
 import "./Progress.css"
 
-export type ProgressVariant = "pixel" | "classic"
+export type ProgressVariant = "pixel" | "classic" | "minimal" | "glass"
 export type ProgressFormat = "auto" | "percent" | "fraction"
 
 export interface ProgressProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {

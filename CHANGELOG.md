@@ -7,6 +7,29 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `minimal` and `glass` styles for `Calendar` (with `CalendarEvent`), `Task`,
+  `Checklist`, `Progress`, `Detent` and `Folio`, beside `pixel` (still the
+  default) and `classic`. Minimal is a designed reduction, not classic with the
+  borders removed; glass is a translucent surface that keeps text legible on
+  light and dark backgrounds. Switching style changes paint, never layout.
+- `Clock` and `Sash` gain `glass`, and `Tether` gains `minimal`. Clock and Sash
+  have no minimal because their classic already is the bare look; a line has no
+  surface, so Tether has no glass. Sash's glass band is tinted, never blurred,
+  because it repaints while it runs.
+- `Tag`: `appearance`, with `pixel` (default, the existing look), `classic`,
+  `minimal` and `glass`. It is not `variant`, which already chooses outline or
+  solid, and it combines with both.
+
+### Changed
+
+- Secondary text in `Calendar`, `Task` and `Checklist` and the minimal styles
+  now passes 4.5:1 contrast on light backgrounds as well as dark ones.
+  `Calendar`'s today markers and `Clock`'s pixel time mix the accent with the
+  text colour, so they read on a light page; on a dark page the accent is a
+  little paler than before.
+
 ## [0.3.0] - 2026-11-08
 
 ### Added

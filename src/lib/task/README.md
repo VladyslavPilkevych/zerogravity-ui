@@ -30,11 +30,14 @@ and an expandable detail region. The data and the actions are yours.
 | `actions`                                           | —          | Buttons or menus at the end of the row           |
 | `children`                                          | —          | The detail region; adds the disclosure button    |
 | `as`                                                | `div`      | `div`, `li` or `article`                         |
-| `variant`                                           | `pixel`    | `pixel` or `classic`                             |
+| `variant`                                           | `pixel`    | `pixel`, `classic`, `minimal` or `glass`         |
 
 **Semantics.** The checkbox is a native input named by the title and described
 by the meta line. With children, the title and meta form a disclosure button
 (`aria-expanded`, `aria-controls`) for a region named by the title.
 
 **Styles.** **Pixel** uses square block checks, block separators and a
-monospaced meta line; **classic** a round check and soft card.
+monospaced meta line; **classic** a round check and soft card; **minimal** a
+flat row with an outlined check and one rule beneath; **glass** a translucent
+card with a fine edge, tinted rather than blurred because tasks repeat down a
+list. Classic, minimal and glass share one geometry.

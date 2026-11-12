@@ -11,21 +11,21 @@ speed, however long the content is.
 </Sash>
 ```
 
-| Prop                   | Type               | Default |                                                    |
-| ---------------------- | ------------------ | ------- | -------------------------------------------------- |
-| `children`             | ReactNode          | —       | One run of the band; repeated as often as needed   |
-| `variant`              | `pixel \| classic` | `pixel` | Visual style                                       |
-| `speed`                | number             | `60`    | px per second, independent of the content's length |
-| `direction`            | `left \| right`    | `left`  |                                                    |
-| `gap`                  | number             | `40`    | px between items and between repeats               |
-| `pauseOnHover`         | boolean            | `true`  | Keyboard focus inside the band always pauses it    |
-| `fade`                 | boolean            | `false` | Fades both edges with a mask, on any background    |
-| `paused`               | boolean            | `false` | Hold the band where it is                          |
-| `label`                | string             | —       | Makes the band a named region                      |
-| `disabled`             | boolean            | `false` | Static, wrapped content                            |
-| `respectReducedMotion` | boolean            | `true`  |                                                    |
+| Prop                   | Type                        | Default |                                                    |
+| ---------------------- | --------------------------- | ------- | -------------------------------------------------- |
+| `children`             | ReactNode                   | —       | One run of the band; repeated as often as needed   |
+| `variant`              | `pixel \| classic \| glass` | `pixel` | Visual style                                       |
+| `speed`                | number                      | `60`    | px per second, independent of the content's length |
+| `direction`            | `left \| right`             | `left`  |                                                    |
+| `gap`                  | number                      | `40`    | px between items and between repeats               |
+| `pauseOnHover`         | boolean                     | `true`  | Keyboard focus inside the band always pauses it    |
+| `fade`                 | boolean                     | `false` | Fades both edges with a mask, on any background    |
+| `paused`               | boolean                     | `false` | Hold the band where it is                          |
+| `label`                | string                      | —       | Makes the band a named region                      |
+| `disabled`             | boolean                     | `false` | Static, wrapped content                            |
+| `respectReducedMotion` | boolean                     | `true`  |                                                    |
 
-**Styles.** **Pixel** (default) frames the band with dashed block rules, puts a square marker after every item and fades its edges in hard bands. **Classic** is the bare band with a smooth fade. Both share the same loop.
+**Styles.** **Pixel** (default) frames the band with dashed block rules, puts a square marker after every item and fades its edges in hard bands. **Classic** is the bare band with a smooth fade. **Glass** is a translucent tinted band with a fine edge, and never blurs: the band repaints while its run moves, and a backdrop blur measured ten times the compositor cost. There is no minimal style, because classic already is the bare band. All three share the same loop.
 
 **Seamless loop.** The first run is measured, sub-pixel exact, and the track
 slides by one run plus one gap before starting over, with enough copies to cover

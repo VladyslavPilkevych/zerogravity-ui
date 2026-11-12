@@ -3,9 +3,10 @@
 import { useEffect, useState, type HTMLAttributes, type ReactNode } from "react"
 
 import { cx } from "../internal"
+import "../internal/styles.css"
 import "./Clock.css"
 
-export type ClockVariant = "pixel" | "classic"
+export type ClockVariant = "pixel" | "classic" | "glass"
 export type ClockShow = "datetime" | "date" | "time"
 
 export interface ClockProps extends Omit<HTMLAttributes<HTMLElement>, "children"> {

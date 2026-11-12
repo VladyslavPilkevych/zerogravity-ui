@@ -47,6 +47,12 @@
     stroke-width: calc(var(--zg-tether-width) + 1px);
 }
 
+/* minimal: the bare path over a hairline of where it goes */
+.zg-tether[data-variant="minimal"] .zg-tether-track {
+    stroke-width: 1px;
+    opacity: 0.6;
+}
+
 .zg-tether-content {
     position: relative;
 }

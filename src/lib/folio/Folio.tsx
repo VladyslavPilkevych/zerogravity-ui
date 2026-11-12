@@ -20,7 +20,9 @@ import {
 } from "../internal"
 import "./Folio.css"
 
-export type FolioVariant = "pixel" | "classic"
+export type FolioVariant = "pixel" | "classic" | "minimal" | "glass"
+
+const FOLIO_CORNERS: Record<FolioVariant, number> = { pixel: 4, classic: 20, minimal: 6, glass: 18 }
 
 export interface FolioPanelProps {
     media?: ReactNode
@@ -88,7 +90,7 @@ export function Folio({
     )
     const count = panels.length
     const current = clamp(Math.round(finite(active ?? inner, 0)), 0, Math.max(count - 1, 0))
-    const corner = clamp(finite(radius, variant === "pixel" ? 4 : 20), 0, 200)
+    const corner = clamp(finite(radius, FOLIO_CORNERS[variant] ?? 20), 0, 200)
 
     const stacked = layout === "stack"
     const reduced = usePrefersReducedMotion()
