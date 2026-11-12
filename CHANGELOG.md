@@ -30,6 +30,13 @@ this project adheres to [Semantic Versioning](https://semver.org/).
   text colour, so they read on a light page; on a dark page the accent is a
   little paler than before.
 
+### Fixed
+
+- `Folio` rendered no panels when a React Server Component, such as a Next.js
+  App Router page, passed it its `FolioPanel` children: across that boundary
+  each panel arrives as a client reference, which Folio no longer requires to be
+  the `FolioPanel` function itself.
+
 ## [0.3.0] - 2026-11-08
 
 ### Added

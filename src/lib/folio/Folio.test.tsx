@@ -43,6 +43,25 @@ afterEach(() => {
 })
 
 describe("Folio", () => {
+    it("reads panels from any element child, as a server component passes them", () => {
+        // a server component hands FolioPanel over as a client reference, not the function
+        const Reference = FolioPanel.bind(null)
+        const { container } = render(
+            <Folio label="Work">
+                <Reference label="One" media={<i data-testid="media" />}>
+                    one
+                </Reference>
+                <Reference label="Two">two</Reference>
+            </Folio>,
+        )
+
+        expect(panels(container).map((item) => item.getAttribute("aria-label"))).toEqual([
+            "One",
+            "Two",
+        ])
+        expect(screen.getByTestId("media")).toBeInTheDocument()
+    })
+
     it("drives the whole layout from one open position and a per-panel index", () => {
         widthOf(1000)
         const { container } = render(strip({ defaultActive: 2 }))

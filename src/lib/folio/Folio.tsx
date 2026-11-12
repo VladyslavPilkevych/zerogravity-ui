@@ -84,9 +84,13 @@ export function Folio({
     const [layout, setLayout] = useState<"rail" | "stack" | undefined>(undefined)
     const [inner, setInner] = useState(defaultActive)
 
+    /*
+     * Every element child is a panel, read through its props. From a server
+     * component each FolioPanel arrives as a client reference, not the
+     * function itself, so matching on the type would drop them all.
+     */
     const panels = Children.toArray(children).filter(
-        (child): child is ReactElement<FolioPanelProps> =>
-            isValidElement(child) && child.type === FolioPanel,
+        (child): child is ReactElement<FolioPanelProps> => isValidElement(child),
     )
     const count = panels.length
     const current = clamp(Math.round(finite(active ?? inner, 0)), 0, Math.max(count - 1, 0))

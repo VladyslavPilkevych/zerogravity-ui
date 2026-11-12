@@ -355,6 +355,13 @@ function nextConsumer(tarball) {
         return "static prerender clean"
     })
 
+    step("next: compound children passed from a server component still render", () => {
+        const html = readFileSync(path.join(dir, ".next", "server", "app", "index.html"), "utf8")
+        const panels = html.match(/class="zg-folio-panel"/g)?.length ?? 0
+        if (panels !== 2) throw new Error(`Folio prerendered ${panels} of 2 panels`)
+        return "Folio prerenders both panels"
+    })
+
     step('next: "use client" boundaries survive in the published package', () => {
         const reel = readFileSync(
             path.join(dir, "node_modules", PKG, "dist", "reel", "Reel.js"),
