@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, userEvent, waitFor } from "storybook/test"
 
 import { Calendar, CalendarEvent, useCalendar, type CalendarItem } from "./Calendar"
+import { geometry, StyleBoards } from "../../../.storybook/StyleBoards"
 
 const NOW = new Date(2026, 2, 11, 10, 40)
 const at = (offset: number, hour: number, minute = 0) => new Date(2026, 2, 9 + offset, hour, minute)
@@ -146,5 +147,68 @@ export const NarrowMonth: Story = {
             await expect(box.left).toBeGreaterThanOrEqual(cell.left)
             await expect(box.right).toBeLessThanOrEqual(cell.right)
         }
+    },
+}
+
+const STYLES = ["pixel", "classic", "minimal", "glass"] as const
+
+/**
+ * The four styles over light and dark, with one event layout. Classic, minimal
+ * and glass share every measurement; pixel's mono all-day label runs to a
+ * second line, so its grid starts lower.
+ */
+export const Styles: Story = {
+    parameters: { surface: { padding: 0 } },
+    render: (args) => (
+        <StyleBoards
+            wide
+            styles={STYLES}
+            render={(style, tone) => (
+                <Calendar
+                    {...args}
+                    style={{}}
+                    label={`Calendar, ${style} on ${tone}`}
+                    defaultView="week"
+                    height={420}
+                    scrollToHour={8}
+                    variant={style}
+                />
+            )}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        for (const selector of [
+            ".zg-calendar-slot",
+            ".zg-calendar-scroll",
+            ".zg-calendar-button",
+        ]) {
+            const rects = geometry(canvasElement, "light", selector)
+            await expect(rects.minimal).toBe(rects.classic)
+            await expect(rects.glass).toBe(rects.classic)
+        }
+    },
+}
+
+/** Month cells keep their size in every style. */
+export const StylesMonth: Story = {
+    parameters: { surface: { padding: 0 } },
+    render: (args) => (
+        <StyleBoards
+            wide
+            styles={STYLES}
+            render={(style, tone) => (
+                <Calendar
+                    {...args}
+                    style={{}}
+                    label={`Calendar, ${style} on ${tone}`}
+                    defaultView="month"
+                    variant={style}
+                />
+            )}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const rects = geometry(canvasElement, "light", ".zg-calendar-month td")
+        for (const style of STYLES) await expect(rects[style]).toBe(rects.pixel)
     },
 }

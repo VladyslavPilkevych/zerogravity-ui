@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, userEvent, waitFor } from "storybook/test"
 
 import { Detent } from "./Detent"
+import { geometry, StyleBoards } from "../../../.storybook/StyleBoards"
 
 const meta = {
     title: "Components/Detent",
@@ -70,3 +71,28 @@ export const RightToLeft: Story = {
 
 /** The original, smoother look, kept as the second style. */
 export const Classic: Story = { args: { variant: "classic" } }
+
+const STYLES = ["pixel", "classic", "minimal", "glass"] as const
+
+/** Options keep their size across classic, minimal and glass; pixel is tighter by design. */
+export const Styles: Story = {
+    render: (args) => (
+        <StyleBoards
+            styles={STYLES}
+            render={(style) => (
+                <Detent
+                    {...args}
+                    style={{ font: "14px system-ui, sans-serif" }}
+                    defaultValue="list"
+                    variant={style}
+                />
+            )}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const rects = geometry(canvasElement, "light", ".zg-detent-option")
+        await expect(rects.minimal).toBe(rects.classic)
+        await expect(rects.glass).toBe(rects.classic)
+        await waitFor(() => expect(aligned(canvasElement)).toBeLessThan(1), { timeout: 3000 })
+    },
+}

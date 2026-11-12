@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, fireEvent, waitFor } from "storybook/test"
 
 import { Folio, FolioPanel } from "./Folio"
+import { geometry, StyleBoards } from "../../../.storybook/StyleBoards"
 
 const SWATCHES = [
     ["Harbour", "linear-gradient(160deg, #2e5f8a, #0f2a40)"],
@@ -151,3 +152,21 @@ export const Narrow: Story = {
 }
 
 export const Controlled: Story = { args: { active: 1 } }
+
+const STYLES = ["pixel", "classic", "minimal", "glass"] as const
+
+/** Styles only repaint the frame: every panel keeps its place and size. */
+export const Styles: Story = {
+    parameters: { surface: { padding: 0 } },
+    render: (args) => (
+        <StyleBoards
+            wide
+            styles={STYLES}
+            render={(style) => <Folio {...args} height={220} variant={style} />}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const rects = geometry(canvasElement, "light", ".zg-folio-panel")
+        for (const style of STYLES) await expect(rects[style]).toBe(rects.pixel)
+    },
+}

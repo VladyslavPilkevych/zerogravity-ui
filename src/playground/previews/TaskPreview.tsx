@@ -39,8 +39,12 @@ export function TaskPreview({ config }: PreviewApi) {
                     defaultValue={["outline"]}
                 />
                 <div className="pzp-chip-row">
-                    <Tag status="info">Writing</Tag>
-                    <Tag status="warning">This week</Tag>
+                    <Tag status="info" appearance={variant}>
+                        Writing
+                    </Tag>
+                    <Tag status="warning" appearance={variant}>
+                        This week
+                    </Tag>
                 </div>
             </Task>
             <Task

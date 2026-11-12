@@ -45,3 +45,50 @@ body {
     font-size: 24px;
     font-weight: 600;
 }
+
+.sb-boards {
+    display: grid;
+    gap: 16px;
+}
+
+.sb-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    padding: 24px;
+}
+
+.sb-board[data-wide] {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.sb-board[data-tone="light"] {
+    color-scheme: light;
+    background: #eef0f3;
+    color: #15171c;
+}
+
+.sb-board[data-tone="dark"] {
+    color-scheme: dark;
+    background: #0d0f13;
+    color: #eef0f3;
+}
+
+.sb-board-cell {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    min-width: 0;
+}
+
+.sb-board-label {
+    margin: 0;
+    font:
+        600 11px/1 ui-monospace,
+        "SFMono-Regular",
+        Menlo,
+        monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}

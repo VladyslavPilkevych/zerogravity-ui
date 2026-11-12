@@ -34,7 +34,7 @@ export function SashPreview({ config }: PreviewApi) {
                 {TOPICS.map((topic) => (
                     <span key={topic} className="xpg-sash-word">
                         {topic}
-                        {c.variant === "classic" && <span aria-hidden="true">✦</span>}
+                        {c.variant !== "pixel" && <span aria-hidden="true">✦</span>}
                     </span>
                 ))}
             </Sash>

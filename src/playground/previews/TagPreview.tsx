@@ -1,21 +1,25 @@
 "use client"
 
 import type { PreviewApi } from "@/docs/useDocsConfig"
-import { Tag, TAG_STATUSES, type TagStatus } from "@/lib"
+import { Tag, TAG_STATUSES, type TagAppearance, type TagStatus } from "@/lib"
 
 import "../interface/interface.css"
 
 const VARIANTS = ["outline", "solid"] as const
 
 export function TagPreview({ config }: PreviewApi) {
-    const c = config as { status: TagStatus; variant: "outline" | "solid" }
+    const c = config as {
+        status: TagStatus
+        variant: "outline" | "solid"
+        appearance: TagAppearance
+    }
 
     return (
         <div className="ipg ipg-matrix">
             <div className="ipg-matrix-row">
                 <p className="ipg-matrix-label">Configured</p>
                 <div className="ipg-feature">
-                    <Tag status={c.status} variant={c.variant}>
+                    <Tag status={c.status} variant={c.variant} appearance={c.appearance}>
                         Release
                     </Tag>
                 </div>
@@ -25,7 +29,12 @@ export function TagPreview({ config }: PreviewApi) {
                     <p className="ipg-matrix-label">{variant}</p>
                     <div className="ipg-row">
                         {TAG_STATUSES.map((status) => (
-                            <Tag key={status} status={status} variant={variant}>
+                            <Tag
+                                key={status}
+                                status={status}
+                                variant={variant}
+                                appearance={c.appearance}
+                            >
                                 {status}
                             </Tag>
                         ))}

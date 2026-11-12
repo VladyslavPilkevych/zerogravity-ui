@@ -1,3 +1,5 @@
+import { styleControl } from "@/docs/styles"
+
 import type { ControlGroup } from "../panel/types"
 
 export const DITHER_DEFAULTS = {
@@ -165,6 +167,7 @@ export const SEAM_CONTROLS: ControlGroup[] = [
 export const TAG_DEFAULTS = {
     status: "neutral",
     variant: "outline",
+    appearance: "pixel",
 }
 
 export const TAG_CONTROLS: ControlGroup[] = [
@@ -181,6 +184,7 @@ export const TAG_CONTROLS: ControlGroup[] = [
                 options: ["neutral", "info", "success", "warning", "danger", "live"],
             },
             { kind: "select", path: "variant", label: "Variant", options: ["outline", "solid"] },
+            styleControl("tag"),
         ],
     },
 ]

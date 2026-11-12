@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { expect, userEvent } from "storybook/test"
 
 import { Checklist } from "./Checklist"
+import { StyleBoards } from "../../../.storybook/StyleBoards"
 
 const meta = {
     title: "Components/Checklist",
@@ -38,3 +39,21 @@ export const Pixel: Story = {
 }
 
 export const Classic: Story = { args: { variant: "classic" } }
+
+/** Every style over light and dark, with native checkboxes throughout. */
+export const Styles: Story = {
+    render: (args) => (
+        <StyleBoards
+            styles={["pixel", "classic", "minimal", "glass"] as const}
+            render={(style) => (
+                <Checklist
+                    {...args}
+                    style={{ maxWidth: 420 }}
+                    defaultValue={["tickets"]}
+                    showProgress
+                    variant={style}
+                />
+            )}
+        />
+    ),
+}
